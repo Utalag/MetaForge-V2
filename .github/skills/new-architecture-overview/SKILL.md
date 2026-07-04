@@ -52,27 +52,44 @@ Vstupní bod do celé `New_Architecture/` dokumentace. Poskytuje mapu skillů, r
 | Úkol | Skill |
 |------|-------|
 | Orientace, výběr skillu | `new-architecture-overview` |
-| Core typy, elementy, DataType, TypeModel | `new-architecture-core` |
-| BusinessAuthoringDocument, CommandLog | `new-architecture-business-model` |
-| Facade, projekce, write-back | `new-architecture-translator` |
-| AI integrace, fallback, provider | `new-architecture-ai` |
-| CSharpGenerator, code export | `new-architecture-generators` |
-| Persistence, soubory, JSON | `new-architecture-infrastructure` |
-| CLI, MCP, WebApi | `new-architecture-host-surfaces` |
+| Core typy, elementy, DataType, TypeModel, StrongType, Expression | `new-architecture-core` |
+| BusinessAuthoringDocument, CommandLog, PatchEngine, Replay | `new-architecture-business-model` |
+| Facade, Projection, WriteBack, AI Translator | `new-architecture-translator` |
+| AI integrace, Ollama, PromptRegistry, fallback | `new-architecture-ai` |
+| CSharpGenerator, code export, monetizace, Scriban šablony | `new-architecture-generators` |
+| Persistence, JSONL, konfigurace, caching | `new-architecture-infrastructure` |
+| CLI, MCP, WebApi, REPL | `new-architecture-host-surfaces` |
+| ForgeBlock balíky, EF Core, AutoMapper, marketplace, NuGet | `new-architecture-forgeblocks` |
 | DI registrace, Composition Root | `new-architecture-di-composition` |
 | Exception handling, logging | `new-architecture-error-handling` |
-| Test helpers, test scénáře | `new-architecture-test-scaffold` |
+| Test helpers, FsCheck, Verify snapshoty | `new-architecture-test-scaffold` |
 | Vytvoření projektu, složek | `new-architecture-scaffold` |
+| Schema migrace, health checks, validace, sandbox | `new-architecture-security-stability` |
 
-## Návaznosti mezi dokumenty
+## Návaznosti mezi vrstvami
 
 ```
 03-06 Core ← 07 BusinessModel ← 08 Translator ← 09 AI Layer
                                         ↓
                              10 Generators   11 Infrastructure
+                                        ↓        ↓
+                             27 ForgeBlocks   12 Host Surfaces
                                         ↓
-                                  12 Host Surfaces
+                                  28 Skills/Hooks
+                                        ↓
+                              20 Security   21 Telemetry
+                                        ↓
+                            PROP-030 Schema migrace, Health
 ```
+
+## Plánovací dokumenty
+
+| Soubor | Role |
+|--------|------|
+| `PROPOSALS.md` | Schválené návrhy v implementaci |
+| `PROPOSALS_NEXT.md` | Kandidátní návrhy — neimplementovat bez schválení |
+| `Docs/Plans/PROP-XXX-*.md` | Detailní plány jednotlivých návrhů |
+| `Docs/Plans/Implementation-Roadmap.md` | Autoritativní pořadí implementace — fáze a závislosti |
 
 ## Výstupní checklist
 
