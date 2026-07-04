@@ -1,0 +1,356 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Ai\\MetaForge.Ai.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Ai\\MetaForge.Ai.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Ai\\MetaForge.Ai.csproj",
+        "projectName": "MetaForge.Ai",
+        "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Ai\\MetaForge.Ai.csproj",
+        "packagesPath": "C:\\Users\\Utalag\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Ai\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Utalag\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "framework": "net9.0",
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\MetaForge.Core.csproj": {
+                "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\MetaForge.Core.csproj"
+              },
+              "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Translator\\MetaForge.Translator.csproj": {
+                "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Translator\\MetaForge.Translator.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "framework": "net9.0",
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.Extensions.DependencyInjection.Abstractions": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.16, 9.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.16, 9.0.16]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[9.0.16, 9.0.16]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.BusinessModel\\MetaForge.BusinessModel.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.BusinessModel\\MetaForge.BusinessModel.csproj",
+        "projectName": "MetaForge.BusinessModel",
+        "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.BusinessModel\\MetaForge.BusinessModel.csproj",
+        "packagesPath": "C:\\Users\\Utalag\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.BusinessModel\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Utalag\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "framework": "net9.0",
+            "targetAlias": "net9.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "framework": "net9.0",
+          "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.16, 9.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.16, 9.0.16]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[9.0.16, 9.0.16]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\MetaForge.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\MetaForge.Core.csproj",
+        "projectName": "MetaForge.Core",
+        "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\MetaForge.Core.csproj",
+        "packagesPath": "C:\\Users\\Utalag\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Utalag\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "framework": "net9.0",
+            "targetAlias": "net9.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "framework": "net9.0",
+          "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.16, 9.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.16, 9.0.16]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[9.0.16, 9.0.16]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Translator\\MetaForge.Translator.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Translator\\MetaForge.Translator.csproj",
+        "projectName": "MetaForge.Translator",
+        "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Translator\\MetaForge.Translator.csproj",
+        "packagesPath": "C:\\Users\\Utalag\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Translator\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Utalag\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "framework": "net9.0",
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.BusinessModel\\MetaForge.BusinessModel.csproj": {
+                "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.BusinessModel\\MetaForge.BusinessModel.csproj"
+              },
+              "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\MetaForge.Core.csproj": {
+                "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\MetaForge.Core.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "framework": "net9.0",
+          "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.16, 9.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.16, 9.0.16]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[9.0.16, 9.0.16]"
+            }
+          ],
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

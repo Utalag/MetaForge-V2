@@ -1,10 +1,17 @@
 <Solution>
   <Folder Name="/Src/">
+    <Project Path="Src/MetaForge.Ai/MetaForge.Ai.csproj" />
     <Project Path="Src/MetaForge.BusinessModel/MetaForge.BusinessModel.csproj" />
     <Project Path="Src/MetaForge.Core/MetaForge.Core.csproj" />
     <Project Path="Src/MetaForge.Mcp/MetaForge.Mcp.csproj" />
     <Project Path="Src/MetaForge.Translator/MetaForge.Translator.csproj" />
     <Project Path="Src/MetaForge.Cli/MetaForge.Cli.csproj" />
+    <Project Path="Src/MetaForge.Generators/MetaForge.Generators.csproj" />
+  </Folder>
+  <Folder Name="/Src/ForgeBlocks/">
+    <Project Path="Src/ForgeBlocks/Math/MetaForge.ForgeBlocks.Math.csproj" />
+    <Project Path="Src/ForgeBlocks/String/MetaForge.ForgeBlocks.String.csproj" />
+    <Project Path="Src/ForgeBlocks/Validation/MetaForge.ForgeBlocks.Validation.csproj" />
   </Folder>
   <Folder Name="/Tests/">
   </Folder>
