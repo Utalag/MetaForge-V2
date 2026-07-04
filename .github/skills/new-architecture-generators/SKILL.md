@@ -102,6 +102,16 @@ RootElement → BaseCodeGenerator.Generate()
 - ❌ LanguageMapping používaný jako aktivní generátor
 - ❌ Generátor závislý na BusinessModel (může číst jen Core elementy)
 - ❌ Generovaný kód, který není kompilabilní
+- ❌ `sealed class` pro generátory, které se mají rozšiřovat — `CodeGenerator` byl `sealed`, musel být změněn na `class` pro `TieredCodeGenerator`. Zvaž kompozici. (4.7.2026, PROP-025 #6)
+- ❌ Hardcodované limity — `IncrementalCodeGenerator.GetMaxEntities()` vrací 3 místo čtení z `GeneratorLicense`. (4.7.2026, PROP-025 #5)
+
+## Lessons Learned (z Code Review Fáze 2)
+
+| # | Lekce |
+|---|-------|
+| L1 | **Monetizační model = single source of truth** — `GeneratorLicense` definuje limity, generátory je musí číst. |
+| L2 | **sealed brání rozšiřitelnosti** — pro extendovatelné generátory nepoužívat `sealed`. |
+| L3 | **Scriban šablony musí reflektovat Element properties** — `IsRecord` na `ClassElement` vyžaduje `is_record` v `Class.scriban`. |
 
 ## Výstupní checklist
 
