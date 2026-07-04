@@ -22,6 +22,9 @@ public sealed class ClassElement : RootElement
     public bool IsStatic { get; set; }
     public bool IsPartial { get; set; }
 
+    /// <summary>Určuje, zda je třída record class (C# 9+).</summary>
+    public bool IsRecord { get; set; }
+
     /// <summary>Vlastnosti (property) třídy.</summary>
     public List<PropertyElement> Properties { get; } = new();
 

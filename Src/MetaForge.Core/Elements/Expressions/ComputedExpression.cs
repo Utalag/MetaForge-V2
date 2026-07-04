@@ -6,6 +6,7 @@ namespace MetaForge.Core.Elements.Expressions;
 public sealed class ComputedExpression : Expression
 {
     public override string Kind => "Computed";
+    public override ExpressionKind ExpressionKind => ExpressionKind.Computed;
 
     /// <summary>Sémantická operace.</summary>
     public ComputedOperation Operation { get; set; } = new("identity", "Identita");

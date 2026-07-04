@@ -1,0 +1,29 @@
+{{~ ## C# Class Scriban Template ~}}
+{{~ ## Generuje kompletní C# třídu s usingy, atributy, properties a metodami ~}}
+
+{{~ ## Usingy ~}}
+{{- for using in usings -}}
+using {{ using }};
+{{- end }}
+{{- if usings.size > 0 }}
+
+{{- end }}
+{{~ ## Atributy ~}}
+{{- for attribute in attributes -}}
+{{ attribute }}
+{{- end }}
+{{~ ## Deklarace třídy ~}}
+{{ access_modifier }}{{ if is_static }} static{{ end }}{{ if is_abstract }} abstract{{ end }}{{ if is_sealed }} sealed{{ end }}{{ if is_partial }} partial{{ end }}{{ if is_record }} record{{ end }} class {{ name }}{{ if inheritance }} : {{ inheritance }}{{ end }}
+{
+{{~ ## Properties ~}}
+{{- for property in properties -}}
+    {{ property }}
+{{- end }}
+{{- if properties.size > 0 && methods.size > 0 }}
+
+{{- end }}
+{{~ ## Metody ~}}
+{{- for method in methods -}}
+    {{ method }}
+{{- end }}
+}

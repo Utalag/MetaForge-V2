@@ -1,15 +1,17 @@
 using System.Collections.Concurrent;
+using MetaForge.Core.ValueObjects;
 
 namespace MetaForge.Core.Catalog;
 
 /// <summary>
 /// Centrální správce katalogu — thread-safe, agreguje všechny ICatalogProvider.
-/// Registrace presetů, vyhledávání, resolve typů.
+/// Registrace presetů, vyhledávání, resolve typů, StrongType registry.
 /// </summary>
 public sealed class CatalogManager
 {
     private readonly List<ICatalogProvider> _providers = new();
     private readonly ConcurrentDictionary<string, PresetDefinition> _customPresets = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, StrongType> _strongTypes = new(StringComparer.OrdinalIgnoreCase);
     private readonly object _providersLock = new();
 
     /// <summary>Zaregistruje catalog providera (built-in, filesystem, marketplace).</summary>
@@ -25,6 +27,24 @@ public sealed class CatalogManager
     public void RegisterPreset(PresetDefinition preset)
     {
         _customPresets[preset.Name] = preset; // ConcurrentDictionary, bezpečné
+    }
+
+    /// <summary>Zaregistruje doménový StrongType (např. Money, Email, PhoneNumber).</summary>
+    public void RegisterStrongType(StrongType strongType)
+    {
+        _strongTypes[strongType.Name] = strongType;
+    }
+
+    /// <summary>Vyhledá StrongType podle názvu (case-insensitive). Vrací null pokud neexistuje.</summary>
+    public StrongType? ResolveStrongType(string typeName)
+    {
+        return _strongTypes.TryGetValue(typeName, out var strongType) ? strongType : null;
+    }
+
+    /// <summary>Vrátí všechny registrované StrongType.</summary>
+    public IReadOnlyList<StrongType> GetAllStrongTypes()
+    {
+        return _strongTypes.Values.ToList().AsReadOnly();
     }
 
     /// <summary>Vyhledá typ podle názvu — prohledá custom presety, pak providery.</summary>

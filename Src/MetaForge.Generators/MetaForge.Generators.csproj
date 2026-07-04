@@ -7,5 +7,15 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\MetaForge.Core\MetaForge.Core.csproj" />
+    <ProjectReference Include="..\MetaForge.BusinessModel\MetaForge.BusinessModel.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Scriban" Version="7.2.5" />
+  </ItemGroup>
+  <!-- Kopíruj .scriban šablony do output adresáře -->
+  <ItemGroup>
+    <None Update="Templates\*.scriban">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

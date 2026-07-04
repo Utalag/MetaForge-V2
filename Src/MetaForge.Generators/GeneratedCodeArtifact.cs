@@ -6,6 +6,5 @@ namespace MetaForge.Generators;
 public sealed record GeneratedCodeArtifact(
     string FileName,
     string SourceCode,
-    string LanguageId,
     IReadOnlyList<DiagnosticInfo>? Diagnostics = null
 );
