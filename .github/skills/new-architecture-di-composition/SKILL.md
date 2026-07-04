@@ -95,6 +95,14 @@ var facade = app.Services.GetRequiredService<BusinessAuthoringHostFacade>();
 - ❌ BusinessModel služby jako Singleton (nesdílet stav mezi requesty)
 - ❌ Host-specific služby registrované v nesprávném host projektu
 - ❌ Konfigurační hodnoty hardcodované místo appsettings.json
+- ❌ `AddSingleton` v extension metodách pro DI registraci — při vícenásobném volání způsobí duplicitní registrace. **Vždy používat `TryAddSingleton`/`TryAddScoped`/`TryAddTransient` v `Add*` extension metodách.** (Zjištěno 4.7.2026, PROP-028 Issue #1)
+
+## Lessons Learned (z Code Review)
+
+| # | Lekce | Dopad |
+|---|-------|-------|
+| L1 | **Extension metody pro DI musí používat `TryAdd*`** — `services.AddMetaForgeInfrastructure()` voláno dvakrát → duplicitní registrace. Použít `services.TryAddSingleton<T>()` (z `Microsoft.Extensions.DependencyInjection.Extensions`). | PROP-028 Issue #1 |
+| L2 | **AI služby musí být součástí DI registrace** — `AddMetaForgeAi()` neregistruje `PromptRegistry` a `PromptEvaluationService`. Každá nová služba přidaná do projektu musí být součástí `Add*` metody. | PROP-027 Issue #3 |
 
 ## Výstupní checklist
 
@@ -103,3 +111,4 @@ var facade = app.Services.GetRequiredService<BusinessAuthoringHostFacade>();
 - [ ] appsettings.json existuje a obsahuje správnou strukturu
 - [ ] AI konfigurace je volitelná (Provider: "None" = vypnuto)
 - [ ] Žádné captive dependency
+- [ ] Extension metody používají `TryAdd*` (ne holé `Add*`)

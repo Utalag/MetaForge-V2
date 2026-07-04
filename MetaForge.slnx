@@ -3,6 +3,7 @@
     <Project Path="Src/MetaForge.Ai/MetaForge.Ai.csproj" />
     <Project Path="Src/MetaForge.BusinessModel/MetaForge.BusinessModel.csproj" />
     <Project Path="Src/MetaForge.Core/MetaForge.Core.csproj" />
+    <Project Path="Src/MetaForge.Infrastructure/MetaForge.Infrastructure.csproj" />
     <Project Path="Src/MetaForge.Mcp/MetaForge.Mcp.csproj" />
     <Project Path="Src/MetaForge.Translator/MetaForge.Translator.csproj" />
     <Project Path="Src/MetaForge.Cli/MetaForge.Cli.csproj" />

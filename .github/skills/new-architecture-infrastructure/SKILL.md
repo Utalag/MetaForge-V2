@@ -85,6 +85,15 @@ builder.Services.AddSingleton<ICommandLogRepository, InMemoryCommandLogRepositor
 - ❌ BusinessModel obsahující logiku ukládání (using System.IO)
 - ❌ CommandLogRepository umožňující mazání nebo úpravu záznamů
 - ❌ JSON serializace cyklických referencí (BusinessAuthoringDocument je strom)
+- ❌ Synchronní I/O v `async` metodách — `File.AppendAllText` uvnitř `lock` vracející `Task.CompletedTask`. Není to skutečně async. Pro produkci použít `await File.AppendAllTextAsync` (pokud dostupné) nebo `Task.Run`.
+
+## Lessons Learned (z Code Review)
+
+| # | Lekce | Dopad |
+|---|-------|-------|
+| L1 | **InMemory repository musí být thread-safe** — `InMemoryCommandLogRepository` bez `lock` není bezpečný pro paralelní testy. Vždy přidat `lock` na `List<T>` operace. | Opraveno 4.7.2026 |
+| L2 | **Async metody musí dělat async I/O** — `AppendAsync` volající synchronní `File.AppendAllText` blokuje vlákno. Pro MVP akceptovatelné, pro produkci nutno předělat. | PROP-028 Issue #2 |
+| L3 | **FileSystemProvider jako otevřená třída** — `sealed` + `virtual` = chyba kompilace. Pro mockování musí být třída `public class` (ne `sealed`). | Opraveno 4.7.2026 |
 
 ## Výstupní checklist
 
