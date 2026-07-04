@@ -1,0 +1,16 @@
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\bin\Debug\net10.0\MetaForge.ForgeBlocks.Validation.deps.json
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\bin\Debug\net10.0\MetaForge.ForgeBlocks.Validation.dll
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\bin\Debug\net10.0\MetaForge.ForgeBlocks.Validation.pdb
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\bin\Debug\net10.0\MetaForge.Core.dll
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\bin\Debug\net10.0\MetaForge.Core.pdb
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\obj\Debug\net10.0\MetaForge.ForgeBlocks.Validation.csproj.AssemblyReference.cache
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\obj\Debug\net10.0\MetaForge.ForgeBlocks.Validation.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\obj\Debug\net10.0\MetaForge.ForgeBlocks.Validation.AssemblyInfoInputs.cache
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\obj\Debug\net10.0\MetaForge.ForgeBlocks.Validation.AssemblyInfo.cs
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\obj\Debug\net10.0\MetaForge.ForgeBlocks.Validation.csproj.CoreCompileInputs.cache
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\obj\Debug\net10.0\MetaForge.ForgeBlocks.Validation.sourcelink.json
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\obj\Debug\net10.0\MetaForg.BC7CCC47.Up2Date
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\obj\Debug\net10.0\MetaForge.ForgeBlocks.Validation.dll
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\obj\Debug\net10.0\refint\MetaForge.ForgeBlocks.Validation.dll
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\obj\Debug\net10.0\MetaForge.ForgeBlocks.Validation.pdb
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\Validation\obj\Debug\net10.0\ref\MetaForge.ForgeBlocks.Validation.dll

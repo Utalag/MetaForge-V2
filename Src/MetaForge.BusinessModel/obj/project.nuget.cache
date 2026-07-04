@@ -1,12 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "a04nITpkKUQ=",
+  "dgSpecHash": "CiybRnz9c8c=",
   "success": true,
   "projectFilePath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.BusinessModel\\MetaForge.BusinessModel.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\Utalag\\.nuget\\packages\\microsoft.netcore.app.ref\\9.0.16\\microsoft.netcore.app.ref.9.0.16.nupkg.sha512",
-    "C:\\Users\\Utalag\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\9.0.16\\microsoft.windowsdesktop.app.ref.9.0.16.nupkg.sha512",
-    "C:\\Users\\Utalag\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\9.0.16\\microsoft.aspnetcore.app.ref.9.0.16.nupkg.sha512"
-  ],
+  "expectedPackageFiles": [],
   "logs": []
 }

@@ -14,5 +14,9 @@
     <Project Path="Src/ForgeBlocks/Validation/MetaForge.ForgeBlocks.Validation.csproj" />
   </Folder>
   <Folder Name="/Tests/">
+    <Project Path="Tests/MetaForge.Core.Tests/MetaForge.Core.Tests.csproj" />
+    <Project Path="Tests/MetaForge.BusinessModel.Tests/MetaForge.BusinessModel.Tests.csproj" />
+    <Project Path="Tests/MetaForge.Translator.Tests/MetaForge.Translator.Tests.csproj" />
+    <Project Path="Tests/MetaForge.Generators.Tests/MetaForge.Generators.Tests.csproj" />
   </Folder>
 </Solution>

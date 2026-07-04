@@ -1,0 +1,16 @@
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\bin\Debug\net10.0\MetaForge.ForgeBlocks.String.deps.json
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\bin\Debug\net10.0\MetaForge.ForgeBlocks.String.dll
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\bin\Debug\net10.0\MetaForge.ForgeBlocks.String.pdb
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\bin\Debug\net10.0\MetaForge.Core.dll
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\bin\Debug\net10.0\MetaForge.Core.pdb
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\obj\Debug\net10.0\MetaForge.ForgeBlocks.String.csproj.AssemblyReference.cache
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\obj\Debug\net10.0\MetaForge.ForgeBlocks.String.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\obj\Debug\net10.0\MetaForge.ForgeBlocks.String.AssemblyInfoInputs.cache
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\obj\Debug\net10.0\MetaForge.ForgeBlocks.String.AssemblyInfo.cs
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\obj\Debug\net10.0\MetaForge.ForgeBlocks.String.csproj.CoreCompileInputs.cache
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\obj\Debug\net10.0\MetaForge.ForgeBlocks.String.sourcelink.json
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\obj\Debug\net10.0\MetaForg.238A5994.Up2Date
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\obj\Debug\net10.0\MetaForge.ForgeBlocks.String.dll
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\obj\Debug\net10.0\refint\MetaForge.ForgeBlocks.String.dll
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\obj\Debug\net10.0\MetaForge.ForgeBlocks.String.pdb
+C:\Users\Utalag\Documents\source-git\MetaForge-V2\Src\ForgeBlocks\String\obj\Debug\net10.0\ref\MetaForge.ForgeBlocks.String.dll

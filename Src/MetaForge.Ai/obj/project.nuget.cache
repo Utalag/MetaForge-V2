@@ -1,13 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "ODq6E75Ev98=",
+  "dgSpecHash": "OlcDG/oh7jM=",
   "success": true,
   "projectFilePath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Ai\\MetaForge.Ai.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Utalag\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\9.0.0\\microsoft.extensions.dependencyinjection.abstractions.9.0.0.nupkg.sha512",
-    "C:\\Users\\Utalag\\.nuget\\packages\\microsoft.netcore.app.ref\\9.0.16\\microsoft.netcore.app.ref.9.0.16.nupkg.sha512",
-    "C:\\Users\\Utalag\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\9.0.16\\microsoft.windowsdesktop.app.ref.9.0.16.nupkg.sha512",
-    "C:\\Users\\Utalag\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\9.0.16\\microsoft.aspnetcore.app.ref.9.0.16.nupkg.sha512"
+    "C:\\Users\\Utalag\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\9.0.0\\microsoft.extensions.dependencyinjection.abstractions.9.0.0.nupkg.sha512"
   ],
   "logs": []
 }
