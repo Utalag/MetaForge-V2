@@ -92,6 +92,14 @@ builder.Services.AddSingleton<IConstraintInferencer, RuleBasedConstraintInferenc
 - ❌ AI kontrakty definované v MetaForge.Ai (patří do Core/Translator)
 - ❌ Tier 2 AI vracející volný text pro uživatele
 - ❌ AI volaná bez kontextu (synchronizovaného stavu)
+- ❌ Nové AI služby nepřidané do `AddMetaForgeAi()` — `PromptRegistry` a `PromptEvaluationService` musí být součástí DI registrace. (Zjištěno 4.7.2026, PROP-027 Issue #3)
+
+## Lessons Learned (z Code Review)
+
+| # | Lekce | Dopad |
+|---|-------|-------|
+| L1 | **Každá nová služba v projektu musí být v `Add*` metodě** — `AddMetaForgeAi()` neregistruje `PromptRegistry`/`PromptEvaluationService`. Po přidání nové třídy do projektu vždy zkontrolovat, zda je součástí DI registrace. | PROP-027 Issue #3 |
+| L2 | **PromptRegistry parsování je křehké** — regex pro YAML frontmatter a Markdown nadpisy může selhat na komplexních promptech. Pro MVP akceptovatelné, pro produkci zvážit YAML parser (YamlDotNet). | Nízká priorita |
 
 ## Výstupní checklist
 

@@ -4,6 +4,7 @@ using MetaForge.Ai.Adapters;
 using MetaForge.Ai.Inference;
 using MetaForge.Ai.Translation;
 using MetaForge.Core.Inference;
+using MetaForge.Translator.Translation;
 
 namespace MetaForge.Ai;
 
@@ -27,7 +28,7 @@ public static class AiServiceRegistration
 
         // AI implementace — nahradí deterministické fallbacky
         services.AddSingleton<IConstraintInferencer, AiConstraintInferencer>();
-        services.AddSingleton<AiTranslationService>();
+        services.AddSingleton<ITranslationService, AiTranslationService>();
 
         return services;
     }

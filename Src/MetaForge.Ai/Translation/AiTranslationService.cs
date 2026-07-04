@@ -9,7 +9,7 @@ namespace MetaForge.Ai.Translation;
 /// AI implementace enrichmentu — používá AI pro hlubší analýzu atributů.
 /// Při selhání vrací null (graceful fallback na deterministický DefaultBusinessTranslator).
 /// </summary>
-public sealed class AiTranslationService
+public sealed class AiTranslationService : ITranslationService
 {
     private readonly IAiBackendAdapter _backend;
 
