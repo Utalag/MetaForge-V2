@@ -50,6 +50,11 @@
 | 6 | 4.7.2026 | PROP-025 | `CodeGenerator.cs` | ⚠️ Nízká | `CodeGenerator` změněn z `sealed` na `class` kvůli dědičnosti `TieredCodeGenerator`. To umožňuje nechtěné přepsání metod. | Zvážit kompozici místo dědičnosti (např. `TieredCodeGenerator` wrapuje `CodeGenerator`). |
 | 7 | 4.7.2026 | PROP-019 | `OllamaAiTranslator.cs` | ⚠️ Nízká | Duplikuje logiku z `MetaForge.Ai/Adapters/OllamaAdapter` — oba volají Ollama HTTP API. | PROP-019 explicitně volí Variantu A (přímé volání). Až bude MetaForge.Ai stabilní, sjednotit. |
 | 8 | 4.7.2026 | PROP-019 | `DefaultBusinessTranslator.cs` | ⚠️ Nízká | `TryEnrichAsync` je nová async metoda, ale `IBusinessTranslator` má jen synchronní `TryEnrich`. Volající musí explicitně používat async verzi. | Přidat `TryEnrichAsync` do `IBusinessTranslator` nebo vytvořit `IAsyncBusinessTranslator`. |
+| 9 | 4.7.2026 | PROP-026 | `Program.cs` (CLI) | ⚠️ Nízká | CLI používá `Host.CreateApplicationBuilder` a DI scoped služby, ale command handlery jsou statické lambda. `GetFacade()` vytváří nový scope? Ne — používá root IServiceProvider. | Zvážit vytvoření scope per command, nebo použít singleton pro Facade. |
+| 10 | 4.7.2026 | PROP-029 | `EfCoreForgeBlock.cs` | ⚠️ Nízká | `RequiredTier` je custom property na ForgeBlocku, ale `IForgeBlockCapabilityPackage` ho nedefinuje. Není vynucováno kompilátorem. | Přidat `RequiredTier` do `IForgeBlockCapabilityPackage` nebo použít atribut. |
+| 11 | 4.7.2026 | PROP-029 | ForgeBlock projekty | ⚠️ Nízká | Nové ForgeBlocky (EF Core, AutoMapper, FluentValidation) nemají Scriban šablony — jen metadata. Generování kódu bude v budoucnu. | Implementovat šablony v další iteraci. |
+| 12 | 4.7.2026 | PROP-030 | `ReplayEngine.cs` | ⚠️ Střední | `CommandMigrationEngine` není integrován do `ReplayEngine` — migrace se musí volat ručně před replayem. | Přidat `CommandMigrationEngine` jako závislost `ReplayEngine` a volat automaticky. |
+| 13 | 4.7.2026 | PROP-022 | `BusinessDocumentDiffer.cs` | ⚠️ Nízká | Diff porovnává jen entity a atributy (Add/Remove). Nezachycuje změny vlastností (Modify), relace, workflow. | Rozšířit diff o detekci Modified a další typy uzlů. |
 
 ---
 

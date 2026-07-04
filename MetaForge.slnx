@@ -13,6 +13,9 @@
     <Project Path="Src/ForgeBlocks/Math/MetaForge.ForgeBlocks.Math.csproj" />
     <Project Path="Src/ForgeBlocks/String/MetaForge.ForgeBlocks.String.csproj" />
     <Project Path="Src/ForgeBlocks/Validation/MetaForge.ForgeBlocks.Validation.csproj" />
+    <Project Path="Src/ForgeBlocks/AutoMapper/MetaForge.ForgeBlocks.AutoMapper.csproj" />
+    <Project Path="Src/ForgeBlocks/EntityFramework/MetaForge.ForgeBlocks.EntityFrameworkCore.csproj" />
+    <Project Path="Src/ForgeBlocks/FluentValidation/MetaForge.ForgeBlocks.FluentValidation.csproj" />
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="Tests/MetaForge.Core.Tests/MetaForge.Core.Tests.csproj" />

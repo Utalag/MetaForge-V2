@@ -36,7 +36,7 @@
 |---|--------|-------|------|
 | 10 | `10-Generators.md` | CodeGenerator, Scriban šablony, ExpressionRenderer, Packaging | ✅ |
 | 11 | `11-Infrastructure.md` | Persistence (JSONL), IOptions konfigurace, checkpoint caching, FileSystem | ✅ *(PROP-028)* |
-| 12 | `12-Host-Surfaces.md` | CLI, MCP, WebApi — tenké host vrstvy bez business logiky | ✅ |
+| 12 | `12-Host-Surfaces.md` | CLI (System.CommandLine + Spectre.Console), MCP (JSON-RPC + discovery), WebApi (neimplementováno) | ✅ *(PROP-026)* |
 | 29 | `29-Monetization.md` | Kreditový systém, tier licence, MCP-ready billing gate | ✅ |
 
 ### Plánování a proces

@@ -10,13 +10,6 @@
 
 | ID | Název | Stav | Odhad | Fáze | Odkaz |
 |----|-------|------|-------|------|-------|
-| **FÁZE 3 — Host + Ekosystém** | | | | |
-| PROP-026 | Host Surfaces — CLI/MCP/WebApi/REPL | 🟢 Schváleno | 7,5 dne | Fáze 3a | [Docs/Plans/PROP-026-Host-Surfaces-CLI-MCP-WebApi-REPL.md](Docs/Plans/PROP-026-Host-Surfaces-CLI-MCP-WebApi-REPL.md) |
-| PROP-029 | ForgeBlocks — EF Core, AutoMapper, marketplace | 🟢 Schváleno | 8 dní | Fáze 3b | [Docs/Plans/PROP-029-ForgeBlocks-Expansion-Marketplace.md](Docs/Plans/PROP-029-ForgeBlocks-Expansion-Marketplace.md) |
-| **FÁZE 4 — Kvalita a stabilita** | | | | |
-| PROP-030 | Bezpečnost — schema migrace, validace, health | 🟢 Schváleno | 4 dny | Fáze 4a | [Docs/Plans/PROP-030-Security-Stability-Schema-Validation-Health.md](Docs/Plans/PROP-030-Security-Stability-Schema-Validation-Health.md) |
-| PROP-021 | Testování — FsCheck property + Verify snapshot | 🟢 Schváleno | 1,75 dne | Fáze 4b | [Docs/Plans/PROP-021-Tests-PropertyBased-Snapshot.md](Docs/Plans/PROP-021-Tests-PropertyBased-Snapshot.md) |
-| PROP-022 | Observabilita — OpenTelemetry, BusinessModel diff | 🟢 Schváleno | 2,5 dne | Fáze 4c | [Docs/Plans/PROP-022-Observability-Tracing-Diff.md](Docs/Plans/PROP-022-Observability-Tracing-Diff.md) |
 | **BUDOUCNOST — na zvážení** | | | | |
 | PROP-023 | DX vylepšení — Typový SyncState, Layer stack, YAML DSL, Undo/redo | ⚪ Na zvážení | 5-9 dní | ∞ | [Docs/Plans/PROP-023-DX-Architecture-Improvements-Future.md](Docs/Plans/PROP-023-DX-Architecture-Improvements-Future.md) |
 
@@ -39,6 +32,11 @@
 | PROP-028 | Infrastructure — persistence, config, caching | 2026-07-04 | [Docs/Plans/PROP-028-Infrastructure-Persistence-Config-Cache.md](Docs/Plans/PROP-028-Infrastructure-Persistence-Config-Cache.md) |
 | PROP-019 | Translator — AI enrichment (IAiTranslator) | 2026-07-04 | [Docs/Plans/PROP-019-Translator-AiTranslator.md](Docs/Plans/PROP-019-Translator-AiTranslator.md) |
 | PROP-025 | Generators — Incremental, monetizace, scaffold | 2026-07-04 | [Docs/Plans/PROP-025-Generators-Incremental-Monetization.md](Docs/Plans/PROP-025-Generators-Incremental-Monetization.md) |
+| PROP-026 | Host Surfaces — CLI upgrade, MCP discovery | 2026-07-04 | [Docs/Plans/PROP-026-Host-Surfaces-CLI-MCP-WebApi-REPL.md](Docs/Plans/PROP-026-Host-Surfaces-CLI-MCP-WebApi-REPL.md) |
+| PROP-029 | ForgeBlocks — EF Core, AutoMapper, FluentValidation | 2026-07-04 | [Docs/Plans/PROP-029-ForgeBlocks-Expansion-Marketplace.md](Docs/Plans/PROP-029-ForgeBlocks-Expansion-Marketplace.md) |
+| PROP-030 | Bezpečnost — schema migrace, validace, health | 2026-07-04 | [Docs/Plans/PROP-030-Security-Stability-Schema-Validation-Health.md](Docs/Plans/PROP-030-Security-Stability-Schema-Validation-Health.md) |
+| PROP-021 | Testování — FsCheck property + Verify snapshot | 2026-07-04 | [Docs/Plans/PROP-021-Tests-PropertyBased-Snapshot.md](Docs/Plans/PROP-021-Tests-PropertyBased-Snapshot.md) |
+| PROP-022 | Observabilita — OpenTelemetry, BusinessModel diff | 2026-07-04 | [Docs/Plans/PROP-022-Observability-Tracing-Diff.md](Docs/Plans/PROP-022-Observability-Tracing-Diff.md) |
 
 ## Zamítnuté návrhy
 

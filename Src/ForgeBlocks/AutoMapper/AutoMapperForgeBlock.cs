@@ -1,0 +1,49 @@
+using MetaForge.Core.ForgeBlockPackages;
+using MetaForge.Generators.Monetization;
+
+namespace MetaForge.ForgeBlocks.AutoMapper;
+
+/// <summary>
+/// ForgeBlock pro AutoMapper — generuje Profile třídy a mapping konfiguraci.
+/// TIER 1+ (Domain).
+/// </summary>
+public sealed class AutoMapperForgeBlock : IForgeBlockCapabilityPackage
+{
+    public string Handle => "mapping-automapper";
+    public string Version => "1.0.0";
+
+    public IReadOnlyList<ForgeBlockCapability> Capabilities { get; } = new List<ForgeBlockCapability>
+    {
+        new("generate-mapping-profile", "Generuje MappingProfile", "Vygeneruje AutoMapper Profile s mapováním entit na DTO", new[] { "mapping", "automapper", "dto" }),
+        new("generate-dto", "Generuje DTO", "Vygeneruje DTO třídy pro každou entitu", new[] { "mapping", "automapper", "dto" }),
+        new("generate-mapping-config", "Generuje MappingConfig", "Vygeneruje konfiguraci AutoMapperu pro DI", new[] { "mapping", "automapper", "config" }),
+    };
+
+    public DiscoveryMetadata Discovery { get; } = new(
+        DisplayName: "AutoMapper",
+        Description: "Generuje AutoMapper Profile třídy, DTO a mapping konfiguraci",
+        Author: "MetaForge Team",
+        Tags: new[] { "mapping", "automapper", "dto", "profile" },
+        Categories: new[] { "Mapping", "Domain" }
+    );
+
+    public ForgeBlockPackageDescriptor Descriptor { get; } = new(
+        Handle: "mapping-automapper",
+        Version: "1.0.0",
+        DisplayName: "AutoMapper",
+        Description: "AutoMapper — Profile, DTO, mapping konfigurace"
+    );
+
+    public IReadOnlyList<ForgeBlockCatalogEntryDescriptor> CatalogEntries { get; } = new List<ForgeBlockCatalogEntryDescriptor>
+    {
+        new("automapper-profile", "AutoMapper Profile — mapování entit na DTO"),
+        new("automapper-dto", "DTO třídy — request/response modely"),
+    };
+
+    public GeneratorTier RequiredTier => GeneratorTier.Domain;
+
+    public void Register(ForgeBlockRegistry registry)
+    {
+        // Balík je již zaregistrován v registru (voláno z ForgeBlockRegistry.Register).
+    }
+}

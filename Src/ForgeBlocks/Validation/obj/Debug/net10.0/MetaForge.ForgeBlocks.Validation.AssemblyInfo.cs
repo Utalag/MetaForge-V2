@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MetaForge.ForgeBlocks.Validation")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8bf2d158c4651e9c83c67ab425f53bb36143c939")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b75a04c07f85bbcf63cf9d7da64c5bff6492a595")]
 [assembly: System.Reflection.AssemblyProductAttribute("MetaForge.ForgeBlocks.Validation")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MetaForge.ForgeBlocks.Validation")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

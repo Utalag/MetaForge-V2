@@ -3,6 +3,73 @@
 > Katalog nejpoužívanějších C#/.NET knihoven vhodných pro zapouzdření jako ForgeBlock balíčky.
 > Každá knihovna je hodnocena z hlediska vhodnosti integrace (capability metadata, codegen, katalog/presety, discovery, host surface).
 
+**Aktualizace:** PROP-029 (2026-07-04) — Implementovány 3 nové ForgeBlocky: AutoMapper, EF Core, FluentValidation. Všechny implementují `IForgeBlockCapabilityPackage` s tier omezením.
+
+---
+
+## Aktuální stav implementace (PROP-029)
+
+| ForgeBlock | Handle | Tier | Stav | Capabilities |
+|---|---|---|---|---|
+| **Math** | `math` | — | ✅ Implementováno (PROP-008) | 8 aritmetických operací |
+| **String** | `string` | — | ✅ Implementováno (PROP-008) | 8 textových operací |
+| **Validation** | `validation` | — | ✅ Implementováno (PROP-008) | 8 validačních operací |
+| **AutoMapper** | `mapping-automapper` | 🟡 Domain (Tier 1+) | ✅ Implementováno (PROP-029) | generate-mapping-profile, generate-dto, generate-mapping-config |
+| **EF Core** | `orm-ef-core` | 🔴 Infrastructure (Tier 2+) | ✅ Implementováno (PROP-029) | generate-dbcontext, generate-entity-config, generate-repository, generate-migration, generate-di |
+| **FluentValidation** | `validation-fluent` | 🔴 Infrastructure (Tier 2+) | ✅ Implementováno (PROP-029) | generate-validator, generate-validation-rules, generate-di |
+
+Všechny ForgeBlocky implementují `IForgeBlockCapabilityPackage` z `MetaForge.Core` a registrují se do `ForgeBlockRegistry`. AutoMapper, EF Core a FluentValidation odkazují `MetaForge.Generators` pro `GeneratorTier` monetizaci.
+
+### Struktura adresářů
+
+```
+Src/ForgeBlocks/
+├── Math/                    ← basic, bez tier omezení
+│   ├── MetaForge.ForgeBlocks.Math.csproj
+│   └── MathForgeBlock.cs
+├── String/                  ← basic, bez tier omezení
+│   ├── MetaForge.ForgeBlocks.String.csproj
+│   └── StringForgeBlock.cs
+├── Validation/              ← basic, bez tier omezení
+│   ├── MetaForge.ForgeBlocks.Validation.csproj
+│   └── ValidationForgeBlock.cs
+├── AutoMapper/              ← Domain tier
+│   ├── MetaForge.ForgeBlocks.AutoMapper.csproj
+│   └── AutoMapperForgeBlock.cs
+├── EntityFramework/         ← Infrastructure tier
+│   ├── MetaForge.ForgeBlocks.EntityFrameworkCore.csproj
+│   └── EfCoreForgeBlock.cs
+└── FluentValidation/        ← Infrastructure tier
+    ├── MetaForge.ForgeBlocks.FluentValidation.csproj
+    └── FluentValidationForgeBlock.cs
+```
+
+### Příklad: EfCoreForgeBlock
+
+```csharp
+public sealed class EfCoreForgeBlock : IForgeBlockCapabilityPackage
+{
+    public string Handle => "orm-ef-core";
+    public string Version => "1.0.0";
+    public ForgeBlockPackageDescriptor Descriptor { get; } = new()
+    {
+        DisplayName = "Entity Framework Core",
+        Description = "Generuje DbContext, entity konfiguraci, migrace a repository vrstvu",
+        Tags = ["orm", "ef-core", "database", "sql", "migration"],
+        Tier = GeneratorTier.Infrastructure,  // ← PAID TIER
+    };
+    public IReadOnlyList<ForgeBlockCapability> Capabilities { get; } = [
+        new("generate-dbcontext", "Generuje AppDbContext s DbSet<T> pro každou entitu"),
+        new("generate-entity-config", "Generuje IEntityTypeConfiguration<T> pro každou entitu"),
+        new("generate-repository", "Generuje repository interface + implementaci"),
+        new("generate-migration", "Generuje EF Core migraci"),
+    ];
+    // ...
+}
+```
+
+Všechny implementované ForgeBlocky jsou **metadata-only** — definují capability a catalog entries, ale negenerují zatím reálný kód (codegen je plánován v PROP-025).
+
 ---
 
 ## Kritéria hodnocení

@@ -1,0 +1,10 @@
+{{~ ## C# Constructor Scriban Template ~}}
+{{~ ## Generuje C# konstruktor s parametry a tělem ~}}
+{{ access_modifier }} {{ class_name }}({{ for param in parameters }}{{ if !for.first }}, {{ end }}{{ param.type }} {{ param.name }}{{ if param.default_value }} = {{ param.default_value }}{{ end }}{{ end }})
+{
+{{- if body }}
+    {{ body }}
+{{- else }}
+    throw new NotImplementedException();
+{{- end }}
+}

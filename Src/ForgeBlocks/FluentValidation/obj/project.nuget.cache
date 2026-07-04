@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "LNDYeJvIfhc=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\ForgeBlocks\\FluentValidation\\MetaForge.ForgeBlocks.FluentValidation.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Utalag\\.nuget\\packages\\scriban\\7.2.5\\scriban.7.2.5.nupkg.sha512"
+  ],
+  "logs": []
+}
