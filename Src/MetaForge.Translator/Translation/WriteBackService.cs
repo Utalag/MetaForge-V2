@@ -5,8 +5,8 @@ using MetaForge.BusinessModel.Patches.Operations;
 namespace MetaForge.Translator.Translation;
 
 /// <summary>
-/// Zapisuje enrichment data zpět do business modelu.
-/// Např. AI zjistí, že "Email" atribut by měl mít MaxLength=254 → zapíše do atributu.
+/// Zapisuje enrichment data zpět do business modelu přes CoreDetail.
+/// Používá SetCoreDetailOp — nikdy nemutuje atribut přímo.
 /// </summary>
 public sealed class WriteBackService
 {
@@ -18,45 +18,41 @@ public sealed class WriteBackService
     }
 
     /// <summary>
-    /// Aplikuje enrichment na atribut v dokumentu.
+    /// Aplikuje enrichment na atribut v dokumentu — vytvoří CoreDetail.
+    /// Vrací nový dokument (immutable pattern).
     /// </summary>
-    public void ApplyEnrichment(BusinessAuthoringDocument document, string entityId, EnrichmentResult enrichment)
+    public BusinessAuthoringDocument ApplyEnrichment(BusinessAuthoringDocument document, string entityId, EnrichmentResult enrichment)
     {
         var entity = document.Entities.FirstOrDefault(e => e.Id == entityId);
         var attr = entity?.Attributes.FirstOrDefault(a => a.Id == enrichment.AttributeId);
-        if (attr is null) return;
+        if (attr is null) return document;
 
-        // Aplikuj enrichment data
-        if (enrichment.MaxLength.HasValue)
-            attr.MaxLength = enrichment.MaxLength;
+        // Vytvoř CoreDetail z enrichment dat
+        var coreDetail = new BusinessAttributeCoreDetail
+        {
+            Source = CoreInfoSource.Generated,
+            ValueObjectName = enrichment.SuggestedCSharpType,
+            LastSyncedAt = DateTimeOffset.UtcNow,
+            SyncState = AttributeSyncState.Synced,
+        };
 
-        if (enrichment.DefaultValue is not null)
-            attr.DefaultValue = enrichment.DefaultValue;
-    }
+        // Použij SetCoreDetailOp pro zápis
+        var coreOp = new SetCoreDetailOp(entityId, enrichment.AttributeId, coreDetail);
+        var newDocument = _patchEngine.Apply(document, coreOp);
 
-    /// <summary>
-    /// Aplikuje enrichment a zaznamená do CommandLog přes PatchEngine.
-    /// </summary>
-    public void ApplyEnrichmentWithLog(BusinessAuthoringDocument document, string entityId, EnrichmentResult enrichment)
-    {
-        var entity = document.Entities.FirstOrDefault(e => e.Id == entityId);
-        if (entity is null) return;
+        // Pokud enrichment obsahuje i změny atributu (MaxLength, DefaultValue), použij UpdateAttributeOp
+        if (enrichment.MaxLength.HasValue || enrichment.DefaultValue is not null)
+        {
+            var attrOp = new UpdateAttributeOp(
+                entityId: entityId,
+                attributeId: enrichment.AttributeId,
+                newName: null,
+                newType: enrichment.SuggestedCSharpType,
+                isRequired: null
+            );
+            newDocument = _patchEngine.Apply(newDocument, attrOp);
+        }
 
-        var attr = entity.Attributes.FirstOrDefault(a => a.Id == enrichment.AttributeId);
-        if (attr is null) return;
-
-        // Vytvoř update operaci
-        var op = new UpdateAttributeOp(
-            entityId: entityId,
-            attributeId: enrichment.AttributeId,
-            newName: null, // neměníme název
-            newType: enrichment.SuggestedCSharpType,
-            isRequired: null
-        );
-
-        _patchEngine.Apply(document, op);
-
-        // Aplikuj enrichment dodatečně
-        ApplyEnrichment(document, entityId, enrichment);
+        return newDocument;
     }
 }

@@ -3,10 +3,12 @@ namespace MetaForge.BusinessModel.CommandLog;
 /// <summary>
 /// Append-only úložiště commandů — thread-safe.
 /// INVARIANT: Count nikdy neklesá. Commandy se nikdy nemažou ani nepřepisují.
+/// Podporuje idempotenci přes MutationId.
 /// </summary>
 public sealed class CommandLogStore
 {
     private readonly List<CommandEnvelope> _commands = new();
+    private readonly HashSet<string> _appliedMutationIds = new();
     private readonly object _lock = new();
 
     /// <summary>Počet commandů v logu. Nikdy neklesá.</summary>
@@ -18,9 +20,23 @@ public sealed class CommandLogStore
     /// </summary>
     public void Append(CommandEnvelope envelope)
     {
+        TryAppend(envelope);
+    }
+
+    /// <summary>
+    /// Přidá command na konec logu s kontrolou idempotence.
+    /// Pokud <see cref="CommandEnvelope.MutationId"/> již existuje, command se ignoruje.
+    /// </summary>
+    /// <returns>true pokud byl command přidán, false pokud již existuje (idempotence).</returns>
+    public bool TryAppend(CommandEnvelope envelope)
+    {
         lock (_lock)
         {
+            if (envelope.MutationId is not null && !_appliedMutationIds.Add(envelope.MutationId))
+                return false; // Idempotentní — již aplikováno
+
             _commands.Add(envelope);
+            return true;
         }
     }
 

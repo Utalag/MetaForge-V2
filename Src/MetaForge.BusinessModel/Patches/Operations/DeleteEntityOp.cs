@@ -4,7 +4,7 @@ using MetaForge.BusinessModel.Models;
 namespace MetaForge.BusinessModel.Patches.Operations;
 
 /// <summary>
-/// Smaže entitu a všechny její relace.
+/// Smaže entitu a všechny její relace (immutable).
 /// </summary>
 public sealed class DeleteEntityOp : IPatchOperation
 {
@@ -16,10 +16,19 @@ public sealed class DeleteEntityOp : IPatchOperation
         EntityId = entityId;
     }
 
-    public void Apply(BusinessAuthoringDocument document)
+    public BusinessAuthoringDocument Apply(BusinessAuthoringDocument document)
     {
-        document.Entities.RemoveAll(e => e.Id == EntityId);
-        document.Relations.RemoveAll(r => r.FromEntityId == EntityId || r.ToEntityId == EntityId);
+        return document with
+        {
+            Entities = document.Entities
+                .Where(e => e.Id != EntityId)
+                .ToList()
+                .AsReadOnly(),
+            Relations = document.Relations
+                .Where(r => r.FromEntityId != EntityId && r.ToEntityId != EntityId)
+                .ToList()
+                .AsReadOnly(),
+        };
     }
 
     public CommandEnvelope ToEnvelope() => new()

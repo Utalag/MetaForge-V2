@@ -1,20 +1,39 @@
 using MetaForge.BusinessModel.Models;
 using MetaForge.Core.Catalog;
 using MetaForge.Core.DataTypes;
+using MetaForge.Translator.Prompting;
+using MetaForge.Translator.Prompting.ModelPrompts;
 
 namespace MetaForge.Translator.Translation;
 
 /// <summary>
 /// Výchozí deterministický překladač — business atribut → TypeModel.
 /// Používá CatalogManager pro resolvování typů.
+/// Podporuje volitelný AI enrichment přes IAiTranslator.
 /// </summary>
 public sealed class DefaultBusinessTranslator : IBusinessTranslator
 {
     private readonly CatalogManager _catalog;
+    private readonly IAiTranslator? _aiTranslator;
 
+    /// <summary>
+    /// Vytvoří překladač bez AI (pouze deterministický).
+    /// </summary>
     public DefaultBusinessTranslator(CatalogManager catalog)
     {
         _catalog = catalog;
+        _aiTranslator = null;
+    }
+
+    /// <summary>
+    /// Vytvoří překladač s volitelným AI enrichmentem.
+    /// </summary>
+    /// <param name="catalog">Katalog typů.</param>
+    /// <param name="aiTranslator">AI překladač — může být null (fallback na deterministický).</param>
+    public DefaultBusinessTranslator(CatalogManager catalog, IAiTranslator? aiTranslator)
+    {
+        _catalog = catalog;
+        _aiTranslator = aiTranslator;
     }
 
     /// <summary>
@@ -96,5 +115,61 @@ public sealed class DefaultBusinessTranslator : IBusinessTranslator
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// AI-assisted enrichment — použije IAiTranslator pro hlubší analýzu.
+    /// Pokud AI není dostupná, vrátí deterministický výsledek.
+    /// </summary>
+    /// <param name="attribute">Atribut k obohacení.</param>
+    /// <param name="siblingAttributes">Názvy ostatních atributů entity (pro kontext).</param>
+    /// <param name="entityName">Název entity (pro kontext).</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>Výsledek enrichmentu, nebo null pokud ani AI ani deterministická cesta nic nenašly.</returns>
+    public async Task<EnrichmentResult?> TryEnrichAsync(
+        BusinessAttributeNode attribute,
+        IEnumerable<string> siblingAttributes,
+        string? entityName = null,
+        CancellationToken ct = default)
+    {
+        // 1. Zkus AI enrichment (pokud je dostupný)
+        if (_aiTranslator is not null)
+        {
+            try
+            {
+                var isAvailable = await _aiTranslator.IsAvailableAsync(ct);
+                if (isAvailable)
+                {
+                    var userPrompt = AuthoringTranslationModelPrompt.BuildUserPrompt(
+                        attribute.Name,
+                        attribute.Type,
+                        siblingAttributes,
+                        entityName);
+
+                    var aiResult = await _aiTranslator.CompleteStructuredAsync<SemanticBriefJson>(
+                        AuthoringTranslationModelPrompt.SystemPrompt,
+                        userPrompt,
+                        ct);
+
+                    if (aiResult is not null && aiResult.Confidence > 0.5)
+                    {
+                        return new EnrichmentResult(
+                            AttributeId: attribute.Id,
+                            SuggestedCSharpType: aiResult.SuggestedType,
+                            ValidationRules: aiResult.ValidationRules,
+                            DefaultValue: aiResult.DefaultValue,
+                            MaxLength: aiResult.MaxLength
+                        );
+                    }
+                }
+            }
+            catch
+            {
+                // Graceful fallback — pokračuj na deterministickou cestu
+            }
+        }
+
+        // 2. Fallback na deterministický enrichment
+        return TryEnrich(attribute);
     }
 }

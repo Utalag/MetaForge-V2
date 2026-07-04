@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MetaForge.BusinessModel")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+56f0fc9c8cb1dd9c39b2aafd04429636b3cc55a8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8bf2d158c4651e9c83c67ab425f53bb36143c939")]
 [assembly: System.Reflection.AssemblyProductAttribute("MetaForge.BusinessModel")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MetaForge.BusinessModel")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,3 +1,5 @@
+using MetaForge.BusinessModel.Models;
+
 namespace MetaForge.BusinessModel.CommandLog;
 
 /// <summary>
@@ -25,5 +27,35 @@ public sealed record CommandEnvelope
     public string Payload { get; init; } = "{}";
 
     /// <summary>Verze schématu commandu (pro budoucí migrace).</summary>
-    public string SchemaVersion { get; init; } = Models.BusinessAuthoringDocument.CurrentSchemaVersion;
+    public string SchemaVersion { get; init; } = BusinessAuthoringDocument.CurrentSchemaVersion;
+
+    // --- Nová pole dle PROP-020 ---
+
+    /// <summary>Identifikátor streamu — pro multi-tenant / multi-project log.</summary>
+    public string StreamId { get; init; } = "default";
+
+    /// <summary>Odkud command přišel (CLI, MCP, Chat, ...).</summary>
+    public CommandSource Source { get; init; } = CommandSource.Unknown;
+
+    /// <summary>Původ informace — ruční, generovaná, hybridní.</summary>
+    public CoreInfoSource InfoSource { get; init; } = CoreInfoSource.Manual;
+
+    /// <summary>Kdo command vydal.</summary>
+    public CommandIssuedBy IssuedBy { get; init; } = new();
+
+    /// <summary>Provenience — metadata o vzniku commandu (model, confidence, ...).</summary>
+    public CommandProvenance Provenance { get; init; } = new();
+
+    /// <summary>Korelační ID — pro sledování souvisejících commandů napříč službami.</summary>
+    public string? CorrelationId { get; init; }
+
+    /// <summary>Kauzační ID — ID commandu, který tento command vyvolal.</summary>
+    public string? CausationId { get; init; }
+
+    /// <summary>
+    /// ID mutace pro idempotenci.
+    /// Pokud je nastaveno, CommandLogStore ignoruje duplicitní commandy se stejným MutationId.
+    /// null = idempotence se nekontroluje (zpětná kompatibilita).
+    /// </summary>
+    public string? MutationId { get; init; }
 }

@@ -4,6 +4,7 @@ namespace MetaForge.BusinessModel.CommandLog;
 
 /// <summary>
 /// Autoritativní rekonstrukce stavu — přehraje commandy a vytvoří BusinessAuthoringDocument.
+/// Používá immutable pattern — každý krok vrací nový dokument.
 /// </summary>
 public sealed class ReplayEngine
 {
@@ -17,7 +18,7 @@ public sealed class ReplayEngine
 
         foreach (var command in commands)
         {
-            ApplyCommand(document, command);
+            document = ApplyCommand(document, command);
         }
 
         return document;
@@ -25,76 +26,85 @@ public sealed class ReplayEngine
 
     /// <summary>
     /// Inkrementální replay — přehraje commandy od startIndex na existující dokument.
+    /// Vrací nový dokument — původní zůstává nezměněn.
     /// </summary>
-    public void ReplayFrom(BusinessAuthoringDocument document, IReadOnlyList<CommandEnvelope> commands, int startIndex)
+    public BusinessAuthoringDocument ReplayFrom(BusinessAuthoringDocument document, IReadOnlyList<CommandEnvelope> commands, int startIndex)
     {
+        var current = document;
+
         for (int i = startIndex; i < commands.Count; i++)
         {
-            ApplyCommand(document, commands[i]);
+            current = ApplyCommand(current, commands[i]);
         }
+
+        return current;
     }
 
-    /// <summary>Aplikuje jeden command na dokument.</summary>
-    private static void ApplyCommand(BusinessAuthoringDocument document, CommandEnvelope command)
+    /// <summary>Aplikuje jeden command na dokument a vrátí nový dokument.</summary>
+    private static BusinessAuthoringDocument ApplyCommand(BusinessAuthoringDocument document, CommandEnvelope command)
     {
-        switch (command.CommandType)
+        var result = command.CommandType switch
         {
-            case "AddEntity":
-                ApplyAddEntity(document, command);
-                break;
-            case "UpdateEntity":
-                ApplyUpdateEntity(document, command);
-                break;
-            case "DeleteEntity":
-                ApplyDeleteEntity(document, command);
-                break;
-            case "AddAttribute":
-                ApplyAddAttribute(document, command);
-                break;
-            case "UpdateAttribute":
-                ApplyUpdateAttribute(document, command);
-                break;
-            case "DeleteAttribute":
-                ApplyDeleteAttribute(document, command);
-                break;
-            case "AddRelation":
-                ApplyAddRelation(document, command);
-                break;
-            // Neznámý command typ = přeskočit (pro budoucí kompatibilitu)
-        }
+            "AddEntity" => ApplyAddEntity(document, command),
+            "UpdateEntity" => ApplyUpdateEntity(document, command),
+            "DeleteEntity" => ApplyDeleteEntity(document, command),
+            "AddAttribute" => ApplyAddAttribute(document, command),
+            "UpdateAttribute" => ApplyUpdateAttribute(document, command),
+            "DeleteAttribute" => ApplyDeleteAttribute(document, command),
+            "AddRelation" => ApplyAddRelation(document, command),
+            "SetCoreDetail" => ApplySetCoreDetail(document, command),
+            "UpdateSyncState" => ApplyUpdateSyncState(document, command),
+            _ => document, // Neznámý command typ = přeskočit (pro budoucí kompatibilitu)
+        };
 
-        document.LastModified = command.Timestamp;
+        return result with { LastModified = command.Timestamp };
     }
 
-    private static void ApplyAddEntity(BusinessAuthoringDocument doc, CommandEnvelope cmd)
+    private static BusinessAuthoringDocument ApplyAddEntity(BusinessAuthoringDocument doc, CommandEnvelope cmd)
     {
         var entity = new BusinessEntityNode
         {
             Id = cmd.TargetEntityId ?? Guid.NewGuid().ToString("N")[..8],
-            Name = cmd.Payload, // Payload je název entity
+            Name = cmd.Payload,
         };
-        doc.Entities.Add(entity);
+
+        return doc with
+        {
+            Entities = doc.Entities.Append(entity).ToList().AsReadOnly(),
+        };
     }
 
-    private static void ApplyUpdateEntity(BusinessAuthoringDocument doc, CommandEnvelope cmd)
+    private static BusinessAuthoringDocument ApplyUpdateEntity(BusinessAuthoringDocument doc, CommandEnvelope cmd)
+    {
+        return doc with
+        {
+            Entities = doc.Entities
+                .Select(e => e.Id == cmd.TargetEntityId ? e with { Name = cmd.Payload } : e)
+                .ToList()
+                .AsReadOnly(),
+        };
+    }
+
+    private static BusinessAuthoringDocument ApplyDeleteEntity(BusinessAuthoringDocument doc, CommandEnvelope cmd)
+    {
+        return doc with
+        {
+            Entities = doc.Entities
+                .Where(e => e.Id != cmd.TargetEntityId)
+                .ToList()
+                .AsReadOnly(),
+            Relations = doc.Relations
+                .Where(r => r.FromEntityId != cmd.TargetEntityId && r.ToEntityId != cmd.TargetEntityId)
+                .ToList()
+                .AsReadOnly(),
+        };
+    }
+
+    private static BusinessAuthoringDocument ApplyAddAttribute(BusinessAuthoringDocument doc, CommandEnvelope cmd)
     {
         var entity = doc.Entities.FirstOrDefault(e => e.Id == cmd.TargetEntityId);
-        if (entity is not null)
-            entity.Name = cmd.Payload;
-    }
+        if (entity is null) return doc;
 
-    private static void ApplyDeleteEntity(BusinessAuthoringDocument doc, CommandEnvelope cmd)
-    {
-        doc.Entities.RemoveAll(e => e.Id == cmd.TargetEntityId);
-        doc.Relations.RemoveAll(r => r.FromEntityId == cmd.TargetEntityId || r.ToEntityId == cmd.TargetEntityId);
-    }
-
-    private static void ApplyAddAttribute(BusinessAuthoringDocument doc, CommandEnvelope cmd)
-    {
-        var entity = doc.Entities.FirstOrDefault(e => e.Id == cmd.TargetEntityId);
-        if (entity is null) return;
-
-        // Payload formát: "NázevAtributu|Typ|IsRequired"
         var parts = cmd.Payload.Split('|');
         var attr = new BusinessAttributeNode
         {
@@ -103,28 +113,66 @@ public sealed class ReplayEngine
             Type = parts.Length > 1 ? parts[1] : "string",
             IsRequired = parts.Length > 2 && bool.TryParse(parts[2], out var req) && req,
         };
-        entity.Attributes.Add(attr);
+
+        return doc with
+        {
+            Entities = doc.Entities
+                .Select(e => e.Id == cmd.TargetEntityId
+                    ? e with { Attributes = e.Attributes.Append(attr).ToList().AsReadOnly() }
+                    : e)
+                .ToList()
+                .AsReadOnly(),
+        };
     }
 
-    private static void ApplyUpdateAttribute(BusinessAuthoringDocument doc, CommandEnvelope cmd)
+    private static BusinessAuthoringDocument ApplyUpdateAttribute(BusinessAuthoringDocument doc, CommandEnvelope cmd)
     {
-        var entity = doc.Entities.FirstOrDefault(e => e.Id == cmd.TargetEntityId);
-        var attr = entity?.Attributes.FirstOrDefault(a => a.Id == cmd.TargetAttributeId);
-        if (attr is null) return;
-
         var parts = cmd.Payload.Split('|');
-        if (parts.Length > 0 && !string.IsNullOrEmpty(parts[0])) attr.Name = parts[0];
-        if (parts.Length > 1 && !string.IsNullOrEmpty(parts[1])) attr.Type = parts[1];
-        if (parts.Length > 2 && bool.TryParse(parts[2], out var req)) attr.IsRequired = req;
+
+        return doc with
+        {
+            Entities = doc.Entities
+                .Select(e => e.Id == cmd.TargetEntityId
+                    ? e with
+                    {
+                        Attributes = e.Attributes
+                            .Select(a => a.Id == cmd.TargetAttributeId
+                                ? a with
+                                {
+                                    Name = parts.Length > 0 && !string.IsNullOrEmpty(parts[0]) ? parts[0] : a.Name,
+                                    Type = parts.Length > 1 && !string.IsNullOrEmpty(parts[1]) ? parts[1] : a.Type,
+                                    IsRequired = parts.Length > 2 && bool.TryParse(parts[2], out var req) ? req : a.IsRequired,
+                                }
+                                : a)
+                            .ToList()
+                            .AsReadOnly(),
+                    }
+                    : e)
+                .ToList()
+                .AsReadOnly(),
+        };
     }
 
-    private static void ApplyDeleteAttribute(BusinessAuthoringDocument doc, CommandEnvelope cmd)
+    private static BusinessAuthoringDocument ApplyDeleteAttribute(BusinessAuthoringDocument doc, CommandEnvelope cmd)
     {
-        var entity = doc.Entities.FirstOrDefault(e => e.Id == cmd.TargetEntityId);
-        entity?.Attributes.RemoveAll(a => a.Id == cmd.TargetAttributeId);
+        return doc with
+        {
+            Entities = doc.Entities
+                .Select(e => e.Id == cmd.TargetEntityId
+                    ? e with
+                    {
+                        Attributes = e.Attributes
+                            .Where(a => a.Id != cmd.TargetAttributeId)
+                            .ToList()
+                            .AsReadOnly(),
+                    }
+                    : e)
+                .ToList()
+                .AsReadOnly(),
+        };
     }
 
-    private static void ApplyAddRelation(BusinessAuthoringDocument doc, CommandEnvelope cmd)
+    private static BusinessAuthoringDocument ApplyAddRelation(BusinessAuthoringDocument doc, CommandEnvelope cmd)
     {
         var parts = cmd.Payload.Split('|');
         var relation = new BusinessRelationNode
@@ -134,6 +182,69 @@ public sealed class ReplayEngine
             ToEntityId = parts.Length > 1 ? parts[1] : string.Empty,
             RelationType = parts.Length > 2 ? parts[2] : "OneToMany",
         };
-        doc.Relations.Add(relation);
+
+        return doc with
+        {
+            Relations = doc.Relations.Append(relation).ToList().AsReadOnly(),
+        };
+    }
+
+    /// <summary>Aplikuje SetCoreDetail command — nastaví CoreDetail na atributu.</summary>
+    private static BusinessAuthoringDocument ApplySetCoreDetail(BusinessAuthoringDocument doc, CommandEnvelope cmd)
+    {
+        // Payload formát: "Source|ResolvedPresetId|ValueObjectName|IsStrongType|LastSyncedAt"
+        var parts = cmd.Payload.Split('|');
+        var coreDetail = new BusinessAttributeCoreDetail
+        {
+            Source = parts.Length > 0 && Enum.TryParse<CoreInfoSource>(parts[0], out var src) ? src : CoreInfoSource.Unknown,
+            ResolvedPresetId = parts.Length > 1 && !string.IsNullOrEmpty(parts[1]) ? parts[1] : null,
+            ValueObjectName = parts.Length > 2 && !string.IsNullOrEmpty(parts[2]) ? parts[2] : null,
+            IsStrongType = parts.Length > 3 && bool.TryParse(parts[3], out var ist) && ist,
+            LastSyncedAt = parts.Length > 4 && DateTimeOffset.TryParse(parts[4], out var dt) ? dt : null,
+            SyncState = AttributeSyncState.Synced,
+        };
+
+        return doc with
+        {
+            Entities = doc.Entities
+                .Select(e => e.Id == cmd.TargetEntityId
+                    ? e with
+                    {
+                        Attributes = e.Attributes
+                            .Select(a => a.Id == cmd.TargetAttributeId
+                                ? a with { CoreDetail = coreDetail }
+                                : a)
+                            .ToList()
+                            .AsReadOnly(),
+                    }
+                    : e)
+                .ToList()
+                .AsReadOnly(),
+        };
+    }
+
+    /// <summary>Aplikuje UpdateSyncState command — změní SyncState na atributu.</summary>
+    private static BusinessAuthoringDocument ApplyUpdateSyncState(BusinessAuthoringDocument doc, CommandEnvelope cmd)
+    {
+        if (!Enum.TryParse<AttributeSyncState>(cmd.Payload, out var newState))
+            return doc;
+
+        return doc with
+        {
+            Entities = doc.Entities
+                .Select(e => e.Id == cmd.TargetEntityId
+                    ? e with
+                    {
+                        Attributes = e.Attributes
+                            .Select(a => a.Id == cmd.TargetAttributeId && a.CoreDetail is not null
+                                ? a with { CoreDetail = a.CoreDetail with { SyncState = newState } }
+                                : a)
+                            .ToList()
+                            .AsReadOnly(),
+                    }
+                    : e)
+                .ToList()
+                .AsReadOnly(),
+        };
     }
 }

@@ -4,7 +4,7 @@ using MetaForge.BusinessModel.Models;
 namespace MetaForge.BusinessModel.Patches.Operations;
 
 /// <summary>
-/// Aktualizuje atribut entity.
+/// Aktualizuje atribut entity (immutable).
 /// </summary>
 public sealed class UpdateAttributeOp : IPatchOperation
 {
@@ -24,20 +24,30 @@ public sealed class UpdateAttributeOp : IPatchOperation
         IsRequired = isRequired;
     }
 
-    public void Apply(BusinessAuthoringDocument document)
+    public BusinessAuthoringDocument Apply(BusinessAuthoringDocument document)
     {
-        var entity = document.Entities.FirstOrDefault(e => e.Id == EntityId);
-        var attr = entity?.Attributes.FirstOrDefault(a => a.Id == AttributeId);
-        if (attr is null) return;
-
-        if (!string.IsNullOrEmpty(NewName))
-            attr.Name = NewName;
-
-        if (!string.IsNullOrEmpty(NewType))
-            attr.Type = NewType;
-
-        if (IsRequired.HasValue)
-            attr.IsRequired = IsRequired.Value;
+        return document with
+        {
+            Entities = document.Entities
+                .Select(e => e.Id == EntityId
+                    ? e with
+                    {
+                        Attributes = e.Attributes
+                            .Select(a => a.Id == AttributeId
+                                ? a with
+                                {
+                                    Name = !string.IsNullOrEmpty(NewName) ? NewName : a.Name,
+                                    Type = !string.IsNullOrEmpty(NewType) ? NewType : a.Type,
+                                    IsRequired = IsRequired ?? a.IsRequired,
+                                }
+                                : a)
+                            .ToList()
+                            .AsReadOnly(),
+                    }
+                    : e)
+                .ToList()
+                .AsReadOnly(),
+        };
     }
 
     public CommandEnvelope ToEnvelope() => new()

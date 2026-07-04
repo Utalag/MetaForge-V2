@@ -4,7 +4,7 @@ using MetaForge.BusinessModel.Models;
 namespace MetaForge.BusinessModel.Patches.Operations;
 
 /// <summary>
-/// Přidá atribut k entitě.
+/// Přidá atribut k entitě (immutable).
 /// </summary>
 public sealed class AddAttributeOp : IPatchOperation
 {
@@ -24,7 +24,7 @@ public sealed class AddAttributeOp : IPatchOperation
         IsRequired = isRequired;
     }
 
-    public void Apply(BusinessAuthoringDocument document)
+    public BusinessAuthoringDocument Apply(BusinessAuthoringDocument document)
     {
         var entity = document.Entities.FirstOrDefault(e => e.Id == EntityId);
         if (entity is null)
@@ -37,7 +37,16 @@ public sealed class AddAttributeOp : IPatchOperation
             Type = AttributeType,
             IsRequired = IsRequired,
         };
-        entity.Attributes.Add(attr);
+
+        return document with
+        {
+            Entities = document.Entities
+                .Select(e => e.Id == EntityId
+                    ? e with { Attributes = e.Attributes.Append(attr).ToList().AsReadOnly() }
+                    : e)
+                .ToList()
+                .AsReadOnly(),
+        };
     }
 
     public CommandEnvelope ToEnvelope() => new()

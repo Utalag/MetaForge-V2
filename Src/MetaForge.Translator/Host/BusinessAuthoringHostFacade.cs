@@ -12,7 +12,7 @@ namespace MetaForge.Translator.Host;
 /// </summary>
 public sealed class BusinessAuthoringHostFacade
 {
-    private readonly BusinessAuthoringDocument _document;
+    private BusinessAuthoringDocument _document;
     private readonly CommandLogStore _logStore;
     private readonly PatchEngine _patchEngine;
     private readonly ReplayEngine _replayEngine;
@@ -47,7 +47,7 @@ public sealed class BusinessAuthoringHostFacade
             throw new ArgumentException("Název entity nesmí být prázdný.", nameof(name));
 
         var op = new AddEntityOp(name);
-        _patchEngine.Apply(_document, op);
+        _document = _patchEngine.Apply(_document, op);
         return op.EntityId;
     }
 
@@ -62,7 +62,7 @@ public sealed class BusinessAuthoringHostFacade
             ?? throw new InvalidOperationException($"Entita s Id '{entityId}' neexistuje.");
 
         var op = new UpdateEntityOp(entityId, newName);
-        _patchEngine.Apply(_document, op);
+        _document = _patchEngine.Apply(_document, op);
     }
 
     /// <summary>Smaže entitu a všechny její relace.</summary>
@@ -72,7 +72,7 @@ public sealed class BusinessAuthoringHostFacade
             ?? throw new InvalidOperationException($"Entita s Id '{entityId}' neexistuje.");
 
         var op = new DeleteEntityOp(entityId);
-        _patchEngine.Apply(_document, op);
+        _document = _patchEngine.Apply(_document, op);
     }
 
     /// <summary>Přidá atribut k entitě.</summary>
@@ -85,14 +85,109 @@ public sealed class BusinessAuthoringHostFacade
             ?? throw new InvalidOperationException($"Entita s Id '{entityId}' neexistuje.");
 
         var op = new AddAttributeOp(entityId, name, type, isRequired);
-        _patchEngine.Apply(_document, op);
+        _document = _patchEngine.Apply(_document, op);
         return op.AttributeId;
     }
 
     /// <summary>Aplikuje enrichment data na atribut.</summary>
     public void ApplyEnrichment(string entityId, EnrichmentResult enrichment)
     {
-        _writeBackService.ApplyEnrichment(_document, entityId, enrichment);
+        _document = _writeBackService.ApplyEnrichment(_document, entityId, enrichment);
+    }
+
+    /// <summary>Nastaví CoreDetail na atributu (přes SetCoreDetailOp).</summary>
+    public void SetCoreDetail(string entityId, string attributeId, BusinessAttributeCoreDetail coreDetail)
+    {
+        var op = new SetCoreDetailOp(entityId, attributeId, coreDetail);
+        _document = _patchEngine.Apply(_document, op);
+    }
+
+    /// <summary>Aktualizuje SyncState na atributu.</summary>
+    public void UpdateSyncState(string entityId, string attributeId, AttributeSyncState newState)
+    {
+        var op = new UpdateSyncStateOp(entityId, attributeId, newState);
+        _document = _patchEngine.Apply(_document, op);
+    }
+
+    // === WORKFLOW OPERATIONS ===
+
+    /// <summary>Přidá nové workflow do dokumentu.</summary>
+    public string AddWorkflow(string name, string? description = null)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Název workflow nesmí být prázdný.", nameof(name));
+
+        var workflow = new BusinessWorkflowNode
+        {
+            Id = Guid.NewGuid().ToString("N")[..8],
+            Name = name,
+            Description = description,
+        };
+
+        _document = _document with
+        {
+            Workflows = _document.Workflows.Append(workflow).ToList().AsReadOnly(),
+        };
+
+        return workflow.Id;
+    }
+
+    /// <summary>Přidá krok do existujícího workflow.</summary>
+    public string AddWorkflowStep(string workflowId, string stepName, BusinessWorkflowStepKind kind = BusinessWorkflowStepKind.Manual)
+    {
+        if (string.IsNullOrWhiteSpace(stepName))
+            throw new ArgumentException("Název kroku nesmí být prázdný.", nameof(stepName));
+
+        var workflow = _document.Workflows.FirstOrDefault(w => w.Id == workflowId)
+            ?? throw new InvalidOperationException($"Workflow s Id '{workflowId}' neexistuje.");
+
+        var step = new BusinessWorkflowStepNode
+        {
+            Id = Guid.NewGuid().ToString("N")[..8],
+            Name = stepName,
+            Kind = kind,
+            Order = workflow.Steps.Count,
+        };
+
+        _document = _document with
+        {
+            Workflows = _document.Workflows
+                .Select(w => w.Id == workflowId
+                    ? w with { Steps = w.Steps.Append(step).ToList().AsReadOnly() }
+                    : w)
+                .ToList()
+                .AsReadOnly(),
+        };
+
+        return step.Id;
+    }
+
+    /// <summary>Přidá přechod mezi dvěma kroky workflow.</summary>
+    public string AddWorkflowTransition(string workflowId, string fromStepId, string toStepId, string? condition = null, string? label = null)
+    {
+        var workflow = _document.Workflows.FirstOrDefault(w => w.Id == workflowId)
+            ?? throw new InvalidOperationException($"Workflow s Id '{workflowId}' neexistuje.");
+
+        var transition = new BusinessWorkflowTransitionNode
+        {
+            Id = Guid.NewGuid().ToString("N")[..8],
+            FromStepId = fromStepId,
+            ToStepId = toStepId,
+            Condition = condition,
+            Label = label,
+        };
+
+        _document = _document with
+        {
+            Workflows = _document.Workflows
+                .Select(w => w.Id == workflowId
+                    ? w with { Transitions = w.Transitions.Append(transition).ToList().AsReadOnly() }
+                    : w)
+                .ToList()
+                .AsReadOnly(),
+        };
+
+        return transition.Id;
     }
 
     // === READ OPERATIONS ===

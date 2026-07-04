@@ -4,7 +4,7 @@ using MetaForge.BusinessModel.Models;
 namespace MetaForge.BusinessModel.Patches.Operations;
 
 /// <summary>
-/// Aktualizuje název existující entity.
+/// Aktualizuje název existující entity (immutable).
 /// </summary>
 public sealed class UpdateEntityOp : IPatchOperation
 {
@@ -18,11 +18,15 @@ public sealed class UpdateEntityOp : IPatchOperation
         NewName = newName;
     }
 
-    public void Apply(BusinessAuthoringDocument document)
+    public BusinessAuthoringDocument Apply(BusinessAuthoringDocument document)
     {
-        var entity = document.Entities.FirstOrDefault(e => e.Id == EntityId);
-        if (entity is not null)
-            entity.Name = NewName;
+        return document with
+        {
+            Entities = document.Entities
+                .Select(e => e.Id == EntityId ? e with { Name = NewName } : e)
+                .ToList()
+                .AsReadOnly(),
+        };
     }
 
     public CommandEnvelope ToEnvelope() => new()

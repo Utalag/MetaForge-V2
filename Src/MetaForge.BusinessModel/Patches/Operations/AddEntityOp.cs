@@ -4,7 +4,7 @@ using MetaForge.BusinessModel.Models;
 namespace MetaForge.BusinessModel.Patches.Operations;
 
 /// <summary>
-/// Přidá novou entitu do dokumentu.
+/// Přidá novou entitu do dokumentu (immutable).
 /// </summary>
 public sealed class AddEntityOp : IPatchOperation
 {
@@ -19,14 +19,18 @@ public sealed class AddEntityOp : IPatchOperation
         EntityName = entityName;
     }
 
-    public void Apply(BusinessAuthoringDocument document)
+    public BusinessAuthoringDocument Apply(BusinessAuthoringDocument document)
     {
         var entity = new BusinessEntityNode
         {
             Id = EntityId,
             Name = EntityName,
         };
-        document.Entities.Add(entity);
+
+        return document with
+        {
+            Entities = document.Entities.Append(entity).ToList().AsReadOnly(),
+        };
     }
 
     public CommandEnvelope ToEnvelope() => new()

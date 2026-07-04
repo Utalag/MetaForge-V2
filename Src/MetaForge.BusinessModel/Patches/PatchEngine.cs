@@ -6,6 +6,7 @@ namespace MetaForge.BusinessModel.Patches;
 /// <summary>
 /// Atomické mutace BusinessAuthoringDocument.
 /// Každá mutace vytváří CommandEnvelope a zapisuje do CommandLog.
+/// Používá immutable pattern — vrací nový dokument, nemutuje původní.
 /// </summary>
 public sealed class PatchEngine
 {
@@ -18,22 +19,27 @@ public sealed class PatchEngine
 
     /// <summary>
     /// Aplikuje patch operaci na dokument a zaznamená do logu.
+    /// Vrací novou instanci dokumentu — původní zůstává nezměněn.
     /// </summary>
     /// <exception cref="ArgumentNullException">Pokud document nebo operation je null.</exception>
-    public void Apply(BusinessAuthoringDocument document, IPatchOperation operation)
+    public BusinessAuthoringDocument Apply(BusinessAuthoringDocument document, IPatchOperation operation)
     {
         ArgumentNullException.ThrowIfNull(document);
         ArgumentNullException.ThrowIfNull(operation);
 
-        // 1. Aplikuj mutaci
-        operation.Apply(document);
+        // 1. Aplikuj operaci — získáme nový dokument
+        var newDocument = operation.Apply(document);
 
         // 2. Vytvoř a zapiš command
         var envelope = operation.ToEnvelope();
-        _logStore.Append(envelope);
 
-        // 3. Aktualizuj čas modifikace
-        document.LastModified = envelope.Timestamp;
+        // Použij TryAppend pro idempotenci
+        _logStore.TryAppend(envelope);
+
+        // 3. Aktualizuj čas modifikace na novém dokumentu
+        newDocument = newDocument with { LastModified = envelope.Timestamp };
+
+        return newDocument;
     }
 
     /// <summary>Vytvoří CommandEnvelope pro danou operaci (bez aplikace).</summary>

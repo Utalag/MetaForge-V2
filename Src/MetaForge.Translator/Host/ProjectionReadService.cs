@@ -42,6 +42,14 @@ public sealed class ProjectionReadService
         var view = new ProjectionView
         {
             ProjectName = document.ProjectName,
+            Project = new ProjectionView.ProjectInfoView
+            {
+                Id = document.Project.Id,
+                Name = document.Project.Name,
+                Description = document.Project.Description,
+                Icon = document.Project.Icon,
+                Version = document.Project.Version,
+            },
         };
 
         foreach (var entity in document.Entities)
@@ -65,6 +73,20 @@ public sealed class ProjectionReadService
                     MaxLength = attr.MaxLength,
                     DefaultValue = attr.DefaultValue,
                 };
+
+                // Zohledni CoreDetail v projekci
+                if (attr.CoreDetail is not null)
+                {
+                    attrProj.CoreDetail = new ProjectionView.CoreDetailInfoView
+                    {
+                        Source = attr.CoreDetail.Source,
+                        ResolvedPresetId = attr.CoreDetail.ResolvedPresetId,
+                        ValueObjectName = attr.CoreDetail.ValueObjectName,
+                        IsStrongType = attr.CoreDetail.IsStrongType,
+                        LastSyncedAt = attr.CoreDetail.LastSyncedAt,
+                        SyncState = attr.CoreDetail.SyncState,
+                    };
+                }
 
                 entityProj.Attributes.Add(attrProj);
             }

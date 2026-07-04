@@ -4,23 +4,23 @@ namespace MetaForge.BusinessModel.Models;
 /// Reprezentuje jednu business entitu — např. "Customer", "Order", "Product".
 /// Obsahuje atributy, chování, relace a poznámky.
 /// </summary>
-public sealed class BusinessEntityNode
+public sealed record BusinessEntityNode
 {
     /// <summary>Unikátní identifikátor entity.</summary>
-    public string Id { get; set; } = Guid.NewGuid().ToString("N")[..8];
+    public string Id { get; init; } = Guid.NewGuid().ToString("N")[..8];
 
     /// <summary>Název entity (např. "Customer").</summary>
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; init; } = string.Empty;
 
     /// <summary>Atributy entity.</summary>
-    public List<BusinessAttributeNode> Attributes { get; } = new();
+    public IReadOnlyList<BusinessAttributeNode> Attributes { get; init; } = [];
 
     /// <summary>Chování entity (metody).</summary>
-    public List<BusinessBehaviorNode> Behaviors { get; } = new();
+    public IReadOnlyList<BusinessBehaviorNode> Behaviors { get; init; } = [];
 
     /// <summary>Relace na jiné entity.</summary>
-    public List<BusinessRelationNode> Relations { get; } = new();
+    public IReadOnlyList<BusinessRelationNode> Relations { get; init; } = [];
 
     /// <summary>Poznámky k entitě.</summary>
-    public List<BusinessNoteNode> Notes { get; } = new();
+    public IReadOnlyList<BusinessNoteNode> Notes { get; init; } = [];
 }
