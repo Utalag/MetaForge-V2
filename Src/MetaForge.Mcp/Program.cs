@@ -7,6 +7,7 @@ using MetaForge.BusinessModel.Patches;
 using MetaForge.Core.Catalog;
 using MetaForge.Core.ForgeBlockPackages;
 using MetaForge.Core.Inference;
+using MetaForge.Mcp.Models;
 using MetaForge.Translator.Host;
 using MetaForge.Translator.Translation;
 
@@ -123,24 +124,5 @@ static List<object> GetToolList() => new()
     new { name = "list_entities", description = "Vypíše všechny entity", inputSchema = new { type = "object", properties = new { } } },
 };
 
-// === JSON-RPC modely ===
+// === JSON-RPC modely — přesunuty do MetaForge.Mcp.Models.JsonRpcModels.cs ===
 
-public class JsonRpcRequest
-{
-    public string? Id { get; set; }
-    public string Method { get; set; } = string.Empty;
-    public JsonElement? Params { get; set; }
-}
-
-public class JsonRpcResponse
-{
-    public string? Id { get; set; }
-    public object? Result { get; set; }
-    public JsonRpcError? Error { get; set; }
-}
-
-public class JsonRpcError
-{
-    public int Code { get; set; }
-    public string Message { get; set; } = string.Empty;
-}

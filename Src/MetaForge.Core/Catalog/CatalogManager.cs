@@ -1,24 +1,30 @@
+using System.Collections.Concurrent;
+
 namespace MetaForge.Core.Catalog;
 
 /// <summary>
-/// Centrální správce katalogu — agreguje všechny ICatalogProvider.
+/// Centrální správce katalogu — thread-safe, agreguje všechny ICatalogProvider.
 /// Registrace presetů, vyhledávání, resolve typů.
 /// </summary>
 public sealed class CatalogManager
 {
     private readonly List<ICatalogProvider> _providers = new();
-    private readonly Dictionary<string, PresetDefinition> _customPresets = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, PresetDefinition> _customPresets = new(StringComparer.OrdinalIgnoreCase);
+    private readonly object _providersLock = new();
 
     /// <summary>Zaregistruje catalog providera (built-in, filesystem, marketplace).</summary>
     public void RegisterProvider(ICatalogProvider provider)
     {
-        _providers.Add(provider);
+        lock (_providersLock)
+        {
+            _providers.Add(provider);
+        }
     }
 
     /// <summary>Zaregistruje vlastní preset (z ForgeBlocku nebo uživatele).</summary>
     public void RegisterPreset(PresetDefinition preset)
     {
-        _customPresets[preset.Name] = preset;
+        _customPresets[preset.Name] = preset; // ConcurrentDictionary, bezpečné
     }
 
     /// <summary>Vyhledá typ podle názvu — prohledá custom presety, pak providery.</summary>
@@ -29,7 +35,12 @@ public sealed class CatalogManager
             return custom;
 
         // 2. Providery v pořadí registrace
-        foreach (var provider in _providers)
+        List<ICatalogProvider> providersSnapshot;
+        lock (_providersLock)
+        {
+            providersSnapshot = _providers.ToList();
+        }
+        foreach (var provider in providersSnapshot)
         {
             var result = provider.ResolveType(typeName);
             if (result is not null)
@@ -50,7 +61,12 @@ public sealed class CatalogManager
                         || (p.Tags?.Any(t => t.Contains(query, StringComparison.OrdinalIgnoreCase)) ?? false)));
 
         // Z providerů
-        foreach (var provider in _providers)
+        List<ICatalogProvider> providersSnapshot;
+        lock (_providersLock)
+        {
+            providersSnapshot = _providers.ToList();
+        }
+        foreach (var provider in providersSnapshot)
         {
             results.AddRange(provider.GetAllPresets()
                 .Where(p => p.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
@@ -66,7 +82,12 @@ public sealed class CatalogManager
         var all = new List<PresetDefinition>();
         all.AddRange(_customPresets.Values);
 
-        foreach (var provider in _providers)
+        List<ICatalogProvider> providersSnapshot;
+        lock (_providersLock)
+        {
+            providersSnapshot = _providers.ToList();
+        }
+        foreach (var provider in providersSnapshot)
             all.AddRange(provider.GetAllPresets());
 
         return all.DistinctBy(p => p.Name).ToList().AsReadOnly();

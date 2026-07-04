@@ -36,10 +36,11 @@ public sealed class AiConstraintInferencer : IConstraintInferencer
             - not_negative: nesmí být záporné
             """;
 
-        // Synchronní volání (pro jednoduchost)
+        // Synchronní volání s bezpečným sync-over-async (bez deadlock rizika)
         try
         {
-            var result = _backend.SendJsonAsync<List<string>>(prompt).GetAwaiter().GetResult();
+            var result = Task.Run(() => _backend.SendJsonAsync<List<string>>(prompt))
+                .GetAwaiter().GetResult();
             return result is not null
                 ? (IReadOnlyList<string>)result.AsReadOnly()
                 : Array.Empty<string>();

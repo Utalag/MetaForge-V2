@@ -45,7 +45,8 @@ public sealed class MathForgeBlock : IForgeBlockCapabilityPackage
 
     public void Register(ForgeBlockRegistry registry)
     {
-        // Registrace do katalogu — přidá presety pro matematické typy
-        // (implementace závisí na CatalogManager — volitelné pro v1)
+        // V1: CatalogEntries jsou dostupné přes IForgeBlockCapabilityPackage.CatalogEntries.
+        // Propojení s CatalogManager bude implementováno v Epic 11 — Infrastructure.
+        // Balík je již zaregistrován v registru (voláno z ForgeBlockRegistry.Register).
     }
 }

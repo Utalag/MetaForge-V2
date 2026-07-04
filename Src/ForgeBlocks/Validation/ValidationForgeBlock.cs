@@ -45,6 +45,7 @@ public sealed class ValidationForgeBlock : IForgeBlockCapabilityPackage
 
     public void Register(ForgeBlockRegistry registry)
     {
-        // Registrace do katalogu
+        // V1: CatalogEntries jsou dostupné přes IForgeBlockCapabilityPackage.CatalogEntries.
+        // Propojení s CatalogManager bude implementováno v Epic 11 — Infrastructure.
     }
 }

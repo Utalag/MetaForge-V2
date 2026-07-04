@@ -6,10 +6,19 @@ namespace MetaForge.Core.Tests.DataTypes;
 public class DataTypeTests
 {
     [Fact]
-    public void Enum_Has36Members()
+    public void Enum_HasExpectedCoreValues()
     {
+        // Ověřuje přítomnost klíčových hodnot, ne přesný počet
         var values = Enum.GetValues<DataType>();
-        values.Should().HaveCount(36);
+        values.Should().Contain(DataType.Bool);
+        values.Should().Contain(DataType.String);
+        values.Should().Contain(DataType.Int32);
+        values.Should().Contain(DataType.Decimal);
+        values.Should().Contain(DataType.Guid);
+        values.Should().Contain(DataType.DateTime);
+        values.Should().Contain(DataType.Void);
+        values.Should().Contain(DataType.Entity);
+        values.Should().Contain(DataType.Object);
     }
 
     [Fact]

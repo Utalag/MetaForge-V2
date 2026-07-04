@@ -7,11 +7,14 @@ namespace MetaForge.BusinessModel.Models;
 /// </summary>
 public sealed class BusinessAuthoringDocument
 {
+    /// <summary>Aktuální verze schématu.</summary>
+    public const string CurrentSchemaVersion = "1.0";
+
     /// <summary>Název projektu.</summary>
     public string ProjectName { get; set; } = string.Empty;
 
     /// <summary>Verze schématu dokumentu.</summary>
-    public string SchemaVersion { get; set; } = "1.0";
+    public string SchemaVersion { get; set; } = CurrentSchemaVersion;
 
     /// <summary>Datum poslední modifikace.</summary>
     public DateTime LastModified { get; set; } = DateTime.UtcNow;

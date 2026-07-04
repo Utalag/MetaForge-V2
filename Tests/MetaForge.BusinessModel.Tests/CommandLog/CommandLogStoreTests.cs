@@ -36,13 +36,15 @@ public class CommandLogStoreTests
     }
 
     [Fact]
-    public void Count_NeverDecreases()
+    public void AppendOnly_NoRemoveMethod_InvariantPreserved()
     {
-        var store = new CommandLogStore();
-        store.Append(new CommandEnvelope());
-        var beforeCount = store.Count;
-        // Simulace: nelze odebrat — neexistuje metoda pro odebrání
-        store.Count.Should().Be(beforeCount);
+        // Ověřuje, že CommandLogStore neexponuje žádnou metodu pro odebrání
+        var storeType = typeof(CommandLogStore);
+        var methods = storeType.GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        
+        methods.Should().NotContain(m => m.Name.Contains("Remove", StringComparison.OrdinalIgnoreCase));
+        methods.Should().NotContain(m => m.Name.Contains("Delete", StringComparison.OrdinalIgnoreCase));
+        methods.Should().NotContain(m => m.Name.Contains("Clear", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]

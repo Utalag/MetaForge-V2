@@ -4,7 +4,7 @@ namespace MetaForge.Core.Abstractions;
 /// Kolekce child elementů s notifikací o změnách.
 /// Používá se pro Properties, Methods, Members — kdekoliv kde child elementy ovlivňují TotalCoin.
 /// </summary>
-public class SemanticCollection<T> : List<T>
+public sealed class SemanticCollection<T> : List<T>
 {
     /// <summary>Událost vyvolaná při jakékoliv změně kolekce.</summary>
     public event Action? Changed;

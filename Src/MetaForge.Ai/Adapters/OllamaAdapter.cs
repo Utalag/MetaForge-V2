@@ -16,8 +16,8 @@ public sealed class OllamaAdapter : IAiBackendAdapter
     public string ProviderName => "Ollama";
 
     /// <param name="baseUrl">URL Ollama serveru (výchozí http://localhost:11434).</param>
-    /// <param name="model">Název modelu (výchozí gemma3:12b).</param>
-    public OllamaAdapter(string baseUrl = "http://localhost:11434", string model = "gemma3:12b")
+    /// <param name="model">Název modelu (výchozí gemma4:12b).</param>
+    public OllamaAdapter(string baseUrl = "http://localhost:11434", string model = "gemma4")
     {
         _http = new HttpClient { BaseAddress = new Uri(baseUrl) };
         _model = model;

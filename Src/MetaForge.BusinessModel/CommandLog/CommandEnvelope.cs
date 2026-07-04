@@ -25,5 +25,5 @@ public sealed record CommandEnvelope
     public string Payload { get; init; } = "{}";
 
     /// <summary>Verze schématu commandu (pro budoucí migrace).</summary>
-    public string SchemaVersion { get; init; } = "1.0";
+    public string SchemaVersion { get; init; } = Models.BusinessAuthoringDocument.CurrentSchemaVersion;
 }

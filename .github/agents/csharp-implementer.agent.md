@@ -108,6 +108,7 @@ public class TypeModelTests
 5. **Napiš testy** podle `new-architecture-test-scaffold` skillu.
 6. **Ověř testy:** `dotnet test` musí projít.
 7. **Commitni** s českou commit zprávou: `TASK-X.Y.Z — název tasku`.
+8. **Aktualizuj** `Progress.md` a případně `Memories.md`.
 
 ## Výstup
 
