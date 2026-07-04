@@ -3,13 +3,13 @@ using MetaForge.Core.Abstractions;
 using MetaForge.Core.DataTypes;
 using MetaForge.Core.Elements.Members;
 using MetaForge.Core.Elements.Types;
-using MetaForge.Generators.CSharp;
+using MetaForge.Generators;
 
-namespace MetaForge.Generators.Tests.CSharp;
+namespace MetaForge.Generators.Tests;
 
-public class CSharpGeneratorTests
+public class CodeGeneratorTests
 {
-    private readonly CSharpGenerator _generator = new();
+    private readonly CodeGenerator _generator = new();
 
     [Fact]
     public void Generate_ClassElement_ContainsPublicClass()
@@ -18,7 +18,6 @@ public class CSharpGeneratorTests
         var result = _generator.Generate(cls);
 
         result.SourceCode.Should().Contain("public class Customer");
-        result.LanguageId.Should().Be("csharp");
         result.FileName.Should().Be("Customer.cs");
     }
 
@@ -105,5 +104,37 @@ public class CSharpGeneratorTests
 
         result.SourceCode.Should().Contain("struct Point");
         result.SourceCode.Should().Contain("int X");
+    }
+
+    [Fact]
+    public void Generated_Code_IsValidCSharpSyntax()
+    {
+        // Arrange
+        var cls = new ClassElement { Name = "Customer" };
+        cls.Properties.Add(new PropertyElement { Name = "Id", Type = TypeModel.Int32 });
+        cls.Properties.Add(new PropertyElement { Name = "Name", Type = TypeModel.String });
+
+        var iface = new InterfaceElement { Name = "IRepository" };
+        iface.Methods.Add(new MethodElement { Name = "GetById", ReturnType = TypeModel.Int32 });
+
+        var enm = new EnumElement { Name = "Status" };
+        enm.Members.Add(new EnumMemberElement { Name = "Active" });
+        enm.Members.Add(new EnumMemberElement { Name = "Inactive" });
+
+        var str = new StructElement { Name = "Point" };
+        str.Properties.Add(new PropertyElement { Name = "X", Type = TypeModel.Int32 });
+
+        // Act & Assert
+        foreach (var result in new[]
+        {
+            _generator.Generate(cls),
+            _generator.Generate(iface),
+            _generator.Generate(enm),
+            _generator.Generate(str)
+        })
+        {
+            var isValid = SyntaxValidator.IsValid(result.SourceCode, out var diagnostics);
+            isValid.Should().BeTrue($"syntax error in {result.FileName}:{Environment.NewLine}{diagnostics}");
+        }
     }
 }
