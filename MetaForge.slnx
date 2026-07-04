@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Src/">
+    <Project Path="Src/MetaForge.Core/MetaForge.Core.csproj" />
   </Folder>
   <Folder Name="/Tests/">
   </Folder>
