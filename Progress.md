@@ -15,6 +15,7 @@
 | 2026-07-04 | Epic 6 — AI | IAiBackendAdapter, OllamaAdapter, AI inference, enrichment, DI registration | Copilot |
 | 2026-07-04 | Epic 7 — Generators | CSharpGenerator, BaseCodeGenerator, LanguageMapping | Copilot |
 | 2026-07-04 | Epic 8 — ForgeBlocks | Math, String, Validation ForgeBlock balíky | Copilot |
+| 2026-07-04 | Epic 9 — Testy | 4 test projekty, 63 unit testů, TypeModel, Catalog, CommandLog, Replay, Patch, Translator, Generators | Copilot |
 
 ---
 
@@ -29,3 +30,4 @@
 | 2026-07-04 | Epic 6 | checkpoint/epic-6-done |
 | 2026-07-04 | Epic 7 | checkpoint/epic-7-done |
 | 2026-07-04 | Epic 8 | checkpoint/epic-8-done |
+| 2026-07-04 | Epic 9 | checkpoint/epic-9-done |
