@@ -16,7 +16,7 @@ public static class CliOutputFormatter
     {
         var panel = new Panel(new Markup($"""
             [bold]Projekt:[/] [cyan]{view.ProjectName}[/]
-            [bold]Entit:[/] [green]{view.Entities.Count}[/]  |  [bold]Relací:[/] [yellow]{view.Relations.Count}[/]
+            [bold]Entit:[/] [green]{view.Entities.Count}[/]
             """))
         {
             Header = new PanelHeader(" MetaForge CLI "),
@@ -50,7 +50,7 @@ public static class CliOutputFormatter
         foreach (var attr in entity.Attributes)
         {
             var required = attr.IsRequired ? "[green]✓[/]" : "[grey]–[/]";
-            table.AddRow(attr.Name, attr.Type, required);
+            table.AddRow(attr.Name, attr.CoreType.BaseType.ToString(), required);
         }
 
         AnsiConsole.Write(new Rule($"[bold]📋 Entita: {entity.Name}[/]").RuleStyle("grey"));
@@ -71,17 +71,13 @@ public static class CliOutputFormatter
         var table = new Table()
             .Border(TableBorder.Rounded)
             .AddColumn("[bold]Entita[/]")
-            .AddColumn("[bold]Atributů[/]")
-            .AddColumn("[bold]Relací[/]");
+            .AddColumn("[bold]Atributů[/]");
 
         foreach (var entity in view.Entities)
         {
-            var relationCount = view.Relations.Count(r =>
-                r.SourceEntityId == entity.Id || r.TargetEntityId == entity.Id);
             table.AddRow(
                 $"[cyan]{entity.Name}[/]",
-                entity.Attributes.Count.ToString(),
-                relationCount.ToString());
+                entity.Attributes.Count.ToString());
         }
 
         AnsiConsole.Write(table);
