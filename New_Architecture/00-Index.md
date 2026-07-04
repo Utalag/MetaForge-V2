@@ -21,21 +21,21 @@
 |---|--------|-------|------|
 | 03 | `03-Core-Abstractions.md` | AppRoot, RootElement, TypeModel, DataType, SemanticCollection | ⚠️ Částečný |
 | 04 | `04-Core-Elements.md` | Class, Interface, Enum, Struct, Property, Method, Parameter elem. | ✅ |
-| 05 | `05-Core-Behaviors.md` | Expression, IConstraintInferencer, IStandardLibraryTranslator, Boundary Analysis | ✅ |
-| 06 | `06-Core-Services.md` | CatalogManager, IForgeBlockPackage, StrongType, Discovery | ✅ |
+| 05 | `05-Core-Behaviors.md` | Expression System (11 druhů), IConstraintInferencer, IStandardLibraryTranslator | ✅ *(PROP-024)* |
+| 06 | `06-Core-Services.md` | CatalogManager, ICatalogProvider, StrongType/ValueObject, IConstraintInferencer | ✅ *(PROP-024)* |
 
 ### Business a Translator vrstva
 | # | Soubor | Obsah | Stav |
 |---|--------|-------|------|
-| 07 | `07-BusinessModel.md` | BusinessAuthoringDocument, CommandLogStore, PatchEngine, Event Sourcing | ✅ |
-| 08 | `08-Translator.md` | Facade, ProjectionReadService, DefaultBusinessTranslator, WriteBackService | ✅ |
-| 09 | `09-AI-Layer.md` | AI kontrakty (IConstraintInferencer, ITranslationService), IAiBackendAdapter | ✅ |
+| 07 | `07-BusinessModel.md` | BusinessAuthoringDocument, CommandLog, Patches, Workflow, Validace, Identity | ✅ *(PROP-020)* |
+| 08 | `08-Translator.md` | Facade, Projection, WriteBack, ITranslationService, DefaultBusinessTranslator | ✅ *(PROP-020)* |
+| 09 | `09-AI-Layer.md` | IAiBackendAdapter, OllamaAdapter, PromptRegistry, PromptEvaluator, AiServiceRegistration | ✅ *(PROP-027)* |
 
 ### Generátory, Infrastructure a Monetizace
 | # | Soubor | Obsah | Stav |
 |---|--------|-------|------|
-| 10 | `10-Generators.md` | CSharpGenerator, TemplateRenderer, LanguageMapping | ✅ |
-| 11 | `11-Infrastructure.md` | Persistence, ICommandLogRepository, IDocumentRepository, JSON file repo | ✅ |
+| 10 | `10-Generators.md` | CodeGenerator, Scriban šablony, ExpressionRenderer, Packaging | ✅ |
+| 11 | `11-Infrastructure.md` | Persistence (JSONL), IOptions konfigurace, checkpoint caching, FileSystem | ✅ *(PROP-028)* |
 | 12 | `12-Host-Surfaces.md` | CLI, MCP, WebApi — tenké host vrstvy bez business logiky | ✅ |
 | 29 | `29-Monetization.md` | Kreditový systém, tier licence, MCP-ready billing gate | ✅ |
 

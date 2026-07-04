@@ -75,7 +75,47 @@ public class TestCommandLogBuilder
 
 ---
 
-## Klíčové testovací scénáře
+## Syntax validation generovaného kódu
+
+Pro ověření, že generátor produkuje syntakticky korektní C#, se používá **Roslyn syntax parser** přímo v testech — bez plné kompilace.
+
+### SyntaxValidator
+
+```csharp
+public static class SyntaxValidator
+{
+    /// <summary>Validuje C# syntaxi. Vrací true pokud je kód syntakticky korektní,
+    /// jinak false + výpis chyb do diagnostics.</summary>
+    public static bool IsValid(string sourceCode, out string diagnostics);
+}
+```
+
+- **Soubor:** `Tests/MetaForge.Generators.Tests/SyntaxValidator.cs`
+- **Použití:** `SyntaxValidator.IsValid(result.SourceCode, out var diag)`
+- **Závislost:** `Microsoft.CodeAnalysis.CSharp` (pouze v test projektu)
+- **Princip:** `CSharpSyntaxTree.ParseText()` parsuje syntaxi bez assembly referencí — detekuje chybějící závorky, špatné deklarace, atd.
+
+### Příklad testu
+
+```csharp
+[Fact]
+public void Generated_Code_IsValidCSharpSyntax()
+{
+    var cls = new ClassElement { Name = "Customer" };
+    var result = _generator.Generate(cls);
+
+    var isValid = SyntaxValidator.IsValid(result.SourceCode, out var diagnostics);
+    isValid.Should().BeTrue($"syntax error:{Environment.NewLine}{diagnostics}");
+}
+```
+
+### Co NENÍ validováno
+
+| Typ validace | Proč ne |
+|-------------|---------|
+| Sémantická (neznámé typy, chybějící usingy) | Vyžaduje plnou kompilaci s referencemi |
+| Logická (nekonečná rekurze) | Mimo rozsah generátoru |
+| Stylistická (formátování) | Řeší formatter, ne generátor |
 
 ### Core.Tests
 

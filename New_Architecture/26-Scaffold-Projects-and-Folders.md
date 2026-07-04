@@ -238,6 +238,7 @@ Src/MetaForge.Translator/
 │   └── NodeAssistContext.cs
 ├── Translation/
 │   ├── IBusinessTranslator.cs
+│   ├── ITranslationService.cs
 │   ├── DefaultBusinessTranslator.cs
 │   └── WriteBackService.cs
 ├── Prompting/

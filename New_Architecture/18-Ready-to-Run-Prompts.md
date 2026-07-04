@@ -178,7 +178,7 @@ Ověření: Build projde. Třída je abstract, nemá závislost na jazykové abs
 
 ---
 
-## Prompt 6 — CommandEnvelope record
+## Prompt 6 — CommandEnvelope record (vč. PROP-020 provenience)
 
 ```
 Vytvoř soubor: Src/MetaForge.BusinessModel/CommandLog/CommandEnvelope.cs
@@ -200,28 +200,43 @@ namespace MetaForge.BusinessModel.CommandLog;
 // Vrstva: BusinessModel.
 // Vstup: Vzniká v PatchEngine při mutaci dokumentu.
 // Výstup: Ukládá se do CommandLogStore, čte se při replay.
-// Závislosti: Žádné externí.
+// Závislosti: CommandSource, CommandIssuedBy, CommandProvenance, CoreInfoSource.
 // Nezávislosti: Nezávisí na Core ani Translator.
 // Invarianty: Id musí být unikátní. Timestamp musí být monotónně rostoucí. CommandType nesmí být prázdný.
+// PROP-020: StreamId, Source, InfoSource, IssuedBy, Provenance, CorrelationId, CausationId, MutationId.
 // Související typy: CommandLogStore, ReplayEngine, PatchEngine.
 // Testy: BusinessModel.Tests/CommandLog/CommandEnvelopeTests.cs.
 
 /// <summary>
-/// Immutable záznam jednoho commandu v CommandLog.
+/// Immutable záznam jednoho commandu v CommandLog s proveniencí a idempotencí.
 /// </summary>
-public record CommandEnvelope(
-    string Id,
-    DateTimeOffset Timestamp,
-    string CommandType,
-    string PayloadJson
-);
+public sealed record CommandEnvelope
+{
+    public string Id { get; init; } = Guid.NewGuid().ToString();
+    public DateTime Timestamp { get; init; } = DateTime.UtcNow;
+    public string CommandType { get; init; } = string.Empty;
+    public string? TargetEntityId { get; init; }
+    public string? TargetAttributeId { get; init; }
+    public string Payload { get; init; } = "{}";
+    public string SchemaVersion { get; init; } = "1.0";
 
-Ověření: Build projde. Record má 4 properties.
+    // --- PROP-020 additions ---
+    public string StreamId { get; init; } = "default";
+    public CommandSource Source { get; init; } = CommandSource.Unknown;
+    public CoreInfoSource InfoSource { get; init; } = CoreInfoSource.Manual;
+    public CommandIssuedBy IssuedBy { get; init; } = new();
+    public CommandProvenance Provenance { get; init; } = new();
+    public string? CorrelationId { get; init; }
+    public string? CausationId { get; init; }
+    public string? MutationId { get; init; }
+}
+
+Ověření: Build projde. Record má 15+ properties, včetně MutationId a Provenance.
 ```
 
 ---
 
-## Prompt 7 — CommandLogStore
+## Prompt 7 — CommandLogStore (vč. PROP-020 idempotence)
 
 ```
 Vytvoř soubor: Src/MetaForge.BusinessModel/CommandLog/CommandLogStore.cs
@@ -229,38 +244,49 @@ Vytvoř soubor: Src/MetaForge.BusinessModel/CommandLog/CommandLogStore.cs
 namespace MetaForge.BusinessModel.CommandLog;
 
 //context//
-// Účel: Append-only úložiště commandů. Žádný delete, žádný update.
+// Účel: Append-only úložiště commandů s idempotencí přes MutationId. Žádný delete, žádný update.
 // Vrstva: BusinessModel.
 // Vstup: CommandEnvelope z PatchEngine.
 // Výstup: Sekvence commandů pro replay.
 // Závislosti: CommandEnvelope.
 // Nezávislosti: Nezávisí na BusinessAuthoringDocument — pouze ukládá commandy.
-// Invarianty: APPEND-ONLY. Count nikdy neklesá.
+// Invarianty: APPEND-ONLY. Count nikdy neklesá. MutationId null = bez kontroly idempotence.
+// PROP-020: TryAppend s deduplikací podle MutationId. GetFrom pro inkrementální replay.
 // Související typy: CommandEnvelope, ReplayEngine.
 // Testy: BusinessModel.Tests/CommandLog/CommandLogStoreTests.cs.
 
-/// <summary>
-/// Append-only úložiště commandů.
-/// </summary>
-public class CommandLogStore
+public sealed class CommandLogStore
 {
     private readonly List<CommandEnvelope> _commands = new();
+    private readonly HashSet<string> _appliedMutationIds = new();
+    private readonly object _lock = new();
 
-    /// <summary>Počet commandů v logu.</summary>
-    public int Count => _commands.Count;
+    public int Count { get { lock (_lock) return _commands.Count; } }
 
-    /// <summary>Přidá command do logu. Append-only — nelze mazat.</summary>
-    public void Append(CommandEnvelope envelope)
+    /// <summary>Přidá command (zpětná kompatibilita).</summary>
+    public void Append(CommandEnvelope envelope) => TryAppend(envelope);
+
+    /// <summary>Pokusí se přidat command. Vrací false pokud MutationId již existuje (idempotence).</summary>
+    public bool TryAppend(CommandEnvelope envelope)
     {
         ArgumentNullException.ThrowIfNull(envelope);
-        _commands.Add(envelope);
+        lock (_lock)
+        {
+            if (envelope.MutationId is not null && !_appliedMutationIds.Add(envelope.MutationId))
+                return false;
+            _commands.Add(envelope);
+            return true;
+        }
     }
 
-    /// <summary>Vrací všechny commandy v pořadí vložení.</summary>
-    public IReadOnlyList<CommandEnvelope> GetAll() => _commands.AsReadOnly();
+    /// <summary>Vrací všechny commandy.</summary>
+    public IReadOnlyList<CommandEnvelope> GetAll() { lock (_lock) return _commands.ToList().AsReadOnly(); }
+
+    /// <summary>Vrací command od daného indexu (inkrementální replay).</summary>
+    public IReadOnlyList<CommandEnvelope> GetFrom(int startIndex) { ... }
 }
 
-Ověření: Build projde. Append zvyšuje Count. GetAll vrací všechny commandy.
+Ověření: Build projde. TryAppend s MutationId vrací false při duplicitě. Append zachovává zpětnou kompatibilitu.
 ```
 
 ---

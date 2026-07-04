@@ -285,7 +285,7 @@ namespace MetaForge.Ai.Translation;
 /// AI implementace enrichmentu — používá AI pro hlubší analýzu atributů.
 /// Při selhání vrací null (graceful fallback na deterministický DefaultBusinessTranslator).
 /// </summary>
-public sealed class AiTranslationService
+public sealed class AiTranslationService : ITranslationService
 {
     private readonly IAiBackendAdapter _backend;
 
@@ -375,6 +375,7 @@ using MetaForge.Ai.Adapters;
 using MetaForge.Ai.Inference;
 using MetaForge.Ai.Translation;
 using MetaForge.Core.Inference;
+using MetaForge.Translator.Translation;
 
 namespace MetaForge.Ai;
 
@@ -398,7 +399,7 @@ public static class AiServiceRegistration
 
         // AI implementace — nahradí deterministické fallbacky
         services.AddSingleton<IConstraintInferencer, AiConstraintInferencer>();
-        services.AddSingleton<AiTranslationService>();
+        services.AddSingleton<ITranslationService, AiTranslationService>();
 
         return services;
     }
