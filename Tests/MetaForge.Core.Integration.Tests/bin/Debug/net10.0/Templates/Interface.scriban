@@ -1,0 +1,25 @@
+{{~ ## C# Interface Scriban Template ~}}
+{{~ ## Generuje C# interface s usingy, properties a signaturami metod ~}}
+
+{{~ ## Usingy ~}}
+{{- for using in usings -}}
+using {{ using }};
+{{- end }}
+{{- if usings.size > 0 }}
+
+{{- end }}
+{{~ ## Deklarace interfacu ~}}
+{{ access_modifier }} interface {{ name }}
+{
+{{~ ## Properties ~}}
+{{- for property in properties -}}
+    {{ property }}
+{{- end }}
+{{- if properties.size > 0 && methods.size > 0 }}
+
+{{- end }}
+{{~ ## Metody (pouze signatury) ~}}
+{{- for method in methods -}}
+    {{ method }};
+{{- end }}
+}

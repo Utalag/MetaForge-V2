@@ -1,0 +1,77 @@
+Testovac├ş b─Ťh pro C:\Users\Utalag\Documents\source-git\MetaForge-V2\Tests\MetaForge.Core.Integration.Tests\bin\Debug\net10.0\MetaForge.Core.Integration.Tests.dll (.NETCoreApp,Version=v10.0)
+Celkov├Ż po─Źet testovac├şch soubor┼», kter├ę odpov├şdaj├ş zadan├ęmu vzoru: 1
+[xUnit.net 00:00:00.30]     MetaForge.Core.Integration.Tests.Scenarios.EnumVariantsSnapshots.E4_FlagsEnum [FAIL]
+[xUnit.net 00:00:00.30]     MetaForge.Core.Integration.Tests.Scenarios.TypeModelVariantsSnapshots.T05_IntCollection [FAIL]
+  Ne├║sp─Ť┼ín├ę MetaForge.Core.Integration.Tests.Scenarios.EnumVariantsSnapshots.E4_FlagsEnum [174 ms]
+  Chybov├í zpr├íva:
+   Expected result.SourceCode "
+
+
+public enum Permissions
+{
+}
+" to contain "[Flags]".
+  Trasov├ín├ş z├ísobn├şku:
+     at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
+   at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)
+   at FluentAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)
+   at FluentAssertions.Primitives.StringAssertions`1.Contain(String expected, String because, Object[] becauseArgs)
+   at MetaForge.Core.Integration.Tests.Scenarios.EnumVariantsSnapshots.E4_FlagsEnum() in C:\Users\Utalag\Documents\source-git\MetaForge-V2\Tests\MetaForge.Core.Integration.Tests\Scenarios\EnumVariantsSnapshots.cs:line 55
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  Ne├║sp─Ť┼ín├ę MetaForge.Core.Integration.Tests.Scenarios.TypeModelVariantsSnapshots.T05_IntCollection [47 ms]
+  Chybov├í zpr├íva:
+   Expected result.SourceCode "
+
+
+public class Entity
+{
+
+public List<object> Ids { get; set; }
+
+
+}
+" to contain "List<int>".
+  Trasov├ín├ş z├ísobn├şku:
+     at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
+   at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)
+   at FluentAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)
+   at FluentAssertions.Primitives.StringAssertions`1.Contain(String expected, String because, Object[] becauseArgs)
+   at MetaForge.Core.Integration.Tests.Scenarios.TypeModelVariantsSnapshots.GenerateAndVerify(String propName, TypeModel propType, String expectedCSharpType) in C:\Users\Utalag\Documents\source-git\MetaForge-V2\Tests\MetaForge.Core.Integration.Tests\Scenarios\TypeModelVariantsSnapshots.cs:line 43
+   at MetaForge.Core.Integration.Tests.Scenarios.TypeModelVariantsSnapshots.T05_IntCollection() in C:\Users\Utalag\Documents\source-git\MetaForge-V2\Tests\MetaForge.Core.Integration.Tests\Scenarios\TypeModelVariantsSnapshots.cs:line 20
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+[xUnit.net 00:00:00.31]     MetaForge.Core.Integration.Tests.Scenarios.TypeModelVariantsSnapshots.T06_StringCollection [FAIL]
+  Ne├║sp─Ť┼ín├ę MetaForge.Core.Integration.Tests.Scenarios.TypeModelVariantsSnapshots.T06_StringCollection [1 ms]
+  Chybov├í zpr├íva:
+   Expected result.SourceCode "
+
+
+public class Entity
+{
+
+public List<object> Tags { get; set; }
+
+
+}
+" to contain "List<string>".
+  Trasov├ín├ş z├ísobn├şku:
+     at FluentAssertions.Execution.XUnit2TestFramework.Throw(String message)
+   at FluentAssertions.Execution.TestFrameworkProvider.Throw(String message)
+   at FluentAssertions.Execution.DefaultAssertionStrategy.HandleFailure(String message)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(Func`1 failReasonFunc)
+   at FluentAssertions.Execution.AssertionScope.FailWith(String message, Object[] args)
+   at FluentAssertions.Primitives.StringAssertions`1.Contain(String expected, String because, Object[] becauseArgs)
+   at MetaForge.Core.Integration.Tests.Scenarios.TypeModelVariantsSnapshots.GenerateAndVerify(String propName, TypeModel propType, String expectedCSharpType) in C:\Users\Utalag\Documents\source-git\MetaForge-V2\Tests\MetaForge.Core.Integration.Tests\Scenarios\TypeModelVariantsSnapshots.cs:line 43
+   at MetaForge.Core.Integration.Tests.Scenarios.TypeModelVariantsSnapshots.T06_StringCollection() in C:\Users\Utalag\Documents\source-git\MetaForge-V2\Tests\MetaForge.Core.Integration.Tests\Scenarios\TypeModelVariantsSnapshots.cs:line 21
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+Ne├║sp─Ť┼ín├ę!  - Ne├║sp─Ť┼ín├ę:     3, ├Üsp─Ť┼ín├ę:    45, P┼Öesko─Źeno:     0, Celkem:    48, Doba trv├ín├ş: 195 ms - MetaForge.Core.Integration.Tests.dll (net10.0)

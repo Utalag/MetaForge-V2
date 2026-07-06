@@ -1,0 +1,6 @@
+
+
+[Flags]
+public enum Permissions
+{
+}
