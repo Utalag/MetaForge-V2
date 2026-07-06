@@ -1,6 +1,0 @@
-
-
-[Flags]
-public enum Permissions
-{
-}

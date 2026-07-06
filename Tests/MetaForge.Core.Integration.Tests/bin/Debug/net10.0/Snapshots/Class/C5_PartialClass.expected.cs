@@ -1,8 +1,0 @@
-
-
-
-public partial class Entity
-{
-
-
-}

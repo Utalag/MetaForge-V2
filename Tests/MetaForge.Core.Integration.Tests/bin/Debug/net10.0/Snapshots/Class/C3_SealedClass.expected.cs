@@ -1,8 +1,0 @@
-
-
-
-public sealed class Validator
-{
-
-
-}

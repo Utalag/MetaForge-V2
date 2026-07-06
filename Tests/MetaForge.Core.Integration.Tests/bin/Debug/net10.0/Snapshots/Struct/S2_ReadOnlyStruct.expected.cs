@@ -1,8 +1,0 @@
-
-
-
-public readonly struct Vector
-{
-
-
-}
