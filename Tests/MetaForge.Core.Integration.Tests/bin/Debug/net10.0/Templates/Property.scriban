@@ -1,0 +1,8 @@
+{{~ ## C# Property Scriban Template ~}}
+{{~ ## Generuje C# property deklaraci ~}}
+{{- if attributes -}}
+{{- for attribute in attributes -}}
+{{ attribute }}
+{{- end }}
+{{- end }}
+{{ access_modifier }}{{ if is_static }} static{{ end }}{{ if is_required }} required{{ end }} {{ type }} {{ name }} { {{ if has_getter }}get;{{ end }}{{ if has_setter && is_init_only }} init;{{ else if has_setter }} set;{{ end }} }{{ if default_value }} = {{ default_value }};{{ end }}

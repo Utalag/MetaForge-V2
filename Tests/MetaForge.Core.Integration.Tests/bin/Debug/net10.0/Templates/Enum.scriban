@@ -1,0 +1,24 @@
+{{~ ## C# Enum Scriban Template ~}}
+{{~ ## Generuje C# enum s usingy, atributy a členy ~}}
+
+{{~ ## Usingy ~}}
+{{- for using in usings -}}
+using {{ using }};
+{{- end }}
+{{- if usings.size > 0 }}
+
+{{- end }}
+{{~ ## Atributy ~}}
+{{- if is_flags -}}
+[Flags]
+{{- end }}
+{{- for attribute in attributes -}}
+{{ attribute }}
+{{- end }}
+{{~ ## Deklarace enumu ~}}
+{{ access_modifier }} enum {{ name }}{{ if underlying_type }} : {{ underlying_type }}{{ end }}
+{
+{{- for member in members }}
+    {{ member.name }}{{ if member.value }} = {{ member.value }}{{ end }}{{ if !for.last }},{{ end }}
+{{- end }}
+}

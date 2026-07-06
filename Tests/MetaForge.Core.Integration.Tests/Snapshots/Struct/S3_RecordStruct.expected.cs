@@ -1,0 +1,8 @@
+
+
+
+public record struct Sensor
+{
+
+
+}
