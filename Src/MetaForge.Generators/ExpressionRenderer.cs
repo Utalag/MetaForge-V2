@@ -1,167 +1,68 @@
 using System.Text;
 using MetaForge.Core.Elements.Expressions;
+using MetaForge.Core.Elements.Statements;
 
 namespace MetaForge.Generators;
 
 /// <summary>
-/// Renderuje ComputedExpression do C# kódu.
-/// Pokrývá všechny běžné C# výrazy a statementy: podmínky, cykly, volání metod, operátory.
+/// Renderuje Expression a Statement AST do C# kódu.
+/// Podporuje: binary/unary/constant/method-call/member-access/conditional expressiony
+/// a block/return/if/for/while/assignment/expression statementy.
 /// </summary>
 public sealed class ExpressionRenderer
 {
     private int _indent;
 
     /// <summary>
-    /// Přeloží ComputedExpression na C# kód.
+    /// Vyrenderuje celý blok statementů (tělo metody).
     /// </summary>
-    public string Render(ComputedExpression expr)
+    public string Render(BlockStatement block)
     {
         _indent = 0;
-        return RenderInternal(expr);
+        return RenderStatement(block);
     }
 
     /// <summary>
-    /// Přeloží ComputedExpression na C# kód s počátečním odsazením.
+    /// Vyrenderuje tělo metody s počátečním odsazením.
     /// </summary>
-    public string Render(ComputedExpression expr, int indent)
+    public string Render(BlockStatement block, int indent)
     {
         _indent = indent;
-        return RenderInternal(expr);
+        return RenderStatement(block);
     }
 
-    private string RenderInternal(ComputedExpression expr)
+    // ========================================================================
+    // STATEMENTY
+    // ========================================================================
+
+    /// <summary>
+    /// Typově bezpečný dispatch — renderuje libovolný Statement do C#.
+    /// </summary>
+    public string RenderStatement(Statement stmt) => stmt switch
     {
-        return expr.Operation.OperationId switch
-        {
-            "return" => $"{Indent()}return {RenderOperand(expr.Operands.FirstOrDefault())};",
-            "assign" => $"{Indent()}{RenderOperand(expr.Operands.FirstOrDefault())} = {RenderOperand(expr.Operands.Skip(1).FirstOrDefault())};",
-            "declare-variable" => RenderVariableDeclaration(expr),
-            "throw-if-null" => RenderThrowIfNull(expr),
-            "throw-if-empty" => RenderThrowIfEmpty(expr),
-            "comparison" => RenderComparison(expr),
-            "member-access" => $"{RenderOperand(expr.Operands.FirstOrDefault())}.{RenderOperand(expr.Operands.Skip(1).FirstOrDefault())}",
-            "string-format" => RenderStringFormat(expr),
-            "raw" => RenderRaw(expr),
-            "literal" => RenderLiteral(expr),
-            "variable-ref" => RenderVariableRef(expr),
-            "binary" => RenderBinary(expr),
-            "unary" => RenderUnary(expr),
-            "ternary" => RenderTernary(expr),
-            "method-call" => RenderMethodCall(expr),
-            "block" => RenderBlock(expr),
-            "if" => RenderIf(expr),
-            "for" => RenderFor(expr),
-            "while" => RenderWhile(expr),
-            "throw" => RenderThrow(expr),
-            _ => $"/* Neznámá operace: {expr.Operation.OperationId} */"
-        };
-    }
+        BlockStatement block => RenderBlock(block),
+        ReturnStatement ret => RenderReturn(ret),
+        IfStatement ifs => RenderIf(ifs),
+        ForStatement forS => RenderFor(forS),
+        WhileStatement whileS => RenderWhile(whileS),
+        AssignmentStatement assign => RenderAssignment(assign),
+        ExpressionStatement exprStmt => RenderExprStmt(exprStmt),
+        _ => $"{Indent()}/* Neznámý statement: {stmt.StatementKind} */"
+    };
 
-    // === Operandy ===
-
-    private string RenderOperand(Expression? operand)
+    private string RenderBlock(BlockStatement block)
     {
-        if (operand is null) return "null";
-
-        if (operand is ComputedExpression computed)
-            return RenderInternal(computed);
-
-        return operand.ToString() ?? "null";
-    }
-
-    // === Raw / Literal / Variable ===
-
-    private string RenderRaw(ComputedExpression expr)
-    {
-        // První operand obsahuje raw kód
-        var raw = expr.Operands.FirstOrDefault();
-        return raw?.ToString() ?? "";
-    }
-
-    private string RenderLiteral(ComputedExpression expr)
-    {
-        // První operand je hodnota literálu
-        return RenderOperand(expr.Operands.FirstOrDefault());
-    }
-
-    private string RenderVariableRef(ComputedExpression expr)
-    {
-        // První operand je název proměnné
-        return expr.Operands.FirstOrDefault()?.ToString() ?? "unknown";
-    }
-
-    // === Binární a unární operace ===
-
-    private string RenderBinary(ComputedExpression expr)
-    {
-        // operands[0] = left, operands[1] = operator, operands[2] = right
-        var left = RenderOperand(expr.Operands.ElementAtOrDefault(0));
-        var op = expr.Operands.Count > 1
-            ? RenderOperand(expr.Operands[1])
-            : "+";
-        var right = expr.Operands.Count > 2
-            ? RenderOperand(expr.Operands[2])
-            : "null";
-
-        // Zjednodušíme: pokud je operátor krátký, zabalíme do závorek
-        return op.Length <= 4 ? $"({left} {op} {right})" : $"{left} {op} {right}";
-    }
-
-    private string RenderUnary(ComputedExpression expr)
-    {
-        // operands[0] = operator, operands[1] = operand (prefix)
-        // nebo operands[0] = operand with implicit operator (postfix)
-        if (expr.Operands.Count >= 2)
-        {
-            var op = RenderOperand(expr.Operands[0]);
-            var operand = RenderOperand(expr.Operands[1]);
-            return $"{op}{operand}";
-        }
-
-        return RenderOperand(expr.Operands.FirstOrDefault());
-    }
-
-    // === Ternární výraz ===
-
-    private string RenderTernary(ComputedExpression expr)
-    {
-        // operands[0] = condition, operands[1] = trueBranch, operands[2] = falseBranch
-        var condition = RenderOperand(expr.Operands.ElementAtOrDefault(0));
-        var trueBranch = RenderOperand(expr.Operands.ElementAtOrDefault(1));
-        var falseBranch = RenderOperand(expr.Operands.ElementAtOrDefault(2));
-
-        return $"{condition} ? {trueBranch} : {falseBranch}";
-    }
-
-    // === Volání metody ===
-
-    private string RenderMethodCall(ComputedExpression expr)
-    {
-        // operands[0] = target (volitelné), operands[1] = methodName, operands[2..] = arguments
-        var target = expr.Operands.Count > 0 ? RenderOperand(expr.Operands[0]) : null;
-        var methodBaseIdx = target != null ? 1 : 0;
-        var methodName = expr.Operands.Count > methodBaseIdx
-            ? RenderOperand(expr.Operands[methodBaseIdx])
-            : "UnknownMethod";
-        var args = expr.Operands.Skip(methodBaseIdx + 1).Select(RenderOperand);
-
-        var targetPrefix = target != null ? $"{target}." : "";
-        return $"{targetPrefix}{methodName}({string.Join(", ", args)})";
-    }
-
-    // === Blok ===
-
-    private string RenderBlock(ComputedExpression expr)
-    {
-        // Každý operand je statement uvnitř bloku
         var sb = new StringBuilder();
-        sb.AppendLine("{");
+
+        if (_indent > 0)
+            sb.AppendLine("{");
+        else
+            sb.AppendLine("{");
 
         _indent++;
-        foreach (var stmt in expr.Operands)
+        foreach (var stmt in block.Statements)
         {
-            if (stmt is ComputedExpression computed)
-                sb.AppendLine(RenderInternal(computed));
+            sb.AppendLine(RenderStatement(stmt));
         }
         _indent--;
 
@@ -169,138 +70,203 @@ public sealed class ExpressionRenderer
         return sb.ToString();
     }
 
-    // === Podmínky ===
-
-    private string RenderIf(ComputedExpression expr)
+    private string RenderReturn(ReturnStatement ret)
     {
-        // operands[0] = condition, operands[1] = then, operands[2] = else (volitelné)
-        var condition = RenderOperand(expr.Operands.ElementAtOrDefault(0));
+        if (ret.Value is null)
+            return $"{Indent()}return;";
+
+        var expr = RenderExpression(ret.Value);
+        return $"{Indent()}return {expr};";
+    }
+
+    private string RenderIf(IfStatement ifs)
+    {
         var sb = new StringBuilder();
+        var condition = RenderExpression(ifs.Condition);
 
         sb.Append($"{Indent()}if ({condition})");
         sb.AppendLine();
 
-        if (expr.Operands.Count > 1 && expr.Operands[1] is ComputedExpression thenExpr)
+        if (ifs.TrueBranch is not null)
         {
             _indent++;
-            var thenCode = RenderInternal(thenExpr);
+            sb.AppendLine(RenderStatement(ifs.TrueBranch));
             _indent--;
-            sb.AppendLine(thenCode);
+        }
+        else
+        {
+            _indent++;
+            sb.AppendLine($"{Indent()}{{ }}");
+            _indent--;
         }
 
-        if (expr.Operands.Count > 2 && expr.Operands[2] is ComputedExpression elseExpr)
+        if (ifs.FalseBranch is not null)
         {
             sb.AppendLine($"{Indent()}else");
             _indent++;
-            var elseCode = RenderInternal(elseExpr);
+            sb.AppendLine(RenderStatement(ifs.FalseBranch));
             _indent--;
-            sb.AppendLine(elseCode);
         }
 
         return sb.ToString().TrimEnd();
     }
 
-    // === Cykly ===
-
-    private string RenderFor(ComputedExpression expr)
+    private string RenderFor(ForStatement forS)
     {
-        // operands[0] = init, operands[1] = condition, operands[2] = increment, operands[3] = body
-        var init = expr.Operands.Count > 0 ? RenderOperand(expr.Operands[0]) : "int i = 0";
-        var condition = expr.Operands.Count > 1 ? RenderOperand(expr.Operands[1]) : "i < 10";
-        var increment = expr.Operands.Count > 2 ? RenderOperand(expr.Operands[2]) : "i++";
         var sb = new StringBuilder();
+        var init = $"int {forS.Variable} = {RenderExpression(forS.Start)}";
+        var condition = $"{forS.Variable} < {RenderExpression(forS.End)}";
+        var increment = $"{forS.Variable}++";
 
         sb.Append($"{Indent()}for ({init}; {condition}; {increment})");
         sb.AppendLine();
 
-        if (expr.Operands.Count > 3 && expr.Operands[3] is ComputedExpression bodyExpr)
+        if (forS.Body is not null)
         {
             _indent++;
-            var bodyCode = RenderInternal(bodyExpr);
+            sb.AppendLine(RenderStatement(forS.Body));
             _indent--;
-            sb.AppendLine(bodyCode);
+        }
+        else
+        {
+            _indent++;
+            sb.AppendLine($"{Indent()}{{ }}");
+            _indent--;
         }
 
         return sb.ToString().TrimEnd();
     }
 
-    private string RenderWhile(ComputedExpression expr)
+    private string RenderWhile(WhileStatement whileS)
     {
-        // operands[0] = condition, operands[1] = body
-        var condition = RenderOperand(expr.Operands.ElementAtOrDefault(0));
         var sb = new StringBuilder();
+        var condition = RenderExpression(whileS.Condition);
 
         sb.Append($"{Indent()}while ({condition})");
         sb.AppendLine();
 
-        if (expr.Operands.Count > 1 && expr.Operands[1] is ComputedExpression bodyExpr)
-        {
-            _indent++;
-            var bodyCode = RenderInternal(bodyExpr);
-            _indent--;
-            sb.AppendLine(bodyCode);
-        }
+        _indent++;
+        sb.AppendLine(RenderStatement(whileS.Body));
+        _indent--;
 
         return sb.ToString().TrimEnd();
     }
 
-    // === Throw ===
-
-    private string RenderThrow(ComputedExpression expr)
+    private string RenderAssignment(AssignmentStatement assign)
     {
-        // operands[0] = exception type, operands[1] = message (volitelné)
-        var exceptionType = expr.Operands.Count > 0
-            ? RenderOperand(expr.Operands[0])
-            : "InvalidOperationException";
-        var message = expr.Operands.Count > 1
-            ? RenderOperand(expr.Operands[1])
-            : null;
-
-        return message != null
-            ? $"throw new {exceptionType}({message});"
-            : $"throw new {exceptionType}();";
+        var value = RenderExpression(assign.Value);
+        return $"{Indent()}{assign.Variable} = {value};";
     }
 
-    // === Stávající operace (vylepšené) ===
-
-    private string RenderVariableDeclaration(ComputedExpression expr)
+    private string RenderExprStmt(ExpressionStatement stmt)
     {
-        // operands[0] = type, operands[1] = name, operands[2] = initializer (volitelné)
-        var type = expr.Operands.Count > 0 ? RenderOperand(expr.Operands[0]) : "var";
-        var name = expr.Operands.Count > 1 ? RenderOperand(expr.Operands[1]) : "value";
-        var init = expr.Operands.Count > 2 ? $" = {RenderOperand(expr.Operands[2])}" : "";
-        return $"{Indent()}{type} {name}{init};";
+        var expr = RenderExpression(stmt.Expr);
+        return $"{Indent()}{expr};";
     }
 
-    private string RenderThrowIfNull(ComputedExpression expr)
+    // ========================================================================
+    // EXPRESSIONY
+    // ========================================================================
+
+    /// <summary>
+    /// Renderuje libovolný Expression do C# výrazu (bez středníku).
+    /// </summary>
+    public string RenderExpression(Expression expr) => expr switch
     {
-        var operand = expr.Operands.FirstOrDefault();
-        var name = RenderOperand(operand);
-        return $"{Indent()}if ({name} is null) throw new ArgumentNullException(nameof({name}));";
+        ConstantExpression constant => RenderConstant(constant),
+        BinaryExpression binary => RenderBinary(binary),
+        UnaryExpression unary => RenderUnary(unary),
+        MethodCallExpression methodCall => RenderMethodCall(methodCall),
+        MemberAccessExpression memberAccess => RenderMemberAccess(memberAccess),
+        ConditionalExpression conditional => RenderConditional(conditional),
+        _ => $"/* Neznámý výraz: {expr.Kind} */"
+    };
+
+    private string RenderConstant(ConstantExpression constant)
+    {
+        return constant.Value switch
+        {
+            null => "null",
+            string s => $"\"{s}\"",
+            char c => $"'{c}'",
+            bool b => b ? "true" : "false",
+            _ => constant.Value.ToString() ?? "null"
+        };
     }
 
-    private string RenderThrowIfEmpty(ComputedExpression expr)
+    private string RenderBinary(BinaryExpression binary)
     {
-        var operand = expr.Operands.FirstOrDefault();
-        var name = RenderOperand(operand);
-        return $"{Indent()}if (string.IsNullOrWhiteSpace({name})) throw new ArgumentException(\"{name} cannot be empty.\", nameof({name}));";
+        var left = RenderExpression(binary.Left);
+        var op = RenderBinaryOperator(binary.Operator);
+        var right = RenderExpression(binary.Right);
+
+        // Krátké operátory (aritmetika) dáváme do závorek pro správnou prioritu
+        return op.Length <= 2 ? $"({left} {op} {right})" : $"{left} {op} {right}";
     }
 
-    private string RenderComparison(ComputedExpression expr)
+    private string RenderUnary(UnaryExpression unary)
     {
-        var left = RenderOperand(expr.Operands.FirstOrDefault());
-        var op = expr.Operands.Count > 1 ? RenderOperand(expr.Operands[1]) : "==";
-        var right = expr.Operands.Count > 2 ? RenderOperand(expr.Operands[2]) : "null";
-        return $"{left} {op} {right}";
+        var op = RenderUnaryOperator(unary.Operator);
+        var operand = RenderExpression(unary.Operand);
+        return $"{op}{operand}";
     }
 
-    private string RenderStringFormat(ComputedExpression expr)
+    private string RenderMethodCall(MethodCallExpression methodCall)
     {
-        var parts = expr.Operands.Select(o => RenderOperand(o));
-        return $"$\"{string.Join("", parts)}\"";
+        var args = string.Join(", ", methodCall.Arguments.Select(RenderExpression));
+        return $"{methodCall.MethodName}({args})";
     }
 
-    // === Pomocné ===
+    private string RenderMemberAccess(MemberAccessExpression memberAccess)
+    {
+        return memberAccess.MemberPath;
+    }
+
+    private string RenderConditional(ConditionalExpression conditional)
+    {
+        var condition = RenderExpression(conditional.Condition);
+        var whenTrue = RenderExpression(conditional.WhenTrue);
+        var whenFalse = RenderExpression(conditional.WhenFalse);
+        return $"{condition} ? {whenTrue} : {whenFalse}";
+    }
+
+    // ========================================================================
+    // OPERÁTORY
+    // ========================================================================
+
+    private static string RenderBinaryOperator(BinaryOperator op) => op switch
+    {
+        BinaryOperator.Add => "+",
+        BinaryOperator.Subtract => "-",
+        BinaryOperator.Multiply => "*",
+        BinaryOperator.Divide => "/",
+        BinaryOperator.Modulo => "%",
+        BinaryOperator.Equal => "==",
+        BinaryOperator.NotEqual => "!=",
+        BinaryOperator.GreaterThan => ">",
+        BinaryOperator.LessThan => "<",
+        BinaryOperator.GreaterThanOrEqual => ">=",
+        BinaryOperator.LessThanOrEqual => "<=",
+        BinaryOperator.And => "&&",
+        BinaryOperator.Or => "||",
+        BinaryOperator.Concat => "+",
+        BinaryOperator.NullCoalesce => "??",
+        _ => "??"
+    };
+
+    private static string RenderUnaryOperator(UnaryOperator op) => op switch
+    {
+        UnaryOperator.Not => "!",
+        UnaryOperator.Negate => "-",
+        UnaryOperator.BitwiseNot => "~",
+        UnaryOperator.Increment => "++",
+        UnaryOperator.Decrement => "--",
+        _ => "?"
+    };
+
+    // ========================================================================
+    // POMOCNÉ
+    // ========================================================================
 
     private string Indent() => _indent > 0 ? new string(' ', _indent * 4) : "";
 }

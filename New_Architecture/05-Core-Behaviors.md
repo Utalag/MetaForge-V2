@@ -1,14 +1,16 @@
 # Core — Behaviors
 
-> Expression System (PROP-024), Constraints, Boundary Analysis, StandardLibraries
+> Expression System (PROP-024, PROP-031), Statement System (PROP-031), Constraints, Boundary Analysis, StandardLibraries
 
-**Aktualizace:** PROP-024 (2026-07-04) — Expression hierarchie (11 druhů), ExpressionKind enum.
+**Aktualizace:** PROP-024 (2026-07-04) — Expression hierarchie.
+**Aktualizace:** PROP-031 (2026-07-05) — Statement hierarchie, odstraněn ComputedExpression (nahrazen Statement AST).
 
 ---
 
 ## Expression System (PROP-024)
 
 Hierarchie výrazů inspirovaná `System.Linq.Expressions`, přizpůsobená pro doménové modelování.
+Expressiony se používají uvnitř Statementů (např. `ReturnStatement.Value`, `IfStatement.Condition`, `AssignmentStatement.Value`).
 
 ```csharp
 // Složka: Src/MetaForge.Core/Elements/Expressions/
@@ -32,7 +34,6 @@ public enum ExpressionKind
     Conditional,    // a ? b : c
     Default,        // default(int)
     Conversion,     // (decimal)price
-    Computed,       // ComputedOperation wrapper
 }
 ```
 
@@ -87,16 +88,6 @@ public sealed record MethodCallExpression(
 {
     public override ExpressionKind ExpressionKind => ExpressionKind.MethodCall;
 }
-
-// Computed wrapper — pro ForgeBlock operace
-public sealed record ComputedExpression(
-    ComputedOperation Operation, IReadOnlyList<Expression> Operands) : Expression
-{
-    public override ExpressionKind ExpressionKind => ExpressionKind.Computed;
-}
-
-public sealed record ComputedOperation(
-    string OperationId, string DisplayName, string? Description = null);
 ```
 
 ### Použití
@@ -118,14 +109,46 @@ var expr = new BinaryExpression(
 );
 ```
 
-### ExpressionRenderer (v Generators)
+---
+
+## Statement System (PROP-031)
+
+> Typově bezpečná hierarchie statementů nahrazující `ComputedExpression` pro reprezentaci těl metod.
+> Expressiony se používají uvnitř Statementů — např. `ReturnStatement.Value: Expression`.
 
 ```csharp
-// Renderuje Expression → C# kód
+// Složka: Src/MetaForge.Core/Elements/Statements/
+
+public abstract class Statement
+{
+    public abstract StatementKind StatementKind { get; }
+}
+
+public enum StatementKind
+{
+    Block, Return, If, For, While, Assignment, Expression
+}
+
+// Statementy:
+// BlockStatement       — { stmt1; stmt2; }
+// ReturnStatement      — return X;
+// IfStatement          — if (cond) { } else { }
+// ForStatement         — for (init; cond; inc) { }
+// WhileStatement       — while (cond) { }
+// AssignmentStatement  — varName = value;
+// ExpressionStatement  — expr; (volání metody apod.)
+```
+
+### ExpressionRenderer (v Generators) — aktualizováno
+
+```csharp
+// Renderuje Expression a Statement AST → C# kód
 public sealed class ExpressionRenderer
 {
-    public string Render(ComputedExpression expr);
-    public string Render(ComputedExpression expr, int indent);
+    public string Render(BlockStatement block);          // tělo metody
+    public string Render(BlockStatement block, int indent);
+    public string RenderStatement(Statement stmt);       // dispatch
+    public string RenderExpression(Expression expr);     // dispatch
 }
 ```
 
@@ -152,6 +175,64 @@ Implementace: `RuleBasedConstraintInferencer` (deterministická), `AiConstraintI
 public interface IStandardLibraryTranslator
 {
     string OperationId { get; }
-    StandardLibraryRequirements? Translate(ComputedOperation operation);
+    StandardLibraryRequirements? Translate(string operationId);
 }
 ```
+
+---
+
+## CoreValidator + Element Factory Metody (PROP-033 — nové)
+
+> **Aktualizace:** PROP-033 (2026-07-05) — validace Core elementů a factory metody pro bezpečnou konstrukci.
+> Každá ✅ kombinace z matice = factory metoda. Každá ❌ kombinace = detekce v CoreValidatoru.
+
+### CoreValidator
+
+```csharp
+// Složka: Src/MetaForge.Core/Validation/
+// Soubory: CoreValidator.cs, ValidationIssue.cs
+
+public static class CoreValidator
+{
+    /// <summary>Vrátí seznam validačních problémů. Prázdný seznam = validní.</summary>
+    public static IReadOnlyList<ValidationIssue> Validate(RootElement element);
+
+    /// <summary>Vyhodí výjimku při prvním problému. Pro fail-fast scénáře.</summary>
+    public static void EnsureValid(RootElement element);
+
+    /// <summary>Validátor pro MethodElement (není RootElement).</summary>
+    public static IReadOnlyList<ValidationIssue> ValidateMethod(MethodElement method);
+
+    /// <summary>Validátor pro PropertyElement (není RootElement).</summary>
+    public static IReadOnlyList<ValidationIssue> ValidateProperty(PropertyElement property);
+}
+
+public sealed record ValidationIssue(
+    string Code,      // Kód z matice: "C9", "M11", ...
+    string Category,  // ConflictingModifiers | InvalidAccess | InvalidType | ...
+    string Message    // Lidsky čitelná zpráva
+);
+```
+
+### Pokryté ❌ řádky matice
+
+| Kód | Popis | Kategorie |
+|:---:|-------|-----------|
+| C9 | `abstract sealed` | ConflictingModifiers |
+| C10 | `abstract static` | ConflictingModifiers |
+| C12 | `static record` | ConflictingModifiers |
+| A3-A5 | private/protected top-level | InvalidAccess |
+| I5 | dědění od sealed typu | InvalidInheritance |
+| E5-E6 | nevalidní underlying type enumu | InvalidType |
+| P7 | property bez getteru i setteru | MissingRequired |
+| T19-T21 | void jako property type | InvalidType |
+| M9-M12 | konfliktní modifikátory metod | ConflictingModifiers |
+| B11-B13 | typové chyby ve statementech | StatementTypeError |
+
+### Factory metody na elementech
+
+Factory metody jsou atomické — každá vytváří právě jednu ✅ kombinaci z matice.
+Fluent `With*` metody slouží pro vlastnosti bez konfliktů (access modifier, base class, parametry).
+
+Viz [`04-Core-Elements.md`](04-Core-Elements.md) pro kompletní výčet factory metod.
+

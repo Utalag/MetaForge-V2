@@ -1,6 +1,7 @@
 using MetaForge.Core.Abstractions;
 using MetaForge.Core.DataTypes;
 using MetaForge.Core.Elements.Members;
+using MetaForge.Core.Elements.Statements;
 using MetaForge.Core.Elements.Types;
 
 namespace MetaForge.Generators;
@@ -13,6 +14,9 @@ namespace MetaForge.Generators;
 public class CodeGenerator : BaseCodeGenerator
 {
     private const string FileExtension = ".cs";
+
+    /// <summary>Renderer pro Expression a Statement AST.</summary>
+    private readonly ExpressionRenderer _renderer = new();
 
     public override GeneratedCodeArtifact Generate(RootElement element)
     {
@@ -101,6 +105,7 @@ public class CodeGenerator : BaseCodeGenerator
             { "name", enm.Name },
             { "access_modifier", MapAccessModifier(enm.AccessModifier) },
             { "underlying_type", enm.UnderlyingType != DataType.Int32 ? MapDataType(enm.UnderlyingType) : null },
+            { "is_flags", enm.IsFlags },
             { "usings", enm.Usings },
             { "attributes", enm.Attributes.Select(RenderAttribute).ToList() },
             { "members", enm.Members.Select(m => new Dictionary<string, object?>
@@ -185,7 +190,7 @@ public class CodeGenerator : BaseCodeGenerator
             { "is_async", method.IsAsync },
             { "parameters", parameters },
             { "attributes", method.Attributes.Select(RenderAttribute).ToList() },
-            { "body", method.Body }
+            { "body", RenderMethodBody(method) }
         };
 
         return RenderTemplate("Method", model);
@@ -214,6 +219,18 @@ public class CodeGenerator : BaseCodeGenerator
         var asyncMod = method.IsAsync ? "async " : "";
 
         return $"{accessMod} {staticMod}{asyncMod}{returnType} {method.Name}({parameters})";
+    }
+
+    /// <summary>
+    /// Vyrenderuje tělo metody — buď pomocí AST (BlockStatement) nebo vrátí prázdný string.
+    /// Abstraktní metody (Body == null) vracejí ";" (bez těla).
+    /// </summary>
+    private string RenderMethodBody(MethodElement method)
+    {
+        if (method.IsAbstract || method.Body is null)
+            return ";";
+
+        return _renderer.Render(method.Body);
     }
 
     private static string RenderAttribute(AttributeElement attr)

@@ -1,6 +1,6 @@
 # Generators
 
-> CodeGenerator, Scriban templates, TemplateManager, ExpressionRenderer, Packaging
+> CodeGenerator, Scriban templates, TemplateManager, ExpressionRenderer (Expression & Statement AST), Packaging
 
 ---
 
@@ -21,7 +21,7 @@ Src/MetaForge.Generators/
 ├── BaseCodeGenerator.cs                 (abstraktní báze)
 ├── TemplateManager.cs                   (Scriban loader + cache)
 ├── CodeGenerator.cs                     (jediný generátor)
-├── ExpressionRenderer.cs                (ComputedExpression → C#)
+├── ExpressionRenderer.cs                (Expression & Statement AST → C#)
 ├── GeneratedCodeArtifact.cs
 ├── DiagnosticInfo.cs
 ├── Templates/
@@ -164,58 +164,68 @@ public enum DiagnosticSeverity { Warning, Error }
 ```csharp
 public sealed class ExpressionRenderer
 {
-    // Renderuje ComputedExpression → C# kód s podporou odsazení
-    public string Render(ComputedExpression expr);
-    public string Render(ComputedExpression expr, int indent);
+    // Renderuje Expression a Statement AST → C# kód
+    public string Render(BlockStatement block);           // tělo metody
+    public string Render(BlockStatement block, int indent);
+    public string RenderStatement(Statement stmt);        // dispatch (switch podle StatementKind)
+    public string RenderExpression(Expression expr);      // dispatch (switch podle ExpressionKind)
 }
 ```
 
-### Podporované operace
+### Podporované Statementy (výstup)
 
-| OperationId | Výstup | Příklad |
-|-------------|--------|---------|
-| `return` | `return expr;` | `return result;` |
-| `assign` | `target = value;` | `count = 0;` |
-| `declare-variable` | `type name = init;` | `int total = 0;` |
-| `throw-if-null` | `if (x is null) throw ...` | Guard clause |
-| `throw-if-empty` | `if (string.IsNullOrWhiteSpace(x)) throw ...` | String guard |
-| `comparison` | `left op right` | `a == b` |
-| `member-access` | `target.member` | `person.Name` |
-| `string-format` | `$"..."` | Interpolated string |
-| `binary` | `(left op right)` | `(a + b)` |
-| `unary` | `op operand` | `!flag` |
-| `ternary` | `cond ? true : false` | `a > 0 ? "pos" : "neg"` |
-| `method-call` | `target.Method(args)` | `list.Add(item)` |
-| `literal` | Hodnota | `42`, `"text"` |
-| `variable-ref` | Název | `customerName` |
-| `raw` | Surový kód | `=> expr` |
-| `block` | `{ ... }` | Složený blok |
-| `if` | `if (cond) then else` | Podmínka |
-| `for` | `for (init; cond; incr) body` | Cyklus |
-| `while` | `while (cond) body` | Cyklus |
-| `throw` | `throw new Ex();` | Výjimka |
+| Statement | Výstup | Příklad |
+|-----------|--------|---------|
+| ReturnStatement | `return expr;` | `return result;` |
+| BlockStatement | `{ stmt1; stmt2; }` | Složený blok |
+| IfStatement | `if (cond) { } else { }` | Podmínka |
+| ForStatement | `for (int i = 0; i < n; i++) { }` | Cyklus |
+| WhileStatement | `while (cond) { }` | Cyklus |
+| AssignmentStatement | `var = value;` | `total = price * qty;` |
+| ExpressionStatement | `expr;` | `list.Add(item);` |
 
-### Příklad stromové struktury
+### Podporované Expressiony (výstup)
 
-```
-ComputedExpression (operation: "if")
- ├── Operand[0]: ComputedExpression (operation: "comparison")   → condition
- │    └── Operands: [age, >, 18]
- ├── Operand[1]: ComputedExpression (operation: "block")         → then
- │    └── Operands: [return "adult";]
- └── Operand[2]: ComputedExpression (operation: "block")         → else
-      └── Operands: [return "minor";]
-```
+| Expression | Výstup | Příklad |
+|-----------|--------|---------|
+| ConstantExpression | Hodnota | `42`, `"text"`, `true` |
+| BinaryExpression | `(left op right)` | `(a + b)` |
+| UnaryExpression | `op operand` | `!flag` |
+| MethodCallExpression | `method(args)` | `Math.Sqrt(x)` |
+| MemberAccessExpression | `target.member` | `person.Name` |
+| ConditionalExpression | `cond ? true : false` | `a > 0 ? "yes" : "no"` |
 
-Výstup:
+### Příklad: Pythagorova věta jako AST
+
 ```csharp
-if (age > 18)
+var method = new MethodElement
 {
-    return "adult";
-}
-else
+    Name = "CalculateHypotenuse",
+    ReturnType = TypeModel.Double,
+    Body = new BlockStatement(
+        new ReturnStatement(
+            new MethodCallExpression("Math.Sqrt",
+                new Expression[]
+                {
+                    new BinaryExpression(
+                        new BinaryExpression(
+                            new MemberAccessExpression("a"),
+                            BinaryOperator.Multiply,
+                            new MemberAccessExpression("a")),
+                        BinaryOperator.Add,
+                        new BinaryExpression(
+                            new MemberAccessExpression("b"),
+                            BinaryOperator.Multiply,
+                            new MemberAccessExpression("b")))
+                },
+                TypeModel.Double)))
+};
+```
+
+Výstup (přes `_renderer.Render(method.Body)`):
+```csharp
 {
-    return "minor";
+    return Math.Sqrt((a * a) + (b * b));
 }
 ```
 

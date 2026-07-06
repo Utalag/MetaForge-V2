@@ -18,4 +18,46 @@ public sealed class StructElement : RootElement
 
     public override int TotalCoin =>
         Coin + Properties.Sum(p => p.Coin) + Methods.Sum(m => m.TotalCoin);
+
+    // === Statické factory metody (S1-S4 matice) ===
+
+    /// <summary>S1: public struct Point { }</summary>
+    public static StructElement Basic(string name) => new() { Name = name };
+
+    /// <summary>S2: public readonly struct Point { }</summary>
+    public static StructElement ReadOnly(string name) => new() { Name = name, IsReadOnly = true };
+
+    /// <summary>S3: public record struct Point { }</summary>
+    public static StructElement Record(string name) => new() { Name = name, IsRecord = true };
+
+    /// <summary>S4: public readonly record struct Point { }</summary>
+    public static StructElement ReadOnlyRecord(string name) => new()
+    {
+        Name = name,
+        IsReadOnly = true,
+        IsRecord = true,
+    };
+
+    // === Fluent rozšiřovací metody ===
+
+    /// <summary>Nastaví access modifier.</summary>
+    public StructElement WithAccess(AccessModifier access)
+    {
+        AccessModifier = access;
+        return this;
+    }
+
+    /// <summary>Přidá vlastnost do structu.</summary>
+    public StructElement WithProperty(PropertyElement property)
+    {
+        Properties.Add(property);
+        return this;
+    }
+
+    /// <summary>Přidá metodu do structu.</summary>
+    public StructElement WithMethod(MethodElement method)
+    {
+        Methods.Add(method);
+        return this;
+    }
 }

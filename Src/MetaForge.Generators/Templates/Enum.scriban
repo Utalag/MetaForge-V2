@@ -9,6 +9,9 @@ using {{ using }};
 
 {{- end }}
 {{~ ## Atributy ~}}
+{{- if is_flags -}}
+[Flags]
+{{- end }}
 {{- for attribute in attributes -}}
 {{ attribute }}
 {{- end }}

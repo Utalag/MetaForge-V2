@@ -11,7 +11,7 @@
 | PROP-010 | Infrastructure — persistence CommandLogu | Infrastr. | 🟡 Vysoká | — | ⚠️ Sloučeno do PROP-028 |
 | PROP-011 | WebApi host surface | Host | 🟢 Nízká | — | ⚠️ Sloučeno do PROP-026 |
 | PROP-012 | Payload escaping — JSON místo pipe-delimited | BusinessModel | 🟡 Vysoká | — | ⚠️ Řešeno v rámci PROP-020 |
-| PROP-013 | Integrační testy celé pipeline | Tests | 🟢 Nízká | 2-3 dny | CLI → Facade → Patch → Log → Replay → Projection |
+| PROP-013 | Integrační testy celé pipeline | Tests | 🟢 Nízká | 2-3 dny | CLI → Facade → Patch → Log → Replay → Projection. ⚠️ Core+Generators část pokrývá PROP-032 |
 | PROP-014 | AI test project | AI | 🟢 Nízká | 2 dny | MetaForge.Ai.Tests s mockovaným HttpClient |
 | PROP-015 | ForgeBlock → CatalogManager propojení | Core | 🟡 Vysoká | — | ⚠️ Sloučeno do PROP-029 |
 | PROP-016 | Ollama konfigurace přes DI/IOptions | AI | 🟢 Nízká | — | ⚠️ Sloučeno do PROP-027 |
@@ -27,6 +27,8 @@
 | PROP-028 | Infrastructure — Persistence, konfigurace, caching | Infrastr. | 🟡 Vysoká | 5,25 dne | JSONL persistence, IOptions<T>, checkpoint cache |
 | PROP-029 | ForgeBlocks — Rozšíření a marketplace | ForgeBlocks | 🟡 Vysoká | 8 dní | EF Core, AutoMapper, FluentValidation, NuGet distribuce |
 | PROP-030 | Bezpečnost a stabilita — Schema migration, validace, health | Průřezové | 🟡 Vysoká | 4 dny | CommandMigration, ValidationPipeline, HealthChecks |
+| PROP-031 | Core — Statement System a upgrade Expression pro těla metod | Core | 🟡 Vysoká | 5,25 dne | Statement hierarchie, BlockStatement, If/For/While, Method.Body AST |
+| PROP-032 | Integrační testy — Core + Generators (Snapshot-based) | Tests | 🟡 Vysoká | 7 dní | SnapshotComparer, matice testů, reálné příklady metod, AST statementy |
 
 ## Odložené návrhy
 
@@ -117,6 +119,16 @@ Více: [`Docs/Plans/PROP-029-ForgeBlocks-Expansion-Marketplace.md`](Docs/Plans/P
 ### PROP-030: Bezpečnost a stabilita — Schema Migration, Validation, Health
 
 Více: [`Docs/Plans/PROP-030-Security-Stability-Schema-Validation-Health.md`](Docs/Plans/PROP-030-Security-Stability-Schema-Validation-Health.md)
+
+### PROP-031: Core — Statement System a upgrade Expression pro těla metod
+
+Více: [`Docs/Plans/PROP-031-Core-Statement-System.md`](Docs/Plans/PROP-031-Core-Statement-System.md)
+
+### PROP-032: Integrační testy — Core + Generators (Snapshot-based)
+
+Více: [`Docs/Plans/PROP-032-Integration-Tests-Core-Generators.md`](Docs/Plans/PROP-032-Integration-Tests-Core-Generators.md)
+
+> Testovací matice: [`Docs/Integration/01-Integration-Test-Matrix.md`](Docs/Integration/01-Integration-Test-Matrix.md)
 
 ---
 

@@ -1,7 +1,9 @@
 using FluentAssertions;
 using MetaForge.Core.Abstractions;
 using MetaForge.Core.DataTypes;
+using MetaForge.Core.Elements.Expressions;
 using MetaForge.Core.Elements.Members;
+using MetaForge.Core.Elements.Statements;
 using MetaForge.Core.Elements.Types;
 using MetaForge.Generators;
 
@@ -45,7 +47,12 @@ public class CodeGeneratorTests
         {
             Name = "GetFullName",
             ReturnType = TypeModel.String,
-            Body = "return \"test\";",
+            Body = new BlockStatement(
+                new ReturnStatement
+                {
+                    Value = new ConstantExpression("test")
+                }
+            ),
         });
 
         var result = _generator.Generate(cls);

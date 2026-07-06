@@ -19,10 +19,11 @@
 
 | Projekt | Co testuje | Typ testů |
 |---------|-----------|-----------|
-| `MetaForge.Core.Tests` | Typový model, katalog, ForgeBlock registrace, discovery | Unit |
+| `MetaForge.Core.Tests` | Typový model, katalog, ForgeBlock registrace, discovery, validace (CoreValidator) | Unit |
 | `MetaForge.BusinessModel.Tests` | Dokument, CommandLog, replay, patches, validation | Unit |
 | `MetaForge.Translator.Tests` | Facade, projekce, překlad, write-back, enrichment | Unit + Integration |
 | `MetaForge.Generators.Tests` | C# output, template rendering, kompilabilnost | Unit + Snapshot |
+| **`MetaForge.Core.Integration.Tests`** | **Core → Generators pipeline (snapshot-based), AppRoot traversal, AST rendering** | **Integration + Snapshot** |
 
 ---
 
@@ -116,6 +117,46 @@ public void Generated_Code_IsValidCSharpSyntax()
 | Sémantická (neznámé typy, chybějící usingy) | Vyžaduje plnou kompilaci s referencemi |
 | Logická (nekonečná rekurze) | Mimo rozsah generátoru |
 | Stylistická (formátování) | Řeší formatter, ne generátor |
+
+---
+
+## Snapshot testování (PROP-032 — nové)
+
+> Integrační testy Core → Generators používají **snapshot-based** přístup — vygenerovaný C# kód se porovnává se vzorovými `.expected.cs` soubory.
+
+### SnapshotComparer
+
+```csharp
+// Soubor: Tests/MetaForge.Core.Integration.Tests/Snapshots/SnapshotComparer.cs
+public static class SnapshotComparer
+{
+    /// <summary>Ověří shodu se snapshotem. First-run vytvoří .expected.cs.</summary>
+    public static void Verify(string category, string testName, string generatedCode);
+    
+    /// <summary>Validuje syntaxi generovaného kódu přes Roslyn.</summary>
+    public static void AssertValidSyntax(string generatedCode);
+}
+```
+
+### Decision Matrix
+
+Testovací scénáře jsou definovány v `Docs/Integration/01-Integration-Test-Matrix.md` — 102 řádků pokrývajících:
+- Class modifikátory (abstract, sealed, static, partial, record)
+- Enum varianty (underlying type, Flags)
+- Struct varianty (readonly, record)
+- Property modifikátory + TypeModel varianty
+- Method modifikátory + AST body
+- Statement hierarchie
+
+Každý ✅ řádek = snapshot integrační test. Každý ❌ řádek = Core unit validation test.
+
+### 3-vrstvá validace
+
+| Vrstva | Nástroj | Účel |
+|--------|---------|------|
+| Snapshot | `SnapshotComparer.Verify()` | Detekce regresí v generovaném kódu |
+| Syntax | `SnapshotComparer.AssertValidSyntax()` | Generovaný kód je platný C# |
+| Content | `FluentAssertions.Should().Contain()` | Ověření konkrétních patternů |
 
 ### Core.Tests
 
