@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "JQ3D3jKJT3Y=",
+  "dgSpecHash": "yiSmMD8wZrg=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\ForgeBlocks\\EntityFramework\\MetaForge.ForgeBlocks.EntityFrameworkCore.csproj",
+  "projectFilePath": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/ForgeBlocks/EntityFramework/MetaForge.ForgeBlocks.EntityFrameworkCore.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Utalag\\.nuget\\packages\\scriban\\7.2.5\\scriban.7.2.5.nupkg.sha512"
+    "/home/runner/.nuget/packages/scriban/7.2.5/scriban.7.2.5.nupkg.sha512"
   ],
   "logs": []
 }

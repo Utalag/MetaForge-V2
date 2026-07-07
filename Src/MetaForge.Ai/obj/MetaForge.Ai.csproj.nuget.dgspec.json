@@ -1,32 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Ai\\MetaForge.Ai.csproj": {}
+    "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Ai/MetaForge.Ai.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Ai\\MetaForge.Ai.csproj": {
+    "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Ai/MetaForge.Ai.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Ai\\MetaForge.Ai.csproj",
+        "projectUniqueName": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Ai/MetaForge.Ai.csproj",
         "projectName": "MetaForge.Ai",
-        "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Ai\\MetaForge.Ai.csproj",
-        "packagesPath": "C:\\Users\\Utalag\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Ai\\obj\\",
+        "projectPath": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Ai/MetaForge.Ai.csproj",
+        "packagesPath": "/home/runner/.nuget/packages/",
+        "outputPath": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Ai/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Utalag\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/home/runner/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -34,11 +27,11 @@
             "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\MetaForge.Core.csproj": {
-                "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\MetaForge.Core.csproj"
+              "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Core/MetaForge.Core.csproj": {
+                "projectPath": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Core/MetaForge.Core.csproj"
               },
-              "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Translator\\MetaForge.Translator.csproj": {
-                "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Translator\\MetaForge.Translator.csproj"
+              "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Translator/MetaForge.Translator.csproj": {
+                "projectPath": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Translator/MetaForge.Translator.csproj"
               }
             }
           }
@@ -81,7 +74,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.301/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -359,29 +352,22 @@
         }
       }
     },
-    "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.BusinessModel\\MetaForge.BusinessModel.csproj": {
+    "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.BusinessModel/MetaForge.BusinessModel.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.BusinessModel\\MetaForge.BusinessModel.csproj",
+        "projectUniqueName": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.BusinessModel/MetaForge.BusinessModel.csproj",
         "projectName": "MetaForge.BusinessModel",
-        "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.BusinessModel\\MetaForge.BusinessModel.csproj",
-        "packagesPath": "C:\\Users\\Utalag\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.BusinessModel\\obj\\",
+        "projectPath": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.BusinessModel/MetaForge.BusinessModel.csproj",
+        "packagesPath": "/home/runner/.nuget/packages/",
+        "outputPath": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.BusinessModel/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Utalag\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/home/runner/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -423,7 +409,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.301/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -701,29 +687,22 @@
         }
       }
     },
-    "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\MetaForge.Core.csproj": {
+    "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Core/MetaForge.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\MetaForge.Core.csproj",
+        "projectUniqueName": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Core/MetaForge.Core.csproj",
         "projectName": "MetaForge.Core",
-        "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\MetaForge.Core.csproj",
-        "packagesPath": "C:\\Users\\Utalag\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\obj\\",
+        "projectPath": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Core/MetaForge.Core.csproj",
+        "packagesPath": "/home/runner/.nuget/packages/",
+        "outputPath": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Core/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Utalag\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/home/runner/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -765,7 +744,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.301/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
@@ -1043,29 +1022,22 @@
         }
       }
     },
-    "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Translator\\MetaForge.Translator.csproj": {
+    "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Translator/MetaForge.Translator.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Translator\\MetaForge.Translator.csproj",
+        "projectUniqueName": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Translator/MetaForge.Translator.csproj",
         "projectName": "MetaForge.Translator",
-        "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Translator\\MetaForge.Translator.csproj",
-        "packagesPath": "C:\\Users\\Utalag\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Translator\\obj\\",
+        "projectPath": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Translator/MetaForge.Translator.csproj",
+        "packagesPath": "/home/runner/.nuget/packages/",
+        "outputPath": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Translator/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Utalag\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/home/runner/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -1073,11 +1045,11 @@
             "framework": "net10.0",
             "targetAlias": "net10.0",
             "projectReferences": {
-              "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.BusinessModel\\MetaForge.BusinessModel.csproj": {
-                "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.BusinessModel\\MetaForge.BusinessModel.csproj"
+              "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.BusinessModel/MetaForge.BusinessModel.csproj": {
+                "projectPath": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.BusinessModel/MetaForge.BusinessModel.csproj"
               },
-              "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\MetaForge.Core.csproj": {
-                "projectPath": "C:\\Users\\Utalag\\Documents\\source-git\\MetaForge-V2\\Src\\MetaForge.Core\\MetaForge.Core.csproj"
+              "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Core/MetaForge.Core.csproj": {
+                "projectPath": "/home/runner/work/MetaForge-V2/MetaForge-V2/Src/MetaForge.Core/MetaForge.Core.csproj"
               }
             }
           }
@@ -1114,7 +1086,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.300/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.301/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",
