@@ -35,6 +35,7 @@ public class CodeGenerator : BaseCodeGenerator
             InterfaceElement iface => GenerateInterface(iface),
             EnumElement enm => GenerateEnum(enm),
             StructElement str => GenerateStruct(str),
+            DelegateElement dele => GenerateDelegate(dele),
             _ => $"// Nepodporovaný element typu: {element.GetType().Name}"
         };
 
@@ -80,7 +81,9 @@ public class CodeGenerator : BaseCodeGenerator
             { "usings", cls.Usings },
             { "attributes", cls.Attributes.Select(RenderAttribute).ToList() },
             { "properties", cls.Properties.Select(RenderProperty).ToList() },
-            { "methods", cls.Methods.Select(RenderMethod).ToList() }
+            { "methods", cls.Methods.Select(RenderMethod).ToList() },
+            { "events", cls.Events.Select(RenderEvent).ToList() },
+            { "operators", cls.Operators.Select(RenderOperator).ToList() }
         };
 
         return RenderTemplate("Class", model);
@@ -135,13 +138,85 @@ public class CodeGenerator : BaseCodeGenerator
             { "usings", str.Usings },
             { "attributes", str.Attributes.Select(RenderAttribute).ToList() },
             { "properties", str.Properties.Select(RenderProperty).ToList() },
-            { "methods", str.Methods.Select(RenderMethod).ToList() }
+            { "methods", str.Methods.Select(RenderMethod).ToList() },
+            { "operators", str.Operators.Select(RenderOperator).ToList() }
         };
 
         return RenderTemplate("Struct", model);
     }
 
     // === Renderování memberů do stringů pro šablony ===
+
+    private static string RenderEvent(EventElement evt)
+    {
+        var accessMod = MapAccessModifier(evt.AccessModifier);
+        var staticMod = evt.IsStatic ? "static " : "";
+        return $"{accessMod} {staticMod}event {evt.DelegateTypeName} {evt.Name};";
+    }
+
+    private string RenderOperator(OperatorElement op)
+    {
+        var accessMod = MapAccessModifier(op.AccessModifier);
+        var returnType = MapType(op.ReturnType);
+        var opToken = MapOperatorToken(op.Operator);
+        var parameters = string.Join(", ", op.Parameters.Select(p => $"{MapType(p.Type)} {p.Name}"));
+        var body = op.Body is null ? "throw new NotImplementedException();" : _renderer.Render(op.Body);
+
+        return $$"""
+            {{accessMod}} static {{returnType}} operator {{opToken}}({{parameters}})
+            {
+                {{body}}
+            }
+            """;
+    }
+
+    private static string MapOperatorToken(OperatorKind op) => op switch
+    {
+        OperatorKind.Add => "+",
+        OperatorKind.Subtract => "-",
+        OperatorKind.Multiply => "*",
+        OperatorKind.Divide => "/",
+        OperatorKind.Modulo => "%",
+        OperatorKind.Equality => "==",
+        OperatorKind.Inequality => "!=",
+        OperatorKind.GreaterThan => ">",
+        OperatorKind.LessThan => "<",
+        OperatorKind.GreaterThanOrEqual => ">=",
+        OperatorKind.LessThanOrEqual => "<=",
+        OperatorKind.UnaryPlus => "+",
+        OperatorKind.UnaryNegation => "-",
+        OperatorKind.LogicalNot => "!",
+        OperatorKind.BitwiseComplement => "~",
+        OperatorKind.Increment => "++",
+        OperatorKind.Decrement => "--",
+        OperatorKind.True => "true",
+        OperatorKind.False => "false",
+        OperatorKind.BitwiseAnd => "&",
+        OperatorKind.BitwiseOr => "|",
+        OperatorKind.ExclusiveOr => "^",
+        OperatorKind.LeftShift => "<<",
+        OperatorKind.RightShift => ">>",
+        _ => "+",
+    };
+
+    private string GenerateDelegate(DelegateElement dele)
+    {
+        var accessMod = MapAccessModifier(dele.AccessModifier);
+        var returnType = MapType(dele.ReturnType);
+        var typeParams = RenderTypeParameterList(dele.TypeParameters);
+        var constraints = RenderConstraintClauses(dele.TypeParameters);
+        var parameters = string.Join(", ", dele.Parameters.Select(p =>
+        {
+            var modifier = MapParameterModifier(p.Modifier);
+            var modifierStr = modifier.Length > 0 ? $"{modifier} " : "";
+            return $"{modifierStr}{MapType(p.Type)} {p.Name}";
+        }));
+        var usings = dele.Usings.Count > 0
+            ? string.Join(Environment.NewLine, dele.Usings.Select(u => $"using {u};")) + Environment.NewLine + Environment.NewLine
+            : "";
+
+        return $"{usings}{accessMod} delegate {returnType} {dele.Name}{typeParams}({parameters}){constraints};";
+    }
 
     private static string RenderProperty(PropertyElement prop)
     {
@@ -169,11 +244,11 @@ public class CodeGenerator : BaseCodeGenerator
 
     private string RenderMethod(MethodElement method)
     {
-        var parameters = method.Parameters.Select(p => new Dictionary<string, object?>
+        var parameters = method.Parameters.Select((p, idx) => new Dictionary<string, object?>
         {
             { "name", p.Name },
             { "type", MapType(p.Type) },
-            { "modifier", MapParameterModifier(p.Modifier) },
+            { "modifier", idx == 0 && method.IsExtensionMethod ? "this" : MapParameterModifier(p.Modifier) },
             { "default_value", p.HasDefaultValue && p.DefaultValue is not null ? p.DefaultValue : null }
         }).ToList();
 

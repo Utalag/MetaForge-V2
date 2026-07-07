@@ -31,11 +31,18 @@ public sealed class ClassElement : RootElement
     /// <summary>Metody třídy.</summary>
     public List<MethodElement> Methods { get; } = new();
 
+    /// <summary>Eventy třídy.</summary>
+    public List<EventElement> Events { get; } = new();
+
+    /// <summary>Přetížené operátory třídy.</summary>
+    public List<OperatorElement> Operators { get; } = new();
+
     /// <summary>Generické typové parametry (např. `T` v `class Repository&lt;T&gt;`).</summary>
     public List<TypeParameterElement> TypeParameters { get; } = new();
 
     public override int TotalCoin =>
-        Coin + Properties.Sum(p => p.Coin) + Methods.Sum(m => m.TotalCoin);
+        Coin + Properties.Sum(p => p.Coin) + Methods.Sum(m => m.TotalCoin)
+             + Events.Sum(e => e.Coin) + Operators.Sum(o => o.Coin);
 
     // === Statické factory metody pro modifikátorové kombinace (C1-C8 matice) ===
 
@@ -114,6 +121,20 @@ public sealed class ClassElement : RootElement
     public ClassElement WithMethod(MethodElement method)
     {
         Methods.Add(method);
+        return this;
+    }
+
+    /// <summary>Přidá event do třídy.</summary>
+    public ClassElement WithEvent(EventElement evt)
+    {
+        Events.Add(evt);
+        return this;
+    }
+
+    /// <summary>Přidá přetížený operátor do třídy.</summary>
+    public ClassElement WithOperator(OperatorElement op)
+    {
+        Operators.Add(op);
         return this;
     }
 

@@ -22,6 +22,12 @@ public sealed class MethodElement
     public bool IsVirtual { get; set; }
     public bool IsOverride { get; set; }
 
+    /// <summary>
+    /// Je metoda extension method (static metoda ve static třídě s `this` modifikátorem
+    /// na prvním parametru)? Vyžaduje, aby obklopující třída byla static a metoda static.
+    /// </summary>
+    public bool IsExtensionMethod { get; set; }
+
     /// <summary>Parametry metody.</summary>
     public List<ParameterElement> Parameters { get; } = new();
 
@@ -133,6 +139,14 @@ public sealed class MethodElement
     public MethodElement WithCoin(int coin)
     {
         Coin = coin;
+        return this;
+    }
+
+    /// <summary>Označí metodu jako extension method (vyžaduje static metodu a static třídu).</summary>
+    public MethodElement AsExtensionMethod()
+    {
+        IsStatic = true;
+        IsExtensionMethod = true;
         return this;
     }
 }

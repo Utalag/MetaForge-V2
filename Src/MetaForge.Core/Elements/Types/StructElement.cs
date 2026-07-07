@@ -16,11 +16,14 @@ public sealed class StructElement : RootElement
     public List<PropertyElement> Properties { get; } = new();
     public List<MethodElement> Methods { get; } = new();
 
+    /// <summary>Přetížené operátory structu.</summary>
+    public List<OperatorElement> Operators { get; } = new();
+
     /// <summary>Generické typové parametry (např. `T` v `struct Pair&lt;T&gt;`).</summary>
     public List<TypeParameterElement> TypeParameters { get; } = new();
 
     public override int TotalCoin =>
-        Coin + Properties.Sum(p => p.Coin) + Methods.Sum(m => m.TotalCoin);
+        Coin + Properties.Sum(p => p.Coin) + Methods.Sum(m => m.TotalCoin) + Operators.Sum(o => o.Coin);
 
     // === Statické factory metody (S1-S4 matice) ===
 
@@ -61,6 +64,13 @@ public sealed class StructElement : RootElement
     public StructElement WithMethod(MethodElement method)
     {
         Methods.Add(method);
+        return this;
+    }
+
+    /// <summary>Přidá přetížený operátor do structu.</summary>
+    public StructElement WithOperator(OperatorElement op)
+    {
+        Operators.Add(op);
         return this;
     }
 

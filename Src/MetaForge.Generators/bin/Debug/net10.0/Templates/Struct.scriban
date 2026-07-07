@@ -19,7 +19,14 @@ using {{ using }};
 {{- for property in properties -}}
     {{ property }}
 {{- end }}
-{{- if properties.size > 0 && methods.size > 0 }}
+{{- if properties.size > 0 && operators.size > 0 }}
+
+{{- end }}
+{{~ ## Operators ~}}
+{{- for operator in operators -}}
+    {{ operator }}
+{{- end }}
+{{- if (properties.size > 0 || operators.size > 0) && methods.size > 0 }}
 
 {{- end }}
 {{~ ## Metody ~}}
