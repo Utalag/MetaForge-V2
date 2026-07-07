@@ -26,6 +26,13 @@ public sealed record TypeModel
                           && !IsNullable && !IsCollection
                           && GenericArguments.Count == 0;
 
+    /// <summary>
+    /// Rozlišuje sémantiku "nullable" mezi hodnotovým typem (<see cref="Nullable{T}"/>)
+    /// a nullable reference type (NRT) anotací (`string?`). Výchozí je <see cref="NullabilityKind.Oblivious"/>,
+    /// což znamená, že se rozdíl nesleduje (zpětně kompatibilní s <see cref="IsNullable"/>).
+    /// </summary>
+    public NullabilityKind Nullability { get; init; } = NullabilityKind.Oblivious;
+
     // === Factory metody pro často používané typy ===
 
     public static TypeModel Void { get; } = new() { BaseType = DataType.Void };
@@ -43,6 +50,20 @@ public sealed record TypeModel
     /// <summary>Vytvoří nullable variantu tohoto typu.</summary>
     public TypeModel MakeNullable() => this with { IsNullable = true };
 
+    /// <summary>Vytvoří variantu typu jako `Nullable&lt;T&gt;` (hodnotový typ, např. `int?`).</summary>
+    public TypeModel MakeValueTypeNullable() => this with
+    {
+        IsNullable = true,
+        Nullability = NullabilityKind.ValueTypeNullable,
+    };
+
+    /// <summary>Vytvoří variantu typu jako nullable reference type anotaci (např. `string?`).</summary>
+    public TypeModel MakeReferenceNullable() => this with
+    {
+        IsNullable = true,
+        Nullability = NullabilityKind.ReferenceAnnotated,
+    };
+
     /// <summary>Vytvoří kolekční variantu tohoto typu.</summary>
     public TypeModel MakeCollection() => this with { IsCollection = true };
 
@@ -54,4 +75,24 @@ public sealed record TypeModel
     {
         GenericArguments = [..GenericArguments, arg]
     };
+}
+
+/// <summary>
+/// Rozlišuje druh nullable sémantiky pro <see cref="TypeModel"/>.
+/// Analogie k Roslyn <c>NullableAnnotation</c> — odděluje hodnotové <c>Nullable&lt;T&gt;</c>
+/// od nullable reference type (NRT) anotace, aby se předešlo sémantické nejednoznačnosti.
+/// </summary>
+public enum NullabilityKind
+{
+    /// <summary>Rozdíl se nesleduje (výchozí, zpětně kompatibilní chování).</summary>
+    Oblivious,
+
+    /// <summary>Hodnotový typ obalený jako <c>Nullable&lt;T&gt;</c>, např. `int?`.</summary>
+    ValueTypeNullable,
+
+    /// <summary>Referenční typ s NRT anotací `?`, např. `string?`.</summary>
+    ReferenceAnnotated,
+
+    /// <summary>Referenční typ explicitně anotovaný jako non-nullable, např. `string` v `#nullable enable` kontextu.</summary>
+    ReferenceNotAnnotated,
 }

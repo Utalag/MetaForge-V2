@@ -9,7 +9,7 @@ using {{ using }};
 
 {{- end }}
 {{~ ## Deklarace interfacu ~}}
-{{ access_modifier }} interface {{ name }}
+{{ access_modifier }} interface {{ name }}{{ type_params }}{{ constraints }}
 {
 {{~ ## Properties ~}}
 {{- for property in properties -}}

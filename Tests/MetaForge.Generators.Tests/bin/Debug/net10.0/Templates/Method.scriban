@@ -5,7 +5,7 @@
 {{ attribute }}
 {{- end }}
 {{- end }}
-{{ access_modifier }}{{ if is_static }} static{{ end }}{{ if is_virtual }} virtual{{ end }}{{ if is_override }} override{{ end }}{{ if is_abstract }} abstract{{ end }}{{ if is_async }} async{{ end }} {{ return_type }} {{ name }}({{ for param in parameters }}{{ if !for.first }}, {{ end }}{{ if param.modifier != "" }}{{ param.modifier }} {{ end }}{{ param.type }} {{ param.name }}{{ if param.default_value }} = {{ param.default_value }}{{ end }}{{ end }}){{ if is_abstract }};{{ else }}
+{{ access_modifier }}{{ if is_static }} static{{ end }}{{ if is_virtual }} virtual{{ end }}{{ if is_override }} override{{ end }}{{ if is_abstract }} abstract{{ end }}{{ if is_async }} async{{ end }} {{ return_type }} {{ name }}{{ type_params }}({{ for param in parameters }}{{ if !for.first }}, {{ end }}{{ if param.modifier != "" }}{{ param.modifier }} {{ end }}{{ param.type }} {{ param.name }}{{ if param.default_value }} = {{ param.default_value }}{{ end }}{{ end }}){{ constraints }}{{ if is_abstract }};{{ else }}
 {
 {{- if body }}
     {{ body }}

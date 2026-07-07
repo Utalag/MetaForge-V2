@@ -69,4 +69,37 @@ public class TypeModelTests
         original.IsNullable.Should().BeFalse();
         nullable.IsNullable.Should().BeTrue();
     }
+
+    [Fact]
+    public void Nullability_Default_IsOblivious()
+    {
+        TypeModel.String.Nullability.Should().Be(NullabilityKind.Oblivious);
+    }
+
+    [Fact]
+    public void MakeValueTypeNullable_SetsNullabilityKind()
+    {
+        var type = TypeModel.Int32.MakeValueTypeNullable();
+
+        type.IsNullable.Should().BeTrue();
+        type.Nullability.Should().Be(NullabilityKind.ValueTypeNullable);
+    }
+
+    [Fact]
+    public void MakeReferenceNullable_SetsNullabilityKind()
+    {
+        var type = TypeModel.String.MakeReferenceNullable();
+
+        type.IsNullable.Should().BeTrue();
+        type.Nullability.Should().Be(NullabilityKind.ReferenceAnnotated);
+    }
+
+    [Fact]
+    public void MakeValueTypeNullable_And_MakeReferenceNullable_AreDistinguishable()
+    {
+        var valueTypeNullable = TypeModel.Int32.MakeValueTypeNullable();
+        var referenceNullable = TypeModel.String.MakeReferenceNullable();
+
+        valueTypeNullable.Nullability.Should().NotBe(referenceNullable.Nullability);
+    }
 }

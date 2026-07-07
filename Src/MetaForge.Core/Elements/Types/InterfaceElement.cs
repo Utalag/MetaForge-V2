@@ -14,6 +14,9 @@ public sealed class InterfaceElement : RootElement
     public List<PropertyElement> Properties { get; } = new();
     public List<MethodElement> Methods { get; } = new();
 
+    /// <summary>Generické typové parametry (např. `T` v `interface IRepository&lt;T&gt;`).</summary>
+    public List<TypeParameterElement> TypeParameters { get; } = new();
+
     public override int TotalCoin =>
         Coin + Properties.Sum(p => p.Coin) + Methods.Sum(m => m.TotalCoin);
 
@@ -42,6 +45,13 @@ public sealed class InterfaceElement : RootElement
     public InterfaceElement WithMethod(MethodElement method)
     {
         Methods.Add(method);
+        return this;
+    }
+
+    /// <summary>Přidá generický typový parametr.</summary>
+    public InterfaceElement WithTypeParameter(TypeParameterElement typeParameter)
+    {
+        TypeParameters.Add(typeParameter);
         return this;
     }
 }

@@ -74,6 +74,8 @@ public class CodeGenerator : BaseCodeGenerator
             { "is_sealed", cls.IsSealed },
             { "is_partial", cls.IsPartial },
             { "is_record", cls.IsRecord },
+            { "type_params", RenderTypeParameterList(cls.TypeParameters) },
+            { "constraints", RenderConstraintClauses(cls.TypeParameters) },
             { "inheritance", inheritance.Count > 0 ? string.Join(", ", inheritance) : null },
             { "usings", cls.Usings },
             { "attributes", cls.Attributes.Select(RenderAttribute).ToList() },
@@ -90,6 +92,8 @@ public class CodeGenerator : BaseCodeGenerator
         {
             { "name", iface.Name },
             { "access_modifier", MapAccessModifier(iface.AccessModifier) },
+            { "type_params", RenderTypeParameterList(iface.TypeParameters) },
+            { "constraints", RenderConstraintClauses(iface.TypeParameters) },
             { "usings", iface.Usings },
             { "properties", iface.Properties.Select(RenderPropertySignature).ToList() },
             { "methods", iface.Methods.Select(RenderMethodSignature).ToList() }
@@ -126,6 +130,8 @@ public class CodeGenerator : BaseCodeGenerator
             { "access_modifier", MapAccessModifier(str.AccessModifier) },
             { "is_readonly", str.IsReadOnly },
             { "is_record", str.IsRecord },
+            { "type_params", RenderTypeParameterList(str.TypeParameters) },
+            { "constraints", RenderConstraintClauses(str.TypeParameters) },
             { "usings", str.Usings },
             { "attributes", str.Attributes.Select(RenderAttribute).ToList() },
             { "properties", str.Properties.Select(RenderProperty).ToList() },
@@ -188,6 +194,8 @@ public class CodeGenerator : BaseCodeGenerator
             { "is_abstract", method.IsAbstract },
             { "is_override", method.IsOverride },
             { "is_async", method.IsAsync },
+            { "type_params", RenderTypeParameterList(method.TypeParameters) },
+            { "constraints", RenderConstraintClauses(method.TypeParameters) },
             { "parameters", parameters },
             { "attributes", method.Attributes.Select(RenderAttribute).ToList() },
             { "body", RenderMethodBody(method) }
@@ -217,8 +225,10 @@ public class CodeGenerator : BaseCodeGenerator
         var accessMod = MapAccessModifier(method.AccessModifier);
         var staticMod = method.IsStatic ? "static " : "";
         var asyncMod = method.IsAsync ? "async " : "";
+        var typeParams = RenderTypeParameterList(method.TypeParameters);
+        var constraints = RenderConstraintClauses(method.TypeParameters);
 
-        return $"{accessMod} {staticMod}{asyncMod}{returnType} {method.Name}({parameters})";
+        return $"{accessMod} {staticMod}{asyncMod}{returnType} {method.Name}{typeParams}({parameters}){constraints}";
     }
 
     /// <summary>
@@ -242,6 +252,45 @@ public class CodeGenerator : BaseCodeGenerator
     }
 
     // === Mapovací helpery ===
+
+    /// <summary>Vyrenderuje `&lt;T, U&gt;` seznam generických typových parametrů (prázdné, pokud žádné nejsou).</summary>
+    private static string RenderTypeParameterList(List<TypeParameterElement> typeParameters)
+    {
+        if (typeParameters.Count == 0)
+            return "";
+
+        var names = typeParameters.Select(tp => tp.Variance switch
+        {
+            GenericVariance.Out => $"out {tp.Name}",
+            GenericVariance.In => $"in {tp.Name}",
+            _ => tp.Name,
+        });
+
+        return $"<{string.Join(", ", names)}>";
+    }
+
+    /// <summary>Vyrenderuje `where T : ... where U : ...` klauzule (prázdné, pokud žádná omezení nejsou).</summary>
+    private static string RenderConstraintClauses(List<TypeParameterElement> typeParameters)
+    {
+        var clauses = typeParameters
+            .Where(tp => tp.Constraints.Count > 0)
+            .Select(tp => $" where {tp.Name} : {string.Join(", ", tp.Constraints.Select(RenderConstraint))}");
+
+        return string.Concat(clauses);
+    }
+
+    private static string RenderConstraint(GenericConstraint constraint) => constraint.Kind switch
+    {
+        GenericConstraintKind.Class => "class",
+        GenericConstraintKind.Struct => "struct",
+        GenericConstraintKind.NotNull => "notnull",
+        GenericConstraintKind.Unmanaged => "unmanaged",
+        GenericConstraintKind.NewConstructor => "new()",
+        GenericConstraintKind.Default => "default",
+        GenericConstraintKind.BaseType => constraint.TypeName ?? "object",
+        GenericConstraintKind.Interface => constraint.TypeName ?? "object",
+        _ => "class",
+    };
 
     private static string MapAccessModifier(AccessModifier am) => am switch
     {

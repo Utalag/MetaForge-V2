@@ -31,6 +31,9 @@ public sealed class ClassElement : RootElement
     /// <summary>Metody třídy.</summary>
     public List<MethodElement> Methods { get; } = new();
 
+    /// <summary>Generické typové parametry (např. `T` v `class Repository&lt;T&gt;`).</summary>
+    public List<TypeParameterElement> TypeParameters { get; } = new();
+
     public override int TotalCoin =>
         Coin + Properties.Sum(p => p.Coin) + Methods.Sum(m => m.TotalCoin);
 
@@ -111,6 +114,13 @@ public sealed class ClassElement : RootElement
     public ClassElement WithMethod(MethodElement method)
     {
         Methods.Add(method);
+        return this;
+    }
+
+    /// <summary>Přidá generický typový parametr.</summary>
+    public ClassElement WithTypeParameter(TypeParameterElement typeParameter)
+    {
+        TypeParameters.Add(typeParameter);
         return this;
     }
 }

@@ -25,6 +25,9 @@ public sealed class MethodElement
     /// <summary>Parametry metody.</summary>
     public List<ParameterElement> Parameters { get; } = new();
 
+    /// <summary>Generické typové parametry metody (např. `T` v `T Get&lt;T&gt;(...)`).</summary>
+    public List<TypeParameterElement> TypeParameters { get; } = new();
+
     /// <summary>Atributy na metodě.</summary>
     public List<AttributeElement> Attributes { get; } = new();
 
@@ -109,6 +112,13 @@ public sealed class MethodElement
     public MethodElement WithParameters(params ParameterElement[] parameters)
     {
         Parameters.AddRange(parameters);
+        return this;
+    }
+
+    /// <summary>Přidá generický typový parametr.</summary>
+    public MethodElement WithTypeParameter(TypeParameterElement typeParameter)
+    {
+        TypeParameters.Add(typeParameter);
         return this;
     }
 

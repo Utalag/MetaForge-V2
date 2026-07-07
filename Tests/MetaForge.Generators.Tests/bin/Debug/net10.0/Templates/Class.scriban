@@ -13,7 +13,7 @@ using {{ using }};
 {{ attribute }}
 {{- end }}
 {{~ ## Deklarace třídy ~}}
-{{ access_modifier }}{{ if is_static }} static{{ end }}{{ if is_abstract }} abstract{{ end }}{{ if is_sealed }} sealed{{ end }}{{ if is_partial }} partial{{ end }}{{ if is_record }} record{{ end }} class {{ name }}{{ if inheritance }} : {{ inheritance }}{{ end }}
+{{ access_modifier }}{{ if is_static }} static{{ end }}{{ if is_abstract }} abstract{{ end }}{{ if is_sealed }} sealed{{ end }}{{ if is_partial }} partial{{ end }}{{ if is_record }} record{{ end }} class {{ name }}{{ type_params }}{{ if inheritance }} : {{ inheritance }}{{ end }}{{ constraints }}
 {
 {{~ ## Properties ~}}
 {{- for property in properties -}}
