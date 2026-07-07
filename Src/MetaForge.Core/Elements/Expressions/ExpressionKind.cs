@@ -35,6 +35,9 @@ public enum ExpressionKind
     /// <summary>Konverze typu: (decimal)price.</summary>
     Conversion,
 
+    /// <summary>Vzor pro pattern matching: `is int i`, `case > 0`, `case Customer c`.</summary>
+    Pattern,
+
     /// <summary>Složený výraz (obecný).</summary>
     Computed,
 }

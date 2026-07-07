@@ -159,9 +159,9 @@ public class StatementTests
         stmt.Expr.Should().BeOfType<MethodCallExpression>();
     }
 
-    /// <summary>StatementKind enum — má všech 7 hodnot.</summary>
+    /// <summary>StatementKind enum — má všech 12 hodnot.</summary>
     [Fact]
-    public void StatementKind_HasAllSevenValues()
+    public void StatementKind_HasAllExpectedValues()
     {
         var values = Enum.GetValues<StatementKind>();
         values.Should().Contain(StatementKind.Block);
@@ -171,5 +171,10 @@ public class StatementTests
         values.Should().Contain(StatementKind.While);
         values.Should().Contain(StatementKind.Assignment);
         values.Should().Contain(StatementKind.Expression);
+        values.Should().Contain(StatementKind.Switch);
+        values.Should().Contain(StatementKind.ForEach);
+        values.Should().Contain(StatementKind.TryCatch);
+        values.Should().Contain(StatementKind.Using);
+        values.Should().Contain(StatementKind.LocalFunction);
     }
 }
