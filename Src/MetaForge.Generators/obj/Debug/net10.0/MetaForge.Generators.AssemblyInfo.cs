@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MetaForge.Generators")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+088e52a4a966d64b0ff6487388fc2b1bde901ff1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3bf866c010b2d7d1dcc3c38fbfeb12435fbb8d23")]
 [assembly: System.Reflection.AssemblyProductAttribute("MetaForge.Generators")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MetaForge.Generators")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

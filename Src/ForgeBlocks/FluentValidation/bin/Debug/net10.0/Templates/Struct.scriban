@@ -13,13 +13,20 @@ using {{ using }};
 {{ attribute }}
 {{- end }}
 {{~ ## Deklarace structu ~}}
-{{ access_modifier }}{{ if is_readonly }} readonly{{ end }}{{ if is_record }} record{{ end }} struct {{ name }}
+{{ access_modifier }}{{ if is_readonly }} readonly{{ end }}{{ if is_record }} record{{ end }} struct {{ name }}{{ type_params }}{{ constraints }}
 {
 {{~ ## Properties ~}}
 {{- for property in properties -}}
     {{ property }}
 {{- end }}
-{{- if properties.size > 0 && methods.size > 0 }}
+{{- if properties.size > 0 && operators.size > 0 }}
+
+{{- end }}
+{{~ ## Operators ~}}
+{{- for operator in operators -}}
+    {{ operator }}
+{{- end }}
+{{- if (properties.size > 0 || operators.size > 0) && methods.size > 0 }}
 
 {{- end }}
 {{~ ## Metody ~}}
