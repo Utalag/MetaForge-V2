@@ -1,9 +1,8 @@
 # PROP-031: Core — Statement System a upgrade Expression pro těla metod
 
-> **Stav:** ✅ Dokončeno
-> **Datum:** 2026-07-05
+> **Stav:** ✅ Základ dokončen (2026-07-05) | 🔵 Rozšíření: Switch, ForEach, TryCatch, Using, LocalFunction (plánováno)
 > **Autor:** Copilot (C# Implementer)
-> **Návaznost:** PROP-002 (Core base), PROP-024 (Expression System)
+> **Návaznost:** PROP-002 (Core base), PROP-024 (Expression System), PROP-035 (C#-First Migration)
 
 ---
 
@@ -37,7 +36,13 @@ Statements/
 ├── ForStatement.cs            ← Variable, Expression Start, Expression End, Statement? Body
 ├── WhileStatement.cs          ← Expression Condition, Statement Body
 ├── AssignmentStatement.cs     ← string Variable, Expression Value
-└── ExpressionStatement.cs     ← Expression Expr (pro volání metod bez návratu)
+├── ExpressionStatement.cs     ← Expression Expr (pro volání metod bez návratu)
+├── SwitchStatement.cs         ← Expression Selector, List<SwitchCase> Cases, Statement? DefaultCase
+├── ForEachStatement.cs        ← string Variable, Expression Collection, Statement? Body
+├── TryCatchStatement.cs       ← Statement TryBody, List<CatchClause> Catches, Statement? FinallyBody
+├── UsingStatement.cs          ← Expression Resource, Statement Body
+├── UsingDeclarationStatement.cs ← Expression Resource (C# 8+ `using var x = ...`)
+└── LocalFunctionStatement.cs  ← MethodElement LocalFunction (lokální funkce v těle metody)
 ```
 
 ### Návrh Statement base class
@@ -61,9 +66,15 @@ public enum StatementKind
     Return,         // return X;
     If,             // if (cond) { } else { }
     For,            // for (init; cond; inc) { }
+    ForEach,        // foreach (var item in collection) { }
     While,          // while (cond) { }
+    Switch,         // switch (expr) { case X: ... }
     Assignment,     // varName = value;
     Expression,     // volání metody, inkrementace
+    TryCatch,       // try { } catch (Ex ex) { } finally { }
+    Using,          // using (resource) { }
+    UsingDeclaration, // using var x = ...; (C# 8+)
+    LocalFunction,  // lokální funkce uvnitř metody
 }
 ```
 
@@ -153,6 +164,83 @@ public sealed class ExpressionStatement : Statement
 }
 ```
 
+### Návrh SwitchStatement
+
+```csharp
+/// <summary>switch (Selector) { case Pattern1: Body1; ... default: DefaultBody; }</summary>
+public sealed class SwitchStatement : Statement
+{
+    public override StatementKind StatementKind => StatementKind.Switch;
+    public Expression Selector { get; init; } = default!;
+    public List<SwitchCase> Cases { get; init; } = [];
+    public Statement? DefaultCase { get; init; }
+}
+
+public sealed record SwitchCase(Expression Pattern, Statement Body);
+```
+
+### Návrh ForEachStatement
+
+```csharp
+/// <summary>foreach (var Variable in Collection) Body</summary>
+public sealed class ForEachStatement : Statement
+{
+    public override StatementKind StatementKind => StatementKind.ForEach;
+    public string Variable { get; init; } = string.Empty;
+    public Expression Collection { get; init; } = default!;
+    public Statement? Body { get; init; }
+}
+```
+
+### Návrh TryCatchStatement
+
+```csharp
+/// <summary>try { TryBody } catch (ExType ExName) { CatchBody } ... finally { FinallyBody }</summary>
+public sealed class TryCatchStatement : Statement
+{
+    public override StatementKind StatementKind => StatementKind.TryCatch;
+    public Statement TryBody { get; init; } = default!;
+    public List<CatchClause> Catches { get; init; } = [];
+    public Statement? FinallyBody { get; init; }
+}
+
+public sealed record CatchClause(
+    string? ExceptionType,    // null pro catch-all `catch { }`
+    string? ExceptionVariable,
+    Statement Body
+);
+```
+
+### Návrh UsingStatement a UsingDeclarationStatement
+
+```csharp
+/// <summary>using (var resource = ...) { Body }</summary>
+public sealed class UsingStatement : Statement
+{
+    public override StatementKind StatementKind => StatementKind.Using;
+    public Expression Resource { get; init; } = default!;
+    public Statement Body { get; init; } = default!;
+}
+
+/// <summary>using var resource = ...; (C# 8+ using declaration)</summary>
+public sealed class UsingDeclarationStatement : Statement
+{
+    public override StatementKind StatementKind => StatementKind.UsingDeclaration;
+    public Expression Resource { get; init; } = default!;
+}
+```
+
+### Návrh LocalFunctionStatement
+
+```csharp
+/// <summary>Lokální funkce uvnitř těla metody. Používá existující MethodElement model.</summary>
+public sealed class LocalFunctionStatement : Statement
+{
+    public override StatementKind StatementKind => StatementKind.LocalFunction;
+    public MethodElement LocalFunction { get; init; } = default!;
+}
+```
+
 ---
 
 ## Změna v MethodElement
@@ -179,12 +267,18 @@ Přidat metodu `RenderStatement(Statement stmt)` s typovým dispatchem:
 public string RenderStatement(Statement stmt) => stmt switch
 {
     BlockStatement block => RenderBlock(block),
-    ReturnStatement ret => $"return {RenderExpression(ret.Value)};",
+    ReturnStatement ret => $"return {(ret.Value != null ? RenderExpression(ret.Value) : "")};",
     IfStatement ifs => RenderIf(ifs),
     ForStatement forS => RenderFor(forS),
+    ForEachStatement fe => RenderForEach(fe),
     WhileStatement whileS => RenderWhile(whileS),
+    SwitchStatement sw => RenderSwitch(sw),
     AssignmentStatement assign => $"{assign.Variable} = {RenderExpression(assign.Value)};",
     ExpressionStatement expr => $"{RenderExpression(expr.Expr)};",
+    TryCatchStatement tc => RenderTryCatch(tc),
+    UsingStatement us => RenderUsing(us),
+    UsingDeclarationStatement ud => $"using {RenderExpression(ud.Resource)};",
+    LocalFunctionStatement lf => RenderMethod(lf.LocalFunction),
     _ => $"/* unknown statement: {stmt.StatementKind} */"
 };
 ```

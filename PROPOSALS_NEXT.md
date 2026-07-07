@@ -29,6 +29,12 @@
 | PROP-030 | Bezpečnost a stabilita — Schema migration, validace, health | Průřezové | 🟡 Vysoká | 4 dny | CommandMigration, ValidationPipeline, HealthChecks |
 | PROP-031 | Core — Statement System a upgrade Expression pro těla metod | Core | 🟡 Vysoká | 5,25 dne | Statement hierarchie, BlockStatement, If/For/While, Method.Body AST |
 | PROP-032 | Integrační testy — Core + Generators (Snapshot-based) | Tests | 🟡 Vysoká | 7 dní | SnapshotComparer, matice testů, reálné příklady metod, AST statementy |
+| PROP-034 | Core Reference Documentation + Support Matrix | Core, Docs | 🟡 Vysoká | 4 dny | Docs/Core/ sada referenčních dokumentů, support matice jako backlog, roundtrip boundary. Vychází z IDEA-001/002/003. |
+| PROP-035 | C#-First Core Migration + Expression/Statement Completeness | Core, Translator, Tests | 🔴 Kritická | 4,5-8 dní | 7 commitů: RootElement → Class/Interface/Struct (TypeParams+GenericConstraint) → MethodElement → Expressions (Lambda/New/Default/Conversion/NamedArg + Await/Switch/NullCoalescing) → Translator → Tests. C# sémantický model. Pokrývá GitHub task kroky 1-3, 8. |
+| PROP-036 | Core Specification Layer | Core, Tests, AI | 🟡 Vysoká | 5-8 dní | InvariantDefinition, boolean AST, IInvariantEvaluator, test generation. Vychází z Perplexity konverzace 05663298. |
+| PROP-037 | C# Completeness — Chybějící konstrukty + Projektová metadata + Roslyn Importer | Core, Infra | 🟢 Střední | 6-9 dní | DelegateElement, EventElement, OperatorElement; rozšířený ProjectElement; MetaForge.Core.Framework; MetaForge.Importer (Roslyn). Pokrývá GitHub task kroky 4-6. |
+| PROP-038 | Core DX & Diagnostics — Fluent Builder, DiagnosticBag, AttributeModel, XmlDocModel | Core | 🔴 Kritická | 1-2 dny | Fluent Builder API pro všechny elementy; DiagnosticBag s reportéry; AttributeElement (first-class); XmlDocElement strukturovaně. Additivní, žádný breaking change. |
+| PROP-039 | Core Composability — TransformPipeline, Mixin/Trait, ConventionRegistry | Core | 🟢 Střední | 1-2 dny | Middleware pipeline nad immutable modelem; Mixin/Trait systém (build-time expanze); ConventionRegistry (PascalCase, I-prefix). |
 
 ## Odložené návrhy
 
@@ -129,6 +135,77 @@ Více: [`Docs/Plans/PROP-031-Core-Statement-System.md`](Docs/Plans/PROP-031-Core
 Více: [`Docs/Plans/PROP-032-Integration-Tests-Core-Generators.md`](Docs/Plans/PROP-032-Integration-Tests-Core-Generators.md)
 
 > Testovací matice: [`Docs/Integration/01-Integration-Test-Matrix.md`](Docs/Integration/01-Integration-Test-Matrix.md)
+
+### PROP-034: Core Reference Documentation + Support Matrix
+
+Více: [`Docs/Plans/PROP-034-Core-Reference-Documentation.md`](Docs/Plans/PROP-034-Core-Reference-Documentation.md)
+
+> **Vychází z:** IDEA-001, IDEA-002, IDEA-003 (Perplexity analýza d773bf6a)
+> **Obsahuje:** Docs/Core/ sada (Overview, Support Matrix, Type System, Type Kinds, Value Objects, Methods, Expressions, Roundtrip, Examples)
+> **OQ-034-01:** Jak udržovat support matici živou? (ručně vs generovaně)
+> **OQ-034-02:** Je roundtrip cílový stav nebo jen užitečná vlastnost?
+> **OQ-034-03:** Má se matice verzovat s Core?
+
+### IDEA-004 Follow-up: Method Expression Boundary
+
+> **Follow-up k:** PROP-031 (Core Statement System)
+> **Popis:** Doplnit `MethodBodyKind` (None/Structured/Text/AiBody) do `MethodElement` a vymezit hranici "co je AST a co už ne".
+> **OQ:** Jaký je default `MethodBodyKind` pro nově parsované metody?
+> **Zdroj:** IDEA-004 z `.github/ideas/old_ideas/`
+
+### PROP-035: C#-First Core Migration
+
+Více: [`Docs/Plans/PROP-035-CSharp-First-Core-Migration.md`](Docs/Plans/PROP-035-CSharp-First-Core-Migration.md)
+
+> **Vychází z:** Perplexity konverzace 05663298 (5 dotazů)
+> **Obsahuje:** 7 commitů migrace (RootElement → ClassElement → MethodElement → Expressions → Translator → Tests → Docs)
+> **Princip:** C#-first sémantický Core, ne syntaktický. Red lines: nikdy raw kód, formatting, prompt texty, pricing flagy.
+> **OQ-035-01:** Kdy udělat breaking release?
+> **OQ-035-02:** Převést BaseClassName na TypeModel??
+> **OQ-035-03:** Přesný tvar LanguageCapabilityProfile?
+
+### PROP-036: Core Specification Layer
+
+Více: [`Docs/Plans/PROP-036-Core-Specification-Layer.md`](Docs/Plans/PROP-036-Core-Specification-Layer.md)
+
+> **Vychází z:** Perplexity konverzace 05663298 (5 dotazů)
+> **Obsahuje:** InvariantDefinition, InvariantExpression boolean AST, IInvariantEvaluator se Local/Scoped/Relational/Global scope, test generation z invariantů.
+> **Princip:** Jeden zdroj pravdy pro invarianty → runtime validace + test generation + AI guardraily.
+> **OQ-036-01:** GeneratorIntent na StrongType nebo odvodit z invariantů?
+> **OQ-036-02:** Granularita AI-generated invariantů?
+> **OQ-036-03:** IInvariantEvaluator v Core nebo Infrastructure?
+
+### PROP-037: C# Completeness — Chybějící konstrukty + Projektová metadata + Roslyn Importer
+
+Více: [`Docs/Plans/PROP-037-CSharp-Completeness-Importer.md`](Docs/Plans/PROP-037-CSharp-Completeness-Importer.md)
+
+> **Vychází z:** GitHub task "Implement the plan" kroky 4, 5, 6
+> **Obsahuje:** DelegateElement, EventElement, OperatorElement; rozšířený ProjectElement (TargetFramework, PackageReference); MetaForge.Core.Framework (DI, ASP.NET, EF); MetaForge.Importer (Roslyn-based, 2 režimy).
+> **Celkem:** 47-69h, 6-9 dní
+> **OQ-037-01:** MetaForge.Core.Framework jako samostatný projekt?
+> **OQ-037-02:** Granularita framework metadata?
+> **OQ-037-03:** Importer s přímou Roslyn závislostí nebo abstrakcí?
+
+### PROP-038: Core DX & Diagnostics — Fluent Builder, DiagnosticBag, AttributeModel, XmlDocModel
+
+Více: [`Docs/Plans/PROP-038-Core-DX-Diagnostics.md`](Docs/Plans/PROP-038-Core-DX-Diagnostics.md)
+
+> **Vychází z:** Perplexity konverzace e0609fe1
+> **Obsahuje:** Fluent Builder API (Class("X").WithProperty(...).Build()); DiagnosticBag s Console/JSON/InMemory reportéry; AttributeElement jako first-class; XmlDocElement strukturovaně.
+> **Celkem:** 8-13h, 1-2 dny. Additivní změny.
+> **OQ-038-01:** Attributes jako breaking change, nebo vedle starých?
+> **OQ-038-02:** Extension methods nebo vnořené třídy pro buildery?
+
+### PROP-039: Core Composability — TransformPipeline, Mixin/Trait, ConventionRegistry
+
+Více: [`Docs/Plans/PROP-039-Core-Composability.md`](Docs/Plans/PROP-039-Core-Composability.md)
+
+> **Vychází z:** Perplexity konverzace e0609fe1
+> **Obsahuje:** TransformPipeline (middleware nad immutable modelem); Mixin/Trait (build-time expanze); ConventionRegistry (PascalCase, I-prefix, Async suffix).
+> **Celkem:** 9-15h, 1-2 dny.
+> **OQ-039-01:** TransformPipeline v Core nebo samostatný projekt?
+> **OQ-039-02:** Mixiny + atributy + XML doc?
+> **OQ-039-03:** Per-element override konvencí?
 
 ---
 
