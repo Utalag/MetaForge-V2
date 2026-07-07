@@ -1,0 +1,130 @@
+# === .NET ===
+bin/
+obj/
+*.csproj.user
+*.csproj.DotSettings.user
+*.user
+*.suo
+*.sln.docstats
+*.sln.sqlite
+*.userprefs
+*.DotSettings.user
+[Dd]ebug/
+[Rr]elease/
+[Dd]ebugPublic/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+app.*.config
+packages/
+*.nupkg
+*.snk
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# === .NET - NuGet ===
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+
+# === .NET - BenchmarkDotNet ===
+BenchmarkDotNet.Artifacts/
+
+# === .NET - JetBrains dotCover ===
+dotCover/
+
+# === Test Results ===
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+*.coverage
+*.coveragexml
+*.log
+
+# === Visual Studio ===
+.vs/
+*.sln.ide/
+*.ntvs_analysis.*
+*.rsuser
+*.tlog
+*.ilk
+*.exp
+*.lib
+*.pdb
+*.ipdb
+*.iobj
+
+# === VS Code ===
+.vscode/
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/settings.json
+.history/
+
+# === Rider / JetBrains ===
+.idea/
+*.sln.iml
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# === Node / NPM (for docs tooling) ===
+node_modules/
+
+# === OS ===
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# === Python / virtual envs (if any tooling scripts) ===
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+
+# === Secrets ===
+*.pfx
+*.p12
+*.cert
+*.key
+*.keystore
+user-secrets.json
+secrets.json
+appsettings.*.local.json
+
+# === Environment ===
+.env
+.env.local
+.env.*.local
+
+# === Temp / Misc ===
+*.tmp
+*.temp
+*.swp
+*~
+*.bak
+*.orig
+*.old
+*.dylib
+*.o
+*.so
+*.dll
+*.cache
