@@ -35,6 +35,7 @@ public class CodeGenerator : BaseCodeGenerator
             InterfaceElement iface => GenerateInterface(iface),
             EnumElement enm => GenerateEnum(enm),
             StructElement str => GenerateStruct(str),
+            DelegateElement del => GenerateDelegate(del),
             _ => $"// Nepodporovaný element typu: {element.GetType().Name}"
         };
 
@@ -78,7 +79,9 @@ public class CodeGenerator : BaseCodeGenerator
             { "usings", cls.Usings },
             { "attributes", cls.Attributes.Select(RenderAttribute).ToList() },
             { "properties", cls.Properties.Select(RenderProperty).ToList() },
-            { "methods", cls.Methods.Select(RenderMethod).ToList() }
+            { "methods", cls.Methods.Select(RenderMethod).ToList() },
+            { "constructors", cls.Constructors.Select(RenderConstructor).ToList() },
+            { "fields", cls.Fields.Select(RenderField).ToList() }
         };
 
         return RenderTemplate("Class", model);
@@ -231,6 +234,79 @@ public class CodeGenerator : BaseCodeGenerator
             return ";";
 
         return _renderer.Render(method.Body);
+    }
+
+    /// <summary>
+    /// Vyrenderuje konstruktor pomocí Scriban šablony.
+    /// </summary>
+    private string RenderConstructor(ConstructorElement ctor)
+    {
+        var parameters = string.Join(", ", ctor.Parameters.Select(p =>
+        {
+            var modifier = MapParameterModifier(p.Modifier);
+            var modifierStr = modifier.Length > 0 ? $"{modifier} " : "";
+            var type = MapType(p.Type);
+            var defaultValue = p.HasDefaultValue && p.DefaultValue is not null
+                ? $" = {p.DefaultValue}" : "";
+            return $"{modifierStr}{type} {p.Name}{defaultValue}";
+        }));
+
+        var model = new Dictionary<string, object?>
+        {
+            { "name", ctor.Name },
+            { "access_modifier", MapAccessModifier(ctor.AccessModifier) },
+            { "is_static", ctor.IsStatic },
+            { "parameters", parameters },
+            { "initializer", ctor.Initializer },
+            { "has_body", ctor.Body != null },
+            { "body", ctor.Body != null ? _renderer.Render(ctor.Body) : null }
+        };
+
+        return RenderTemplate("Constructor", model);
+    }
+
+    /// <summary>
+    /// Vyrenderuje field pomocí Scriban šablony.
+    /// </summary>
+    private string RenderField(FieldElement field)
+    {
+        var model = new Dictionary<string, object?>
+        {
+            { "name", field.Name },
+            { "type", MapType(field.Type) },
+            { "access_modifier", MapAccessModifier(field.AccessModifier) },
+            { "is_readonly", field.IsReadOnly },
+            { "is_static", field.IsStatic },
+            { "is_const", field.IsConst },
+            { "default_value", field.DefaultValue }
+        };
+
+        return RenderTemplate("Field", model);
+    }
+
+    /// <summary>
+    /// Vygeneruje delegáta.
+    /// </summary>
+    private string GenerateDelegate(DelegateElement del)
+    {
+        var returnType = MapType(del.ReturnType);
+        var parameters = string.Join(", ", del.Parameters.Select(p =>
+        {
+            var modifier = MapParameterModifier(p.Modifier);
+            var modifierStr = modifier.Length > 0 ? $"{modifier} " : "";
+            var type = MapType(p.Type);
+            return $"{modifierStr}{type} {p.Name}";
+        }));
+        var typeParams = del.TypeParameters.Count > 0
+            ? "<" + string.Join(", ", del.TypeParameters) + ">"
+            : "";
+        var access = MapAccessModifier(del.AccessModifier);
+        var usings = del.Usings.Count > 0
+            ? string.Join(Environment.NewLine, del.Usings.Select(u => $"using {u};")) + Environment.NewLine
+            : "";
+        var ns = del.Namespace != null ? $"namespace {del.Namespace};{Environment.NewLine}{Environment.NewLine}" : "";
+
+        return $@"{usings}{ns}{access} delegate {returnType} {del.Name}{typeParams}({parameters});";
     }
 
     private static string RenderAttribute(AttributeElement attr)

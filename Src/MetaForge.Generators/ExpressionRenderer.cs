@@ -1,5 +1,7 @@
 using System.Text;
+using MetaForge.Core.DataTypes;
 using MetaForge.Core.Elements.Expressions;
+using MetaForge.Core.Elements.Members;
 using MetaForge.Core.Elements.Statements;
 
 namespace MetaForge.Generators;
@@ -47,6 +49,12 @@ public sealed class ExpressionRenderer
         WhileStatement whileS => RenderWhile(whileS),
         AssignmentStatement assign => RenderAssignment(assign),
         ExpressionStatement exprStmt => RenderExprStmt(exprStmt),
+        ForEachStatement fe => RenderForEach(fe),
+        SwitchStatement sw => RenderSwitch(sw),
+        TryCatchStatement tc => RenderTryCatch(tc),
+        UsingStatement u => RenderUsing(u),
+        UsingDeclarationStatement ud => RenderUsingDeclaration(ud),
+        LocalFunctionStatement lf => RenderLocalFunction(lf),
         _ => $"{Indent()}/* Neznámý statement: {stmt.StatementKind} */"
     };
 
@@ -164,6 +172,138 @@ public sealed class ExpressionRenderer
         return $"{Indent()}{expr};";
     }
 
+    private string RenderForEach(ForEachStatement fe)
+    {
+        var sb = new StringBuilder();
+        var typeHint = fe.VariableType != null ? $"{fe.VariableType} " : "var ";
+        var collection = RenderExpression(fe.Collection);
+        sb.Append($"{Indent()}foreach ({typeHint}{fe.VariableName} in {collection})");
+        sb.AppendLine();
+        _indent++;
+        sb.AppendLine(fe.Body != null ? RenderStatement(fe.Body) : $"{Indent()}{{ }}");
+        _indent--;
+        return sb.ToString().TrimEnd();
+    }
+
+    private string RenderSwitch(SwitchStatement sw)
+    {
+        var sb = new StringBuilder();
+        var selector = RenderExpression(sw.Selector);
+        sb.AppendLine($"{Indent()}switch ({selector})");
+        sb.AppendLine($"{Indent()}{{");
+        _indent++;
+        foreach (var c in sw.Cases)
+        {
+            sb.AppendLine($"{Indent()}case {RenderExpression(c.Pattern)}:");
+            _indent++;
+            sb.AppendLine(RenderStatement(c.Body));
+            if (!c.Body.ToString()?.Contains("break") == true)
+                sb.AppendLine($"{Indent()}break;");
+            _indent--;
+        }
+        if (sw.DefaultCase != null)
+        {
+            sb.AppendLine($"{Indent()}default:");
+            _indent++;
+            sb.AppendLine(RenderStatement(sw.DefaultCase));
+            _indent--;
+        }
+        _indent--;
+        sb.Append($"{Indent()}}}");
+        return sb.ToString();
+    }
+
+    private string RenderTryCatch(TryCatchStatement tc)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"{Indent()}try");
+        _indent++;
+        sb.AppendLine(RenderStatement(tc.TryBody));
+        _indent--;
+        foreach (var cc in tc.Catches)
+        {
+            var exType = cc.ExceptionType ?? "";
+            var varName = cc.VariableName ?? "";
+            var filter = cc.Filter != null ? $" when ({cc.Filter})" : "";
+            sb.AppendLine($"{Indent()}catch ({exType} {varName}){filter}");
+            _indent++;
+            sb.AppendLine(RenderStatement(cc.Body));
+            _indent--;
+        }
+        if (tc.FinallyBody != null)
+        {
+            sb.AppendLine($"{Indent()}finally");
+            _indent++;
+            sb.AppendLine(RenderStatement(tc.FinallyBody));
+            _indent--;
+        }
+        return sb.ToString().TrimEnd();
+    }
+
+    private string RenderUsing(UsingStatement u)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"{Indent()}using ({u.ResourceDeclaration})");
+        _indent++;
+        sb.AppendLine(u.Body != null ? RenderStatement(u.Body) : $"{Indent()}{{ }}");
+        _indent--;
+        return sb.ToString().TrimEnd();
+    }
+
+    private string RenderUsingDeclaration(UsingDeclarationStatement ud)
+    {
+        var init = RenderExpression(ud.Initializer);
+        return $"{Indent()}using var {ud.VariableName} = {init};";
+    }
+
+    private string RenderLocalFunction(LocalFunctionStatement lf)
+    {
+        var sb = new StringBuilder();
+        var method = lf.Function;
+        var returnType = MapType(method.ReturnType);
+        var parameters = string.Join(", ", method.Parameters.Select(p => RenderParameter(p)));
+        sb.Append($"{Indent()}{returnType} {method.Name}({parameters})");
+        if (method.ExpressionBody != null)
+        {
+            sb.AppendLine($" => {RenderExpression(method.ExpressionBody)};");
+        }
+        else if (method.Body != null)
+        {
+            sb.AppendLine();
+            _indent++;
+            sb.AppendLine(RenderStatement(method.Body));
+            _indent--;
+        }
+        else
+        {
+            sb.AppendLine(";");
+        }
+        return sb.ToString();
+    }
+
+    private static string MapType(MetaForge.Core.DataTypes.TypeModel type) => type?.BaseType switch
+    {
+        MetaForge.Core.DataTypes.DataType.Void => "void",
+        MetaForge.Core.DataTypes.DataType.Int32 => "int",
+        MetaForge.Core.DataTypes.DataType.String => "string",
+        MetaForge.Core.DataTypes.DataType.Bool => "bool",
+        _ => type?.CustomTypeName ?? "var"
+    };
+
+    private static string RenderParameter(MetaForge.Core.Elements.Members.ParameterElement p)
+    {
+        var mod = p.Modifier switch
+        {
+            ParameterModifier.Ref => "ref ",
+            ParameterModifier.Out => "out ",
+            ParameterModifier.In => "in ",
+            ParameterModifier.Params => "params ",
+            _ => ""
+        };
+        var def = p.HasDefaultValue ? $" = {p.DefaultValue}" : "";
+        return $"{mod}{MapType(p.Type)} {p.Name}{def}";
+    }
+
     // ========================================================================
     // EXPRESSIONY
     // ========================================================================
@@ -179,6 +319,14 @@ public sealed class ExpressionRenderer
         MethodCallExpression methodCall => RenderMethodCall(methodCall),
         MemberAccessExpression memberAccess => RenderMemberAccess(memberAccess),
         ConditionalExpression conditional => RenderConditional(conditional),
+        NewExpression newExpr => RenderNew(newExpr),
+        AwaitExpression awaitExpr => RenderAwait(awaitExpr),
+        ConversionExpression conv => RenderConversion(conv),
+        DefaultExpression def => RenderDefault(def),
+        IsPatternExpression ip => RenderIsPattern(ip),
+        LambdaExpression lam => RenderLambda(lam),
+        NullCoalescingExpression nc => RenderNullCoalescing(nc),
+        SwitchExpression sw => RenderSwitchExpr(sw),
         _ => $"/* Neznámý výraz: {expr.Kind} */"
     };
 
@@ -228,6 +376,62 @@ public sealed class ExpressionRenderer
         var whenTrue = RenderExpression(conditional.WhenTrue);
         var whenFalse = RenderExpression(conditional.WhenFalse);
         return $"{condition} ? {whenTrue} : {whenFalse}";
+    }
+
+    private string RenderNew(NewExpression newExpr)
+    {
+        var args = string.Join(", ", newExpr.ConstructorArguments.Select(RenderExpression));
+        var bindings = newExpr.MemberBindings?.Count > 0
+            ? " { " + string.Join(", ", newExpr.MemberBindings.Select(b => $"{b.MemberName} = {RenderExpression(b.Value)}")) + " }"
+            : "";
+        return $"new {newExpr.TypeName}({args}){bindings}";
+    }
+
+    private string RenderAwait(AwaitExpression awaitExpr)
+    {
+        return $"await {RenderExpression(awaitExpr.Operand)}";
+    }
+
+    private string RenderConversion(ConversionExpression conv)
+    {
+        if (conv.IsExplicit)
+            return $"({conv.TargetType}){RenderExpression(conv.Operand)}";
+        return RenderExpression(conv.Operand);
+    }
+
+    private string RenderDefault(DefaultExpression def)
+    {
+        return $"default({def.TargetType})";
+    }
+
+    private string RenderIsPattern(IsPatternExpression ip)
+    {
+        var pattern = ip.TargetTypeName ?? ip.PatternKind switch
+        {
+            PatternKind.Null => "null",
+            PatternKind.Constant => "constant",
+            _ => "var"
+        };
+        var negated = ip.IsNegated ? "not " : "";
+        return $"{RenderExpression(ip.Operand)} is {negated}{pattern}";
+    }
+
+    private string RenderLambda(LambdaExpression lam)
+    {
+        var parameters = string.Join(", ", lam.ParameterNames);
+        var body = RenderExpression(lam.Body);
+        return $"({parameters}) => {body}";
+    }
+
+    private string RenderNullCoalescing(NullCoalescingExpression nc)
+    {
+        return $"{RenderExpression(nc.Left)} ?? {RenderExpression(nc.Right)}";
+    }
+
+    private string RenderSwitchExpr(SwitchExpression sw)
+    {
+        var arms = string.Join(", ", sw.Arms.Select(a => $"{RenderExpression(a.Pattern)} => {RenderExpression(a.Value)}"));
+        return $"{RenderExpression(sw.Selector)} switch {{ {arms} }}";
     }
 
     // ========================================================================

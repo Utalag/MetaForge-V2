@@ -9,6 +9,7 @@
 | ID | Název | Vrstva | Priorita | Odhad | Poznámka |
 |----|-------|--------|----------|-------|----------|
 | **NOVÉ** | | | | | |
+| PROP-043 | Generator Completeness — Expression/Statement renderery, Constructor/Field integrace, Delegate generování | Generators | 🔴 Kritická | 2-3 dny | Perplexity Deep Research: 9/15 expressionů a 6/13 statementů chybí |
 | PROP-040 | Core Member Consistency — IMemberElement, PropertyElement Attributes, XmlSummary | Core | 🟡 Vysoká | 2-3 dny | Perplexity Deep Research: architektonické nekonzistence členů |
 | PROP-041 | ConstructorElement + FieldElement | Core | 🟡 Vysoká | 2-3 dny | Perplexity Deep Research: chybějící elementy pro DI/generování |
 | PROP-042 | Core Test Expansion — FsCheck, snapshoty, guard testy, Roslyn integrace | Tests | 🟡 Vysoká | 3-4 dny | Perplexity Deep Research: kompletní testovací matice |
