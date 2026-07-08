@@ -16,6 +16,26 @@ public sealed class ClassElement : RootElement
     /// <summary>Seznam implementovaných interfaců.</summary>
     public List<string> ImplementedInterfaces { get; } = new();
 
+    /// <summary>
+    /// Typové parametry pro generické třídy.
+    /// Např. <c>class Repository&lt;T, TKey&gt;</c> → ["T", "TKey"].
+    /// Prázdný seznam = negenerická třída.
+    /// </summary>
+    public List<string> TypeParameters { get; init; } = [];
+
+    /// <summary>
+    /// Generic constrainty pro typové parametry.
+    /// Např. <c>where T : class, new()</c>, <c>where TKey : IComparable&lt;TKey&gt;</c>.
+    /// </summary>
+    public List<GenericConstraint> TypeConstraints { get; init; } = [];
+
+    /// <summary>
+    /// Parametry primary konstruktoru (C# 12+).
+    /// Např. <c>record Point(int X, int Y)</c> → [ParameterElement("X", Int32), ParameterElement("Y", Int32)].
+    /// null = bez primary konstruktoru.
+    /// </summary>
+    public List<ParameterElement>? PrimaryConstructorParameters { get; set; }
+
     public AccessModifier AccessModifier { get; set; } = AccessModifier.Public;
     public bool IsAbstract { get; set; }
     public bool IsSealed { get; set; }
@@ -70,12 +90,45 @@ public sealed class ClassElement : RootElement
         IsRecord = true,
     };
 
+    /// <summary>C9: public record class Foo(int X, int Y); — primary constructor.</summary>
+    public static ClassElement PrimaryRecord(string name, params ParameterElement[] parameters) => new()
+    {
+        Name = name,
+        IsRecord = true,
+        PrimaryConstructorParameters = parameters.ToList(),
+    };
+
+    /// <summary>
+    /// C10: public class Repository&lt;T, TKey&gt; where T : class, new() where TKey : IComparable&lt;TKey&gt;.
+    /// Vytvoří generickou třídu s typovými parametry a volitelnými constrainty.
+    /// </summary>
+    public static ClassElement Generic(string name, string[] typeParameters, GenericConstraint[]? constraints = null) => new()
+    {
+        Name = name,
+        TypeParameters = typeParameters.ToList(),
+        TypeConstraints = constraints?.ToList() ?? [],
+    };
+
     // === Fluent rozšiřovací metody (bez konfliktů, vždy bezpečné) ===
 
     /// <summary>Nastaví access modifier (A1,A2,A6).</summary>
     public ClassElement WithAccess(AccessModifier access)
     {
         AccessModifier = access;
+        return this;
+    }
+
+    /// <summary>Nastaví namespace elementu.</summary>
+    public new ClassElement WithNamespace(string? ns)
+    {
+        Namespace = ns;
+        return this;
+    }
+
+    /// <summary>Nastaví XML documentation summary.</summary>
+    public new ClassElement WithXmlSummary(string? summary)
+    {
+        XmlSummary = summary;
         return this;
     }
 

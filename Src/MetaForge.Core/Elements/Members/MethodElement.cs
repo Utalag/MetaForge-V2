@@ -1,6 +1,8 @@
 using MetaForge.Core.Abstractions;
 using MetaForge.Core.DataTypes;
+using MetaForge.Core.Elements.Expressions;
 using MetaForge.Core.Elements.Statements;
+using MetaForge.Core.Elements.Types;
 
 namespace MetaForge.Core.Elements.Members;
 
@@ -22,11 +24,39 @@ public sealed class MethodElement
     public bool IsVirtual { get; set; }
     public bool IsOverride { get; set; }
 
+    /// <summary>
+    /// Extension metoda (C# 3+). <c>this TypeName</c> — první parametr musí být <c>this</c>.
+    /// Implikuje IsStatic = true (extension metody jsou vždy statické).
+    /// </summary>
+    public bool IsExtension { get; set; }
+
+    /// <summary>
+    /// Typové parametry pro generické metody.
+    /// Např. <c>void Swap&lt;T&gt;(ref T a, ref T b)</c> → ["T"].
+    /// Prázdný seznam = negenerická metoda.
+    /// </summary>
+    public List<string> TypeParameters { get; init; } = [];
+
+    /// <summary>Generic constrainty pro typové parametry metody.</summary>
+    public List<GenericConstraint> TypeConstraints { get; init; } = [];
+
+    /// <summary>
+    /// Expression-bodied člen (C# 6+).
+    /// Např. <c>int Double(int x) => x * 2;</c> — ExpressionBody = BinaryExpression(x, Multiply, 2).
+    /// null = block-bodied metoda (používá Body).
+    /// </summary>
+    public Expression? ExpressionBody { get; set; }
+
     /// <summary>Parametry metody.</summary>
     public List<ParameterElement> Parameters { get; } = new();
 
     /// <summary>Atributy na metodě.</summary>
     public List<AttributeElement> Attributes { get; } = new();
+
+    /// <summary>
+    /// Univerzální key-value anotace (dokumentace, validace, generátorové hinty, AI kontext).
+    /// </summary>
+    public MetadataBag Metadata { get; init; } = new();
 
     /// <summary>Tělo metody jako AST (BlockStatement). Null pro abstraktní metody.</summary>
     public BlockStatement? Body { get; set; }
@@ -87,6 +117,18 @@ public sealed class MethodElement
         Name = name,
         ReturnType = returnType,
         IsOverride = true,
+    };
+
+    /// <summary>
+    /// M8: generická metoda <c>public void Swap&lt;T&gt;(ref T a, ref T b)</c>
+    /// s volitelnými constrainty.
+    /// </summary>
+    public static MethodElement Generic(string name, TypeModel returnType, string[] typeParameters, GenericConstraint[]? constraints = null) => new()
+    {
+        Name = name,
+        ReturnType = returnType,
+        TypeParameters = typeParameters.ToList(),
+        TypeConstraints = constraints?.ToList() ?? [],
     };
 
     // === Fluent rozšiřovací metody ===

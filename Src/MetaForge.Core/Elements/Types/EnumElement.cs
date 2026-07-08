@@ -65,6 +65,20 @@ public sealed class EnumElement : RootElement
         return this;
     }
 
+    /// <summary>Nastaví namespace elementu.</summary>
+    public new EnumElement WithNamespace(string? ns)
+    {
+        Namespace = ns;
+        return this;
+    }
+
+    /// <summary>Nastaví XML documentation summary.</summary>
+    public new EnumElement WithXmlSummary(string? summary)
+    {
+        XmlSummary = summary;
+        return this;
+    }
+
     /// <summary>Přidá člena enumu.</summary>
     public EnumElement WithMember(EnumMemberElement member)
     {

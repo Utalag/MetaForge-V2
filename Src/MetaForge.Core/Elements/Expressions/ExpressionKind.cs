@@ -37,4 +37,16 @@ public enum ExpressionKind
 
     /// <summary>Složený výraz (obecný).</summary>
     Computed,
+
+    /// <summary>Await výraz: await task.</summary>
+    Await,
+
+    /// <summary>Switch výraz: x switch { 1 => "one", _ => "many" }.</summary>
+    Switch,
+
+    /// <summary>Pattern matching: x is string, x is not null.</summary>
+    IsPattern,
+
+    /// <summary>Null coalescing: a ?? b.</summary>
+    NullCoalescing,
 }

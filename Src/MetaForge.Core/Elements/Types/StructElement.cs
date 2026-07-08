@@ -13,6 +13,21 @@ public sealed class StructElement : RootElement
     public bool IsReadOnly { get; set; }
     public bool IsRecord { get; set; }
 
+    /// <summary>
+    /// Typové parametry pro generické structy.
+    /// Např. <c>struct Pair&lt;T1, T2&gt;</c> → ["T1", "T2"].
+    /// </summary>
+    public List<string> TypeParameters { get; init; } = [];
+
+    /// <summary>Generic constrainty pro typové parametry.</summary>
+    public List<GenericConstraint> TypeConstraints { get; init; } = [];
+
+    /// <summary>
+    /// Parametry primary konstruktoru (C# 12+).
+    /// null = bez primary konstruktoru.
+    /// </summary>
+    public List<ParameterElement>? PrimaryConstructorParameters { get; set; }
+
     public List<PropertyElement> Properties { get; } = new();
     public List<MethodElement> Methods { get; } = new();
 
@@ -44,6 +59,20 @@ public sealed class StructElement : RootElement
     public StructElement WithAccess(AccessModifier access)
     {
         AccessModifier = access;
+        return this;
+    }
+
+    /// <summary>Nastaví namespace elementu.</summary>
+    public new StructElement WithNamespace(string? ns)
+    {
+        Namespace = ns;
+        return this;
+    }
+
+    /// <summary>Nastaví XML documentation summary.</summary>
+    public new StructElement WithXmlSummary(string? summary)
+    {
+        XmlSummary = summary;
         return this;
     }
 

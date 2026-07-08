@@ -18,6 +18,13 @@ public sealed class MethodCallExpression : Expression
     public IReadOnlyList<Expression> Arguments { get; init; } = Array.Empty<Expression>();
 
     /// <summary>
+    /// Pojmenované argumenty (C# 4+). Prázdné = poziční.
+    /// Např. <c>MethodCall(p1: 5, p2: "hello")</c> → ["p1", "p2"].
+    /// Pokud je položka null, znamená poziční argument na dané pozici.
+    /// </summary>
+    public IReadOnlyList<string?> ArgumentNames { get; init; } = Array.Empty<string?>();
+
+    /// <summary>
     /// Vytvoří výraz volání metody.
     /// </summary>
     /// <param name="methodName">Plně kvalifikovaný název metody.</param>

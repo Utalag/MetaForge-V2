@@ -24,6 +24,11 @@ public sealed class PropertyElement
     /// <summary>Výchozí hodnota jako string (např. "0", "null", "\"hello\"").</summary>
     public string? DefaultValue { get; set; }
 
+    /// <summary>
+    /// Univerzální key-value anotace (dokumentace, validace, generátorové hinty).
+    /// </summary>
+    public MetadataBag Metadata { get; init; } = new();
+
     /// <summary>Cena v kreditech.</summary>
     public int Coin { get; set; } = 2;
 

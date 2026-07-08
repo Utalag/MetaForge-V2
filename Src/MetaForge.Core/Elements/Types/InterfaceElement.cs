@@ -11,6 +11,15 @@ public sealed class InterfaceElement : RootElement
     public override string Kind => "interface";
     public AccessModifier AccessModifier { get; set; } = AccessModifier.Public;
 
+    /// <summary>
+    /// Typové parametry pro generické interfacy.
+    /// Např. <c>interface IRepository&lt;T&gt;</c> → ["T"].
+    /// </summary>
+    public List<string> TypeParameters { get; init; } = [];
+
+    /// <summary>Generic constrainty pro typové parametry.</summary>
+    public List<GenericConstraint> TypeConstraints { get; init; } = [];
+
     public List<PropertyElement> Properties { get; } = new();
     public List<MethodElement> Methods { get; } = new();
 
@@ -28,6 +37,20 @@ public sealed class InterfaceElement : RootElement
     public InterfaceElement WithAccess(AccessModifier access)
     {
         AccessModifier = access;
+        return this;
+    }
+
+    /// <summary>Nastaví namespace elementu.</summary>
+    public new InterfaceElement WithNamespace(string? ns)
+    {
+        Namespace = ns;
+        return this;
+    }
+
+    /// <summary>Nastaví XML documentation summary.</summary>
+    public new InterfaceElement WithXmlSummary(string? summary)
+    {
+        XmlSummary = summary;
         return this;
     }
 
