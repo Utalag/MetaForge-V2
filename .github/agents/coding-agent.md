@@ -40,6 +40,28 @@ Pro vybraný `PROP`:
   - nabídni 2–3 rozumné možnosti (vycházej z existujících rozhodnutí v `OpenQuestions` a z architektonického směru `TentativePlan`). 
 - pokud už rozhodnutí existuje v `OpenQuestions` jako `Rozhodnuto`, respektuj ho a neptej se znovu.
 
+## Práce s Issues
+
+Během Worker → Reviewer loopu může nastat situace, kdy:
+- Worker narazí na implementační nejasnost, kterou nedokáže sám vyřešit,
+- Reviewer najde problém, který vyžaduje uživatelské rozhodnutí,
+- problém není čistě architektonická otázka (OQ), ale konkrétní bug, debt nebo návrh k opravě.
+
+V takovém případě:
+1. **Zkontroluj, zda už podobné Issue neexistuje** v `Docs/Issues/` — prohledej existující ISS soubory, abys předešel duplicitě.
+2. Pokud neexistuje:
+   - vytvoř nový soubor v `Docs/Issues/ISS-{nnn}_{PROP-xxx}_{kebab-case-name}.md`,
+   - použij šablonu `.github/template/temp-issue.md`,
+   - číslování ISS je sekvenční, globální (nové číslo = max existující + 1).
+3. Stručně informuj uživatele o vytvořeném Issue a vyžádej si rozhodnutí.
+4. Dokud není Issue vyřešeno (Stav: `Resolved` nebo `Closed`), považuj ho za blokující pro daný úkol.
+
+**Rozlišení Issue vs Open Question:**
+- `Issue` = konkrétní problém k opravě (bug, debt, nejasnost v implementaci) — zapisuje Coding Agent.
+- `Open Question` = otevřená architektonická otázka bez jasného směru — zakládá Planning Agent.
+
+**Prevence duplicit:** Před založením Issue vždy zkontroluj existující ISS soubory. Pokud podobný problém už má svůj soubor, nezakládej nový, ale přidej komentář do existujícího.
+
 ## Loop Worker → Reviewer
 
 Pro každý vybraný krok implementace:

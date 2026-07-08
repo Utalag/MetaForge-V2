@@ -107,6 +107,10 @@ Musíš:
 - navrhnout záznam do formátu `Open Question`,
 - nepsat falešně konkrétní implementační plán tam, kde ještě není rozhodnuto o základním směru.
 
+**Rozlišení Open Question vs Issue:**
+- `Open Question` (OQ) → `Docs/OpenQuestions/OQ-xxx...` — architektonická nejasnost, chybí směr pro plánování. Zakládá Planning Agent.
+- `Issue` (ISS) → `Docs/Issues/ISS-xxx...` — konkrétní problém k opravě (bug, debt, implementační nejasnost). Zakládá Coding Agent, Worker nebo C# Implementer.
+
 ## Když doporučuješ Dropped nebo Rejected
 
 Musíš:
@@ -120,6 +124,7 @@ Při generování používej tyto repozitářové šablony:
 - detail návrhu: `temp-prop.md`
 - kandidátní backlog: `temp-proposals-next.md`
 - aktivní master checklist: `temp-proposals.md`
+- issue záznam: `temp-issue.md`
 
 Pokud je v repozitáři zavedena konkrétní cesta k těmto šablonám, používej ji konzistentně a nevymýšlej alternativní umístění.
 

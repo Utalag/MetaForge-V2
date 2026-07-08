@@ -25,6 +25,15 @@ Pravidlo: Každá položka má být krátká; pokud návrh dozraje, dostane vlas
 - Název kandidáta — čeká na OQ-0xx....
 - Název kandidáta — čeká na stabilizaci PROP-0yy
 
+## Issues — Známé problémy k opravě
+
+> Problémy zjištěné při Code Review po implementaci. Každý issue má vlastní detailní soubor v `Docs/Issues/ISS-xxx_nazev.md`.
+> Při opravě přesunout do `PROPOSALS.md` jako nový PROP nebo task.
+
+| # | Datum | PROP | Soubor | Závažnost | Popis | Doporučené řešení | Issue soubor |
+|---|-------|------|--------|-----------|-------|-------------------|--------------|
+| 1 | YYYY-MM-DD | PROP-xxx | `cesta/k/souboru.cs` | ⚠️ Střední | Stručný popis problému. | Stručný návrh řešení. | [`ISS-xxx`](Docs/Issues/ISS-xxx_PROP-xxx_nazev.md) |
+
 ## Přesunuto do PROPOSALS
 
 (vzor)

@@ -10,6 +10,7 @@ Pravidlo: Detail návrhu nepatří sem; detail žije v Docs/Plans/PROP-xxx-*.md
 - Každá položka musí mít vlastní detailní markdown v `Docs/Plans/`.
 - Kandidátní nebo nevyzrálé nápady patří do `PROPOSALS_NEXT.md`.
 - Otevřené architektonické otázky patří do `Docs/OpenQuestions/OQ-0xx_PROP-0xx_name.md`.
+- Konkrétní problémy a bugy zjištěné při implementaci patří do `Docs/Issues/ISS-xxx_PROP-xxx_name.md`.
 
 ## Stavové značky
 

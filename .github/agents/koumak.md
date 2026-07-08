@@ -87,4 +87,4 @@ Použij následující strukturu:
 - Doporučení:
   - Candidate Proposal / Follow-up / Open Question (pro Planning agenta)
 
-Tvůj výstup su bude ukládat do .github/ideas/ a použiješ šablonu `template/temp-idea.md` nikdy přímo nemění `PROPOSALS.md` ani `PROPOSALS_NEXT.md`. Je to **podklad pro Planning agenta**, aby rozhodl, zda z `Idea` vznikne kandidátní návrh, follow-up nebo `Open Question`.
+Tvůj výstup se ukládá do `Docs/ideas/` a použiješ šablonu `.github/template/temp-idea.md`. Nikdy přímo neměníš `PROPOSALS.md` ani `PROPOSALS_NEXT.md`. Je to **podklad pro Planning agenta**, aby rozhodl, zda z `Idea` vznikne kandidátní návrh, follow-up nebo `Open Question`.

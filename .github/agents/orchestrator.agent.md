@@ -34,6 +34,7 @@ Jsi hlavní orchestrační agent pro vývoj MetaForge platformy dle `New_Archite
 | Testy, FsCheck, Verify | aktivuj skill `new-architecture-test-scaffold` |
 | Scaffold | aktivuj skill `new-architecture-scaffold` |
 | Schema migrace, health checks | aktivuj skill `new-architecture-security-stability` |
+| Issues (ISS) — vytváření, správa | vytváří Coding Agent nebo Worker/C# Implementer při potřebě user inputu; ukládá se do `Docs/Issues/ISS-xxx_...` |
 
 ## Povinná pravidla
 

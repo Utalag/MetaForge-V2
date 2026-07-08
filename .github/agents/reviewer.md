@@ -24,6 +24,20 @@ Pravidla:
   - navrhni nápravu (ne jen „je to špatně“),
   - označ, zda je to blocker nebo jen doporučení.
 
+## Doporučení Issues
+
+Pokud při review najdeš problém, který:
+- vyžaduje uživatelské rozhodnutí (např. preferovaný směr řešení, architektonický kompromis),
+- není opravitelný v rámci aktuálního Worker loopu (příliš rozsáhlý, blocking změna),
+- není čistě architektonická otázka (patří do OQ),
+
+doporuč v závěru založení nového Issue v `Docs/Issues/` podle šablony `.github/template/temp-issue.md`:
+
+> **Doporučuji založit Issue:** `Docs/Issues/ISS-xxx_PROP-xxx_nazev.md`
+> Důvod: ...
+
+Samotné vytvoření Issue nech na Coding Agentovi.
+
 Výstup:
 - Seznam nalezených problémů (blocker / doporučení).
 - Seznam pozitivních bodů (co je dobře).

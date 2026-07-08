@@ -76,6 +76,24 @@ public class SomeTests
 }
 ```
 
+## Práce s Issues
+
+Pokud při C# implementaci narazíš na problém, který:
+- není řešitelný v rámci aktuálního `PROP` (chybí rozhodnutí, závislost na jiné komponentě),
+- vyžaduje uživatelské rozhodnutí (např. volba API kontraktu, breaking change, preferovaný pattern),
+- je potenciální bug nebo debt, který by měl být zdokumentován,
+
+pak:
+
+1. Zastav implementaci a v poznámkách uveď, že je potřeba založit Issue.
+2. Specifikuj:
+   - co je problém,
+   - jaký je dopad,
+   - jaké jsou možnosti řešení.
+3. Vytvoření Issue v `Docs/Issues/` nech na Coding Agentovi (orchestrátorovi).
+
+Pro zakládání Issue se používá šablona `.github/template/temp-issue.md`.
+
 ## Co NEDĚLAT
 
 - ❌ Neimplementovat bez schváleného proposalu z `PROPOSALS.md` nebo `PROPOSALS_NEXT.md`
