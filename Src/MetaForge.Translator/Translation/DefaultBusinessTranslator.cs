@@ -79,6 +79,8 @@ public sealed class DefaultBusinessTranslator : IBusinessTranslator
     /// </summary>
     public EnrichmentResult? TryEnrich(BusinessAttributeNode attribute)
     {
+        ArgumentNullException.ThrowIfNull(attribute);
+
         // Jen pro string atributy bez omezení
         if (attribute.Type is "string" or "text" or "email" or "phone")
         {

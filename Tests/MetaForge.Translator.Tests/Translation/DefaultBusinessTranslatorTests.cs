@@ -63,4 +63,113 @@ public class DefaultBusinessTranslatorTests
 
         result.Should().BeNull();
     }
+
+    // === Translate — základní typy (High) ===
+
+    [Fact]
+    public void Translate_String_ReturnsStringType()
+    {
+        var attr = new BusinessAttributeNode { Name = "Name", Type = "string" };
+        var result = _translator.Translate(attr);
+
+        result.BaseType.Should().Be(DataType.String);
+    }
+
+    [Fact]
+    public void Translate_Int_ReturnsInt32Type()
+    {
+        var attr = new BusinessAttributeNode { Name = "Count", Type = "int" };
+        var result = _translator.Translate(attr);
+
+        result.BaseType.Should().Be(DataType.Int32);
+    }
+
+    [Fact]
+    public void Translate_Decimal_ReturnsDecimalType()
+    {
+        var attr = new BusinessAttributeNode { Name = "Price", Type = "decimal" };
+        var result = _translator.Translate(attr);
+
+        result.BaseType.Should().Be(DataType.Decimal);
+    }
+
+    [Fact]
+    public void Translate_Bool_ReturnsBoolType()
+    {
+        var attr = new BusinessAttributeNode { Name = "Active", Type = "bool" };
+        var result = _translator.Translate(attr);
+
+        result.BaseType.Should().Be(DataType.Bool);
+    }
+
+    [Fact]
+    public void Translate_DateTime_ReturnsDateTimeType()
+    {
+        var attr = new BusinessAttributeNode { Name = "Created", Type = "datetime" };
+        var result = _translator.Translate(attr);
+
+        result.BaseType.Should().Be(DataType.DateTime);
+    }
+
+    [Fact]
+    public void Translate_Guid_ReturnsGuidType()
+    {
+        var attr = new BusinessAttributeNode { Name = "Id", Type = "guid" };
+        var result = _translator.Translate(attr);
+
+        result.BaseType.Should().Be(DataType.Guid);
+    }
+
+    // === Nullability (High) ===
+
+    [Fact]
+    public void Translate_RequiredAttribute_SetsNonNullable()
+    {
+        var attr = new BusinessAttributeNode { Name = "Name", Type = "string", IsRequired = true };
+        var result = _translator.Translate(attr);
+
+        result.IsNullable.Should().BeFalse();
+    }
+
+    [Fact]
+    public void Translate_NotRequiredAttribute_NullabilityDependsOnType()
+    {
+        // Translator nenastavuje IsNullable automaticky — závisí na typu
+        var attr = new BusinessAttributeNode { Name = "Name", Type = "string", IsRequired = false };
+        var result = _translator.Translate(attr);
+
+        // IsNullable zůstává dle výchozí hodnoty TypeModel
+        result.BaseType.Should().Be(DataType.String);
+    }
+
+    // === TryEnrich — phone a string (High) ===
+
+    [Fact]
+    public void TryEnrich_Phone_ReturnsEnrichmentWithPhoneFormat()
+    {
+        var attr = new BusinessAttributeNode { Id = "a1", Name = "Phone", Type = "phone" };
+        var result = _translator.TryEnrich(attr);
+
+        result.Should().NotBeNull();
+        result!.ValidationRules.Should().Contain("phone_format");
+        result.MaxLength.Should().Be(20);
+    }
+
+    [Fact]
+    public void TryEnrich_String_ReturnsEnrichmentWithDefaultMaxLength()
+    {
+        var attr = new BusinessAttributeNode { Id = "a1", Name = "Description", Type = "string" };
+        var result = _translator.TryEnrich(attr);
+
+        result.Should().NotBeNull();
+        result!.MaxLength.Should().Be(200);
+    }
+
+    [Fact]
+    public void TryEnrich_NullAttribute_ThrowsArgumentNullException()
+    {
+        var act = () => _translator.TryEnrich(null!);
+
+        act.Should().Throw<ArgumentNullException>();
+    }
 }

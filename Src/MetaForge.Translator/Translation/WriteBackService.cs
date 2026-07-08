@@ -23,6 +23,9 @@ public sealed class WriteBackService
     /// </summary>
     public BusinessAuthoringDocument ApplyEnrichment(BusinessAuthoringDocument document, string entityId, EnrichmentResult enrichment)
     {
+        ArgumentNullException.ThrowIfNull(document);
+        ArgumentNullException.ThrowIfNull(enrichment);
+
         var entity = document.Entities.FirstOrDefault(e => e.Id == entityId);
         var attr = entity?.Attributes.FirstOrDefault(a => a.Id == enrichment.AttributeId);
         if (attr is null) return document;
