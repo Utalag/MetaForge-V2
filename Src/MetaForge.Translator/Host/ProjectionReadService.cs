@@ -20,16 +20,7 @@ public sealed class ProjectionReadService
     }
 
     /// <summary>
-    /// Vytvoří aktuální projekci — přehraje commandy a přeloží.
-    /// </summary>
-    public ProjectionView GetProjection(CommandLogStore logStore)
-    {
-        var commands = logStore.GetAll();
-        var document = _replayEngine.Replay(commands);
-        return BuildProjection(document);
-    }
 
-    /// <summary>
     /// Vytvoří projekci z existujícího dokumentu (bez replay).
     /// </summary>
     public ProjectionView GetProjection(BusinessAuthoringDocument document)

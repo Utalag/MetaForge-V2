@@ -81,6 +81,9 @@ public sealed class ReplayEngine
             "AddRelation" => ApplyAddRelation(document, command),
             "SetCoreDetail" => ApplySetCoreDetail(document, command),
             "UpdateSyncState" => ApplyUpdateSyncState(document, command),
+            "AddWorkflow" => ApplyAddWorkflow(document, command),
+            "AddWorkflowStep" => ApplyAddWorkflowStep(document, command),
+            "AddWorkflowTransition" => ApplyAddWorkflowTransition(document, command),
             _ => document, // Neznámý command typ = přeskočit (pro budoucí kompatibilitu)
         };
 
@@ -272,6 +275,76 @@ public sealed class ReplayEngine
                     : e)
                 .ToList()
                 .AsReadOnly(),
+        };
+    }
+
+    private static BusinessAuthoringDocument ApplyAddWorkflow(BusinessAuthoringDocument doc, CommandEnvelope cmd)
+    {
+        var workflow = new BusinessWorkflowNode
+        {
+            Id = cmd.TargetEntityId ?? Guid.NewGuid().ToString("N")[..8],
+            Name = cmd.Payload ?? "",
+        };
+
+        return doc with
+        {
+            Workflows = doc.Workflows.Append(workflow).ToList().AsReadOnly()
+        };
+    }
+
+    private static BusinessAuthoringDocument ApplyAddWorkflowStep(BusinessAuthoringDocument doc, CommandEnvelope cmd)
+    {
+        var workflowId = cmd.TargetEntityId ?? "";
+        var stepId = cmd.TargetAttributeId ?? Guid.NewGuid().ToString("N")[..8];
+        var parts = (cmd.Payload ?? "|").Split('|');
+        var stepName = parts.Length > 0 ? parts[0] : "";
+        var kind = parts.Length > 1 && Enum.TryParse<BusinessWorkflowStepKind>(parts[1], out var k) ? k : BusinessWorkflowStepKind.Manual;
+
+        var step = new BusinessWorkflowStepNode
+        {
+            Id = stepId,
+            Name = stepName,
+            Kind = kind,
+        };
+
+        return doc with
+        {
+            Workflows = doc.Workflows
+                .Select(w => w.Id == workflowId
+                    ? w with { Steps = w.Steps.Append(step).ToList().AsReadOnly() }
+                    : w)
+                .ToList()
+                .AsReadOnly()
+        };
+    }
+
+    private static BusinessAuthoringDocument ApplyAddWorkflowTransition(BusinessAuthoringDocument doc, CommandEnvelope cmd)
+    {
+        var workflowId = cmd.TargetEntityId ?? "";
+        var transitionId = cmd.TargetAttributeId ?? Guid.NewGuid().ToString("N")[..8];
+        var parts = (cmd.Payload ?? "|||").Split('|');
+        var fromStepId = parts.Length > 0 ? parts[0] : "";
+        var toStepId = parts.Length > 1 ? parts[1] : "";
+        var condition = parts.Length > 2 ? parts[2] : null;
+        var label = parts.Length > 3 ? parts[3] : null;
+
+        var transition = new BusinessWorkflowTransitionNode
+        {
+            Id = transitionId,
+            FromStepId = fromStepId,
+            ToStepId = toStepId,
+            Condition = string.IsNullOrEmpty(condition) ? null : condition,
+            Label = string.IsNullOrEmpty(label) ? null : label
+        };
+
+        return doc with
+        {
+            Workflows = doc.Workflows
+                .Select(w => w.Id == workflowId
+                    ? w with { Transitions = w.Transitions.Append(transition).ToList().AsReadOnly() }
+                    : w)
+                .ToList()
+                .AsReadOnly()
         };
     }
 }

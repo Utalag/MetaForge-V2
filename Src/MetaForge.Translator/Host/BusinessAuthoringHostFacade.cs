@@ -117,19 +117,9 @@ public sealed class BusinessAuthoringHostFacade
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException("Název workflow nesmí být prázdný.", nameof(name));
 
-        var workflow = new BusinessWorkflowNode
-        {
-            Id = Guid.NewGuid().ToString("N")[..8],
-            Name = name,
-            Description = description,
-        };
-
-        _document = _document with
-        {
-            Workflows = _document.Workflows.Append(workflow).ToList().AsReadOnly(),
-        };
-
-        return workflow.Id;
+        var op = new AddWorkflowOp(name, description);
+        _document = _patchEngine.Apply(_document, op);
+        return op.WorkflowId;
     }
 
     /// <summary>Přidá krok do existujícího workflow.</summary>
@@ -138,56 +128,17 @@ public sealed class BusinessAuthoringHostFacade
         if (string.IsNullOrWhiteSpace(stepName))
             throw new ArgumentException("Název kroku nesmí být prázdný.", nameof(stepName));
 
-        var workflow = _document.Workflows.FirstOrDefault(w => w.Id == workflowId)
-            ?? throw new InvalidOperationException($"Workflow s Id '{workflowId}' neexistuje.");
-
-        var step = new BusinessWorkflowStepNode
-        {
-            Id = Guid.NewGuid().ToString("N")[..8],
-            Name = stepName,
-            Kind = kind,
-            Order = workflow.Steps.Count,
-        };
-
-        _document = _document with
-        {
-            Workflows = _document.Workflows
-                .Select(w => w.Id == workflowId
-                    ? w with { Steps = w.Steps.Append(step).ToList().AsReadOnly() }
-                    : w)
-                .ToList()
-                .AsReadOnly(),
-        };
-
-        return step.Id;
+        var op = new AddWorkflowStepOp(workflowId, stepName, kind);
+        _document = _patchEngine.Apply(_document, op);
+        return op.StepId;
     }
 
     /// <summary>Přidá přechod mezi dvěma kroky workflow.</summary>
     public string AddWorkflowTransition(string workflowId, string fromStepId, string toStepId, string? condition = null, string? label = null)
     {
-        var workflow = _document.Workflows.FirstOrDefault(w => w.Id == workflowId)
-            ?? throw new InvalidOperationException($"Workflow s Id '{workflowId}' neexistuje.");
-
-        var transition = new BusinessWorkflowTransitionNode
-        {
-            Id = Guid.NewGuid().ToString("N")[..8],
-            FromStepId = fromStepId,
-            ToStepId = toStepId,
-            Condition = condition,
-            Label = label,
-        };
-
-        _document = _document with
-        {
-            Workflows = _document.Workflows
-                .Select(w => w.Id == workflowId
-                    ? w with { Transitions = w.Transitions.Append(transition).ToList().AsReadOnly() }
-                    : w)
-                .ToList()
-                .AsReadOnly(),
-        };
-
-        return transition.Id;
+        var op = new AddWorkflowTransitionOp(workflowId, fromStepId, toStepId, condition, label);
+        _document = _patchEngine.Apply(_document, op);
+        return op.TransitionId;
     }
 
     // === READ OPERATIONS ===
