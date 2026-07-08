@@ -1,3 +1,0 @@
-{{~ ## C# Field Scriban Template ~}}
-{{~ ## Generuje C# field deklaraci ~}}
-{{ access_modifier }}{{ if is_static }} static{{ end }}{{ if is_readonly }} readonly{{ end }} {{ type }} {{ name }}{{ if default_value }} = {{ default_value }}{{ end }};
