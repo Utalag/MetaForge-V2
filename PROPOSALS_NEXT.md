@@ -27,14 +27,14 @@
 | PROP-028 | Infrastructure — Persistence, konfigurace, caching | Infrastr. | 🟡 Vysoká | 5,25 dne | JSONL persistence, IOptions<T>, checkpoint cache |
 | PROP-029 | ForgeBlocks — Rozšíření a marketplace | ForgeBlocks | 🟡 Vysoká | 8 dní | EF Core, AutoMapper, FluentValidation, NuGet distribuce |
 | PROP-030 | Bezpečnost a stabilita — Schema migration, validace, health | Průřezové | 🟡 Vysoká | 4 dny | CommandMigration, ValidationPipeline, HealthChecks |
-| PROP-031 | Core — Statement System a upgrade Expression pro těla metod | Core | 🟡 Vysoká | 5,25 dne | Statement hierarchie, BlockStatement, If/For/While, Method.Body AST |
+| PROP-031 | Core — Statement System a upgrade Expression pro těla metod | Core | ✅ Hotovo | 5,25 dne | Statement hierarchie (Switch, ForEach, TryCatch+CatchClause, Using, UsingDeclaration, LocalFunction) — 6 nových statement typů. StatementKind rozšířen. 6 testů (283 celkem). Dokončeno 2026-07-08. |
 | PROP-032 | Integrační testy — Core + Generators (Snapshot-based) | Tests | 🟡 Vysoká | 7 dní | SnapshotComparer, matice testů, reálné příklady metod, AST statementy |
 | PROP-034 | Core Reference Documentation + Support Matrix | Core, Docs | 🟡 Vysoká | 4 dny | Docs/Core/ sada referenčních dokumentů, support matice jako backlog, roundtrip boundary. Vychází z IDEA-001/002/003. |
-| PROP-035 | C#-First Core Migration + Expression/Statement Completeness | Core, Translator, Tests | 🔴 Kritická | 4,5-8 dní | 7 commitů: RootElement → Class/Interface/Struct (TypeParams+GenericConstraint) → MethodElement → Expressions (Lambda/New/Default/Conversion/NamedArg + Await/Switch/NullCoalescing) → Translator → Tests. C# sémantický model. Pokrývá GitHub task kroky 1-3, 8. |
+| PROP-035 | C#-First Core Migration + Expression/Statement Completeness | Core, Translator, Tests | ✅ Hotovo | 4,5-8 dní | 7 commitů provedeno: RootElement (Namespace, XmlSummary), Class/Interface/Struct (TypeParameters, TypeConstraints, PrimaryConstructor, GenericConstraint), MethodElement (ExpressionBody, IsExtension, TypeParameters), 8 nových expression typů (Lambda, New, Default, Conversion, Await, Switch, IsPattern, NullCoalescing + NamedArgument), LanguageCapabilityProfile (zjednodušeno na C#-first licensing gate). Dokončeno 2026-07-08. |
 | PROP-036 | Core Specification Layer | Core, Tests, AI | 🟡 Vysoká | 5-8 dní | InvariantDefinition, boolean AST, IInvariantEvaluator, test generation. Vychází z Perplexity konverzace 05663298. |
 | PROP-037 | C# Completeness — Chybějící konstrukty + Projektová metadata + Roslyn Importer | Core, Infra | 🟢 Střední | 6-9 dní | DelegateElement, EventElement, OperatorElement; rozšířený ProjectElement; MetaForge.Core.Framework; MetaForge.Importer (Roslyn). Pokrývá GitHub task kroky 4-6. |
-| PROP-038 | Core DX & Diagnostics — Fluent Builder, DiagnosticBag, AttributeModel, XmlDocModel | Core | 🔴 Kritická | 1-2 dny | Fluent Builder API pro všechny elementy; DiagnosticBag s reportéry; AttributeElement (first-class); XmlDocElement strukturovaně. Additivní, žádný breaking change. |
-| PROP-039 | Core Composability — TransformPipeline, Mixin/Trait, ConventionRegistry | Core | 🟢 Střední | 1-2 dny | Middleware pipeline nad immutable modelem; Mixin/Trait systém (build-time expanze); ConventionRegistry (PascalCase, I-prefix). |
+| PROP-038 | Core DX, Diagnostics & Pipeline — Fluent Builder, MetadataBag, DiagnosticBag, TransformPipeline | Core | ✅ Hotovo | 1,5-2 dny | 3 fáze: (1) Fluent Builder API (8 builderů), MetadataBag+MetadataScope+MergeStrategy, integrace do RootElement+PropertyElement+MethodElement; (2) DiagnosticBag, DiagnosticSeverity, ElementPath, BuildResult\<T\> s monadickým .Then(), 3 reportéry (Console/JSON/InMemory); (3) TransformPipeline, IModelTransform, TransformContext, AttributeReflectionTransform. 15 nových testů (277 celkem). Dokončeno 2026-07-08. |
+| PROP-039 | Core Composability — Mixin/Trait, ConventionRegistry, Incremental dirty-tracking | Core | 🟢 Střední | 1,5-2 dny | Mixin/Trait systém (build-time expanze, ConflictStrategy); ConventionRegistry (PascalCase, I-prefix, AsyncSuffix); Incremental dirty-tracking (StructuralHash + PipelineVersion). TransformPipeline přesunut do PROP-038. |
 
 ## Odložené návrhy
 
@@ -45,24 +45,24 @@
 
 ## Issues — Známé problémy k opravě
 
-> Problémy zjištěné při Code Review po implementaci. Každý issue má prioritu a odkaz na dotčený PROP/soubor.
+> Problémy zjištěné při Code Review po implementaci. Každý issue má vlastní detailní soubor v `Docs/Issues/ISS-xxx_nazev.md`.
 > Při opravě přesunout do `PROPOSALS.md` jako nový PROP nebo task.
 
-| # | Datum | PROP | Soubor | Závažnost | Popis | Doporučené řešení |
-|---|-------|------|--------|-----------|-------|-------------------|
-| 1 | 4.7.2026 | PROP-028 | `InfrastructureServiceRegistration.cs` | ⚠️ Střední | `AddSingleton` místo `TryAddSingleton` — při vícenásobném volání `AddMetaForgeInfrastructure()` vzniknou duplicitní DI registrace. | Nahradit `AddSingleton` → `TryAddSingleton`. Vyžaduje referenci na `Microsoft.Extensions.DependencyInjection.Extensions`. |
-| 2 | 4.7.2026 | PROP-028 | `JsonCommandLogRepository.cs` | ⚠️ Nízká | `AppendAsync` používá synchronní `File.AppendAllText` uvnitř `lock` a vrací `Task.CompletedTask`. Není to pravá async operace — při velkém objemu dat může blokovat vlákno. | Pro produkci: použít `await File.AppendAllTextAsync` (pokud existuje) nebo obalit do `Task.Run`. Pro MVP akceptovatelné. |
-| 3 | 4.7.2026 | PROP-027 | `AiServiceRegistration.cs` | ⚠️ Nízká | `AddMetaForgeAi()` neregistruje `PromptRegistry` ani `PromptEvaluationService` — nově přidané služby v PROP-027 nejsou součástí DI. | Přidat `services.AddSingleton<PromptRegistry>()` a `services.AddSingleton<PromptEvaluationService>()` do `AddMetaForgeAi()`. |
-| 4 | 4.7.2026 | PROP-024 | `Expression.cs` | 💡 Návrh | Abstraktní `Expression` má `Kind` jako `string` i `ExpressionKind` jako `enum` — redundantní. Časem sjednotit pouze na `ExpressionKind` enum a `Kind` string odstranit (breaking change, nutná migrace). | Ponechat obojí pro zpětnou kompatibilitu. Při další major verzi odstranit `string Kind`. |
-| 5 | 4.7.2026 | PROP-025 | `IncrementalCodeGenerator.cs` | ⚠️ Střední | `GetMaxEntities()` vrací hardcodované 3 — nečte z `GeneratorLicense.MaxEntities`. Sandbox limit se nekontroluje správně pro vyšší tiery. | Předat `GeneratorLicense` do metody nebo číst `_license.MaxEntities`. |
-| 6 | 4.7.2026 | PROP-025 | `CodeGenerator.cs` | ⚠️ Nízká | `CodeGenerator` změněn z `sealed` na `class` kvůli dědičnosti `TieredCodeGenerator`. To umožňuje nechtěné přepsání metod. | Zvážit kompozici místo dědičnosti (např. `TieredCodeGenerator` wrapuje `CodeGenerator`). |
-| 7 | 4.7.2026 | PROP-019 | `OllamaAiTranslator.cs` | ⚠️ Nízká | Duplikuje logiku z `MetaForge.Ai/Adapters/OllamaAdapter` — oba volají Ollama HTTP API. | PROP-019 explicitně volí Variantu A (přímé volání). Až bude MetaForge.Ai stabilní, sjednotit. |
-| 8 | 4.7.2026 | PROP-019 | `DefaultBusinessTranslator.cs` | ⚠️ Nízká | `TryEnrichAsync` je nová async metoda, ale `IBusinessTranslator` má jen synchronní `TryEnrich`. Volající musí explicitně používat async verzi. | Přidat `TryEnrichAsync` do `IBusinessTranslator` nebo vytvořit `IAsyncBusinessTranslator`. |
-| 9 | 4.7.2026 | PROP-026 | `Program.cs` (CLI) | ⚠️ Nízká | CLI používá `Host.CreateApplicationBuilder` a DI scoped služby, ale command handlery jsou statické lambda. `GetFacade()` vytváří nový scope? Ne — používá root IServiceProvider. | Zvážit vytvoření scope per command, nebo použít singleton pro Facade. |
-| 10 | 4.7.2026 | PROP-029 | `EfCoreForgeBlock.cs` | ⚠️ Nízká | `RequiredTier` je custom property na ForgeBlocku, ale `IForgeBlockCapabilityPackage` ho nedefinuje. Není vynucováno kompilátorem. | Přidat `RequiredTier` do `IForgeBlockCapabilityPackage` nebo použít atribut. |
-| 11 | 4.7.2026 | PROP-029 | ForgeBlock projekty | ⚠️ Nízká | Nové ForgeBlocky (EF Core, AutoMapper, FluentValidation) nemají Scriban šablony — jen metadata. Generování kódu bude v budoucnu. | Implementovat šablony v další iteraci. |
-| 12 | 4.7.2026 | PROP-030 | `ReplayEngine.cs` | ⚠️ Střední | `CommandMigrationEngine` není integrován do `ReplayEngine` — migrace se musí volat ručně před replayem. | Přidat `CommandMigrationEngine` jako závislost `ReplayEngine` a volat automaticky. |
-| 13 | 4.7.2026 | PROP-022 | `BusinessDocumentDiffer.cs` | ⚠️ Nízká | Diff porovnává jen entity a atributy (Add/Remove). Nezachycuje změny vlastností (Modify), relace, workflow. | Rozšířit diff o detekci Modified a další typy uzlů. |
+| # | Datum | PROP | Soubor | Závažnost | Popis | Doporučené řešení | Issue soubor |
+|---|-------|------|--------|-----------|-------|-------------------|--------------|
+| 1 | 4.7.2026 | PROP-028 | `InfrastructureServiceRegistration.cs` | ⚠️ Střední | `AddSingleton` místo `TryAddSingleton` — duplicitní DI registrace. | Nahradit `AddSingleton` → `TryAddSingleton`. | [`ISS-001`](Docs/Issues/ISS-001_PROP-028_Singleton-vs-TryAddSingleton.md) |
+| 2 | 4.7.2026 | PROP-028 | `JsonCommandLogRepository.cs` | ⚠️ Nízká | `AppendAsync` synchronní I/O uvnitř `lock`. | Použít `File.AppendAllTextAsync` nebo `Task.Run`. | [`ISS-002`](Docs/Issues/ISS-002_PROP-028_AppendAsync-sync-over-async.md) |
+| 3 | 4.7.2026 | PROP-027 | `AiServiceRegistration.cs` | ⚠️ Nízká | `AddMetaForgeAi()` neregistruje `PromptRegistry` ani `PromptEvaluationService`. | Přidat `services.AddSingleton<PromptRegistry>()` a `PromptEvaluationService`. | [`ISS-003`](Docs/Issues/ISS-003_PROP-027_Missing-PromptRegistry-DI.md) |
+| 4 | 4.7.2026 | PROP-024 | `Expression.cs` | 💡 Návrh | Redundantní `Kind` string a `ExpressionKind` enum. | Při major verzi odstranit `string Kind`. | [`ISS-004`](Docs/Issues/ISS-004_PROP-024_Kind-ExpressionKind-redundancy.md) |
+| 5 | 4.7.2026 | PROP-025 | `IncrementalCodeGenerator.cs` | ⚠️ Střední | `GetMaxEntities()` hardcodované 3 místo z licence. | Číst `_license.MaxEntities`. | [`ISS-005`](Docs/Issues/ISS-005_PROP-025_GetMaxEntities-hardcoded.md) |
+| 6 | 4.7.2026 | PROP-025 | `CodeGenerator.cs` | ⚠️ Nízká | `sealed` → `class` kvůli dědičnosti, možnost nechtěného přepsání. | Zvážit kompozici místo dědičnosti. | [`ISS-006`](Docs/Issues/ISS-006_PROP-025_CodeGenerator-sealed-vs-composition.md) |
+| 7 | 4.7.2026 | PROP-019 | `OllamaAiTranslator.cs` | ⚠️ Nízká | Duplikuje logiku Ollama HTTP API volání z `OllamaAdapter`. | Po stabilizaci MetaForge.Ai sjednotit. | [`ISS-007`](Docs/Issues/ISS-007_PROP-019_OllamaAiTranslator-duplicate-logic.md) |
+| 8 | 4.7.2026 | PROP-019 | `DefaultBusinessTranslator.cs` | ⚠️ Nízká | `TryEnrichAsync` není v `IBusinessTranslator`, obchází rozhraní. | Přidat do rozhraní nebo vytvořit `IAsyncBusinessTranslator`. | [`ISS-008`](Docs/Issues/ISS-008_PROP-019_TryEnrichAsync-missing-interface.md) |
+| 9 | 4.7.2026 | PROP-026 | `Program.cs` (CLI) | ⚠️ Nízká | CLI používá root `IServiceProvider` pro scoped služby. | Scope per command nebo singleton Facade. | [`ISS-009`](Docs/Issues/ISS-009_PROP-026_CLI-scoped-services.md) |
+| 10 | 4.7.2026 | PROP-029 | `EfCoreForgeBlock.cs` | ⚠️ Nízká | `RequiredTier` není v `IForgeBlockCapabilityPackage`, nevynuceno. | Přidat do rozhraní nebo použít atribut. | [`ISS-010`](Docs/Issues/ISS-010_PROP-029_RequiredTier-not-enforced.md) |
+| 11 | 4.7.2026 | PROP-029 | ForgeBlock projekty | ⚠️ Nízká | ForgeBlocky bez Scriban šablon — jen metadata. | Implementovat šablony v další iteraci. | [`ISS-011`](Docs/Issues/ISS-011_PROP-029_ForgeBlock-missing-templates.md) |
+| 12 | 4.7.2026 | PROP-030 | `ReplayEngine.cs` | ⚠️ Střední | `CommandMigrationEngine` není integrován do `ReplayEngine`. | Přidat jako závislost a volat automaticky. | [`ISS-012`](Docs/Issues/ISS-012_PROP-030_CommandMigration-not-integrated.md) |
+| 13 | 4.7.2026 | PROP-022 | `BusinessDocumentDiffer.cs` | ⚠️ Nízká | Diff nezachycuje Modify, relace, workflow. | Rozšířit o detekci Modified a dalších uzlů. | [`ISS-013`](Docs/Issues/ISS-013_PROP-022_Diff-Modify-not-detected.md) |
 
 ---
 
@@ -151,7 +151,7 @@ Více: [`Docs/Plans/PROP-034-Core-Reference-Documentation.md`](Docs/Plans/PROP-0
 > **Follow-up k:** PROP-031 (Core Statement System)
 > **Popis:** Doplnit `MethodBodyKind` (None/Structured/Text/AiBody) do `MethodElement` a vymezit hranici "co je AST a co už ne".
 > **OQ:** Jaký je default `MethodBodyKind` pro nově parsované metody?
-> **Zdroj:** IDEA-004 z `.github/ideas/old_ideas/`
+> **Zdroj:** IDEA-004 z `Docs/ideas/old_ideas/`
 
 ### PROP-035: C#-First Core Migration
 

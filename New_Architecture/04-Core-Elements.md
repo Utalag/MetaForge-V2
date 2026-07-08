@@ -17,11 +17,21 @@ public sealed class ClassElement : RootElement
     public bool IsSealed { get; set; }
     public bool IsStatic { get; set; }
     public bool IsPartial { get; set; }
+
+    // PROP-035: C#-first
+    public List<string> TypeParameters { get; init; } = [];           // <T, TKey>
+    public List<GenericConstraint> TypeConstraints { get; init; } = []; // where T : class, new()
+    public List<ParameterElement>? PrimaryConstructorParameters { get; set; } // Point(int X, int Y)
+
     public List<PropertyElement> Properties { get; } = new();
     public List<MethodElement> Methods { get; } = new();
 
     public override int TotalCoin =>
         Coin + Properties.Sum(p => p.Coin) + Methods.Sum(m => m.TotalCoin);
+
+    // Factory metody (PROP-035 rozšířeno)
+    public static ClassElement PrimaryRecord(string name, params ParameterElement[] parameters);
+    public static ClassElement Generic(string name, string[] typeParameters, GenericConstraint[]? constraints);
 }
 ```
 
@@ -96,6 +106,7 @@ public sealed class PropertyElement
     public bool IsRequired { get; set; }
     public bool IsStatic { get; set; }
     public string? DefaultValue { get; set; }
+    public MetadataBag Metadata { get; init; } = new();   // PROP-038
 
     public int Coin { get; set; } = 2;
 }
@@ -114,12 +125,23 @@ public sealed class MethodElement
     public bool IsAbstract { get; set; }
     public bool IsVirtual { get; set; }
     public bool IsOverride { get; set; }
+
+    // PROP-035: C#-first
+    public bool IsExtension { get; set; }                           // this TypeName
+    public List<string> TypeParameters { get; init; } = [];         // <T>
+    public List<GenericConstraint> TypeConstraints { get; init; } = []; // where T : struct
+    public Expression? ExpressionBody { get; set; }                 // => x * 2 (null = block body)
+
     public List<ParameterElement> Parameters { get; } = new();
     public List<AttributeElement> Attributes { get; } = new();
     public BlockStatement? Body { get; set; }
+    public MetadataBag Metadata { get; init; } = new();   // PROP-038
 
     public int Coin { get; set; } = 5;
     public int TotalCoin => Coin + Parameters.Sum(p => p.Coin);
+
+    // Factory: generická metoda (PROP-035)
+    public static MethodElement Generic(string name, TypeModel returnType, string[] typeParameters, GenericConstraint[]? constraints);
 }
 ```
 

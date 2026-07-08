@@ -19,16 +19,16 @@
 ### Core vrstva
 | # | Soubor | Obsah | Stav |
 |---|--------|-------|------|
-| 03 | `03-Core-Abstractions.md` | AppRoot, RootElement, TypeModel, DataType, SemanticCollection | ⚠️ Částečný |
-| 04 | `04-Core-Elements.md` | Class, Interface, Enum, Struct, Property, Method, Parameter elem. | ✅ |
-| 05 | `05-Core-Behaviors.md` | Expression System (11 druhů), IConstraintInferencer, IStandardLibraryTranslator | ✅ *(PROP-024)* |
+| 03 | `03-Core-Abstractions.md` | AppRoot, RootElement, TypeModel, DataType, SemanticCollection, MetadataBag (PROP-038) | ✅ *(PROP-035, PROP-038)* |
+| 04 | `04-Core-Elements.md` | Class, Interface, Enum, Struct, Property, Method, Parameter elem. + MetadataBag (PROP-038) | ✅ *(PROP-035, PROP-038)* |
+| 05 | `05-Core-Behaviors.md` | Expression System (11+8 druhů), Statement System (PROP-031), DiagnosticBag, BuildResult\<T\>, TransformPipeline (PROP-038) | ✅ *(PROP-024, PROP-031, PROP-035, PROP-038)* |
 | 06 | `06-Core-Services.md` | CatalogManager, ICatalogProvider, StrongType/ValueObject, IConstraintInferencer | ✅ *(PROP-024)* |
 
 ### Business a Translator vrstva
 | # | Soubor | Obsah | Stav |
 |---|--------|-------|------|
 | 07 | `07-BusinessModel.md` | BusinessAuthoringDocument, CommandLog, Patches, Workflow, Validace, Identity | ✅ *(PROP-020)* |
-| 08 | `08-Translator.md` | Facade, Projection, WriteBack, ITranslationService, DefaultBusinessTranslator | ✅ *(PROP-020)* |
+| 08 | `08-Translator.md` | Facade, Projection, WriteBack, ITranslationService, DefaultBusinessTranslator, LanguageCapabilityProfile (PROP-035) | ✅ *(PROP-020, PROP-035)* |
 | 09 | `09-AI-Layer.md` | IAiBackendAdapter, OllamaAdapter, PromptRegistry, PromptEvaluator, AiServiceRegistration | ✅ *(PROP-027)* |
 
 ### Generátory, Infrastructure a Monetizace
@@ -74,6 +74,11 @@
 |---|--------|-------|------|
 | 27 | `27-ForgeBlock-External-Libraries.md` | Katalog externích C#/.NET knihoven pro ForgeBlock integraci | ✅ |
 
+### Konceptuální přehled
+| # | Soubor | Obsah | Stav |
+|---|--------|-------|------|
+| 30 | `30-Architecture-Summary.md` | Konceptuální přehled platformy, editační matice, principy, data flow | ✅ *(2026-07-08)* |
+
 ---
 
 ## Navigace podle vrstev
@@ -94,7 +99,7 @@
 ├─────────────────────────────────────────────┤
 │           10-Generators.md                   │  Code export · Templating
 ├─────────────────────────────────────────────┤
-│  13-14 Planning · 15-28 Quality/Scaffold/Agents · 29 Monetizace │
+|  13-14 Planning · 15-28 Quality/Scaffold/Agents · 29 Monetizace · 30 Architecture Summary │
 └─────────────────────────────────────────────┘
 ```
 

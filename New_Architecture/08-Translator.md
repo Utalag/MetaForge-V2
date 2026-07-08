@@ -204,3 +204,38 @@ User/AI-1 → BusinessAuthoringHostFacade.AddEntity() → PatchEngine → Comman
              → Document s CoreDetail
          → ProjectionReadService.GetProjection() → ProjectionView (včetně SyncState)
 ```
+
+---
+
+## LanguageCapabilityProfile (PROP-035)
+
+```csharp
+//context//
+// Účel: Definuje, které C# sémantické koncepty jsou v aktuálním kontextu podporovány.
+//        Slouží jako capability gate pro generátory — před generací se ověří,
+//        zda model neobsahuje nepodporované C# konstrukty.
+// Vrstva: Translator.
+// Vstup: Profil (Default, Basic, Professional).
+// Výstup: bool IsSupported(string concept).
+// Závislosti: Žádné (čistý data objekt).
+// Nezávislosti: Nezávisí na Core ani BusinessModel — samostatný koncept.
+// Invarianty: Profil Default() vrací true pro všechny koncepty (wildcard "*").
+//             Basic() omezuje na elementární konstrukty.
+//             Professional() má vše kromě unsafe.
+// Související typy: CapabilityLevel enum (Supported, Unsupported).
+// Testy: Zatím netestováno samostatně — ověřováno přes build.
+// AUTOR: Copilot (PROP-035)
+// DATUM: 2026-07-08
+
+public sealed class LanguageCapabilityProfile
+{
+    public string ProfileName { get; init; }
+    public HashSet<string> Supported { get; init; }   // Wildcard "*" = vše
+    public HashSet<string> Unsupported { get; init; }
+    public bool IsSupported(string concept);
+
+    public static LanguageCapabilityProfile Default();       // CSharp-Default: ["*"]
+    public static LanguageCapabilityProfile Basic();         // CSharp-Basic: class, interface, enum... 
+    public static LanguageCapabilityProfile Professional();  // CSharp-Professional: vše kromě unsafe
+}
+```

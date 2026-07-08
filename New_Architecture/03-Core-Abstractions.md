@@ -32,6 +32,13 @@ public abstract class RootElement
     public Guid Id { get; init; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;
     public abstract string Kind { get; }
+
+    /// <summary>Namespace elementu (C#-first). Null = global::.</summary>
+    public string? Namespace { get; set; }
+
+    /// <summary>XML documentation summary pro AI prompting a generování docs.</summary>
+    public string? XmlSummary { get; set; }
+
     public List<string> Usings { get; } = new();
     public List<AttributeElement> Attributes { get; } = new();
 
@@ -40,6 +47,16 @@ public abstract class RootElement
 
     /// <summary>Coin tohoto elementu + children. Přetěžují potomci.</summary>
     public virtual int TotalCoin => Coin;
+
+    /// <summary>
+    /// Univerzální key-value anotace (dokumentace, validace, generátorové hinty, AI kontext).
+    /// Komplementární k Attributes — C# [Attribute] jde do Attributes, vše ostatní sem.
+    /// </summary>
+    public MetadataBag Metadata { get; init; } = new();
+
+    // === Fluent setters ===
+    // PROP-035: XmlSummary, Namespace
+    // PROP-038: Metadata přístupné přes element.Metadata.Set(...)
 }
 
 public sealed class AttributeElement
@@ -49,6 +66,60 @@ public sealed class AttributeElement
 }
 
 // Konkrétní elementy viz 04-Core-Elements.md
+```
+
+## MetadataBag — univerzální anotační systém (PROP-038)
+
+```csharp
+// Komplementární k AttributeElement (C#-specific [Attribute]).
+// Každý element má MetadataBag pro key-value anotace.
+// Standardizované klíče: Validation.*, Docs.*, Generation.*, Ai.*, Domain.*
+
+public enum MetadataScope { Domain, Validation, Generation, Ai, Documentation }
+public enum MergeStrategy { Override, Skip, Throw }
+
+public sealed record MetadataEntry(string Key, object? Value, MetadataScope Scope);
+
+public sealed class MetadataBag
+{
+    public MetadataBag Set<T>(string key, T value, MetadataScope scope = MetadataScope.Domain);
+    public T? Get<T>(string key);
+    public bool Has(string key);
+    public MetadataBag Merge(MetadataBag other, MergeStrategy strategy = MergeStrategy.Override);
+
+    public static class Keys
+    {
+        // === Validation ===
+        public const string ValidationRequired = "Validation.Required";
+        public const string ValidationMinLength = "Validation.MinLength";
+        public const string ValidationMaxLength = "Validation.MaxLength";
+        public const string ValidationRangeMin = "Validation.Range.Min";
+        public const string ValidationRangeMax = "Validation.Range.Max";
+
+        // === Documentation ===
+        public const string DocsSummary = "Docs.Summary";
+        public const string DocsReturns = "Docs.Returns";
+        public const string DocsRemarks = "Docs.Remarks";
+
+        // === Generation ===
+        public const string GenerationIgnore = "Generation.Ignore";
+        public const string GenerationUsePartial = "Generation.UsePartial";
+        public const string GenerationJsonIgnore = "Generation.JsonIgnore";
+
+        // === AI ===
+        public const string AiContext = "Ai.Context";
+        public const string AiExample = "Ai.Example";
+
+        // === Domain ===
+        public const string DomainBusinessName = "Domain.BusinessName";
+        public const string DomainGlossary = "Domain.Glossary";
+    }
+}
+
+// Integrace:
+// - RootElement.Metadata    ← PROP-038
+// - PropertyElement.Metadata ← PROP-038
+// - MethodElement.Metadata   ← PROP-038 (nové)
 ```
 
 ## DataType — hotová hodnota (enum, 32 C# typů)
