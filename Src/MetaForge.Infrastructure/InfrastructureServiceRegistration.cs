@@ -2,6 +2,7 @@ using MetaForge.Infrastructure.Caching;
 using MetaForge.Infrastructure.Configuration;
 using MetaForge.Infrastructure.Persistence;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace MetaForge.Infrastructure;
 
@@ -32,16 +33,16 @@ public static class InfrastructureServiceRegistration
         // Persistence
         if (useJsonPersistence)
         {
-            services.AddSingleton<ICommandLogRepository, JsonCommandLogRepository>();
-            services.AddSingleton<IDocumentRepository, JsonDocumentRepository>();
+            services.TryAddSingleton<ICommandLogRepository, JsonCommandLogRepository>();
+            services.TryAddSingleton<IDocumentRepository, JsonDocumentRepository>();
         }
         else
         {
-            services.AddSingleton<ICommandLogRepository, InMemoryCommandLogRepository>();
+            services.TryAddSingleton<ICommandLogRepository, InMemoryCommandLogRepository>();
         }
 
         // Caching
-        services.AddSingleton<IProjectionCache, CheckpointProjectionCache>();
+        services.TryAddSingleton<IProjectionCache, CheckpointProjectionCache>();
 
         return services;
     }

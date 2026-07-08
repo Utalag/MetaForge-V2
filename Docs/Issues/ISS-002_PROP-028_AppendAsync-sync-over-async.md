@@ -4,7 +4,7 @@ Datum: 2026-04-07
 PROP: PROP-028
 Soubor: `Src/MetaForge.Infrastructure/JsonCommandLogRepository.cs`
 Závažnost: ⚠️ Nízká
-Stav: Open
+Stav: Resolved (2026-07-08)
 Owner:
 Poslední revize: 2026-04-07
 
@@ -33,6 +33,7 @@ Pro produkci: použít `await File.AppendAllTextAsync(...)` (pokud API existuje)
 ## 6. Rozhodnutí
 
 *(Vyplní se po rozhodnutí usera/ownera.)*
+- 2026-07-08: `AppendAsync` používá `Task.Run` pro offload sync I/O z volajícího vlákna.
 
 ---
 

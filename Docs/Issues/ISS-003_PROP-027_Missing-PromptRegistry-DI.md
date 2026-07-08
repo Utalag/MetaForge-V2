@@ -4,7 +4,7 @@ Datum: 2026-04-07
 PROP: PROP-027
 Soubor: `Src/MetaForge.Ai/AiServiceRegistration.cs`
 Závažnost: ⚠️ Nízká
-Stav: Open
+Stav: Resolved (2026-07-08)
 Owner:
 Poslední revize: 2026-04-07
 
@@ -37,6 +37,7 @@ services.AddSingleton<PromptEvaluationService>();
 ## 6. Rozhodnutí
 
 *(Vyplní se po rozhodnutí usera/ownera.)*
+- 2026-07-08: `AddMetaForgeAi()` nyní registruje `PromptRegistry` a `PromptEvaluationService` jako Singletony.
 
 ---
 

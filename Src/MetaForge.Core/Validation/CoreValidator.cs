@@ -35,6 +35,20 @@ public static class CoreValidator
         public const string B11 = "B11"; // if s ne-bool podmínkou
         public const string B12 = "B12"; // return value ve void metodě
         public const string B13 = "B13"; // return bez value v non-void metodě
+
+        // New guard codes (PROP-042)
+        public const string C13 = "C13"; // abstract + sealed (static kontext)
+        public const string C14 = "C14"; // abstract + sealed + record
+        public const string G07 = "G07"; // struct s base class
+        public const string M13 = "M13"; // abstract + async (C# doesn't allow)
+        public const string M14 = "M14"; // extension method not static
+        public const string M15 = "M15"; // override without base (warning)
+        public const string P9 = "P9";  // required property without required keyword context
+        public const string P10 = "P10"; // init-only with private set
+        public const string G11 = "G11"; // partial + record (warning)
+        public const string G12 = "G12"; // static + partial (warning)
+        // TODO (ISS): K1 (constructor void return), M15 (override without base), G07 (struct base class)
+        // — vyžadují rozšíření kontextu (parent class lookup, struct BaseClassName) — PROP-043
     }
 
     /// <summary>
@@ -46,7 +60,7 @@ public static class CoreValidator
         {
             ClassElement c => ValidateClass(c),
             EnumElement e => ValidateEnum(e),
-            StructElement => [], // Všechny kombinace structu jsou validní (S1-S4)
+            StructElement s => ValidateStruct(s), // Struct validace (PROP-042)
             InterfaceElement => [], // Interface nemá konfliktní kombinace
             _ => [],
         };
@@ -93,9 +107,21 @@ public static class CoreValidator
             issues.Add(new(Codes.M12, ValidationCategories.ConflictingModifiers,
                 "virtual a override nelze kombinovat — override přepisuje virtual metodu"));
 
-        // M13: abstraktní metoda bez těla — jen varování
+        // M13: abstract + async — nelze v C# (abstract nemůže být async)
+        if (method.IsAbstract && method.IsAsync)
+            issues.Add(new(Codes.M13, ValidationCategories.ConflictingModifiers,
+                "abstract async — nelze kombinovat (abstract deklaruje signaturu, async vyžaduje tělo)"));
+
+        // M14: extension metoda musí být static
+        if (method.IsExtension && !method.IsStatic)
+            issues.Add(new(Codes.M14, ValidationCategories.Warning,
+                "Extension metoda by měla být static — IsExtension=true implikuje IsStatic=true"));
+
+        // M15: override bez base (warning — vizualní kontrola, nelze ověřit bez parent class lookup)
+
+        // Abstraktní metoda s tělem — varování
         if (method.IsAbstract && method.Body is not null)
-            issues.Add(new(Codes.M10 + "_body", ValidationCategories.Warning,
+            issues.Add(new("M_BODY", ValidationCategories.Warning,
                 "Abstraktní metoda by neměla mít tělo (Body bude ignorováno)"));
 
         // Kontrola statementů v těle (B11-B13)
@@ -131,6 +157,16 @@ public static class CoreValidator
         if (property.Type.BaseType == DataType.Void && property.Type.IsCollection)
             issues.Add(new(Codes.T21, ValidationCategories.InvalidType,
                 "List<void> není validní typ"));
+
+        // P9: required property — musí být v kontextu, kde required keyword dává smysl
+        if (property.IsRequired && property.IsStatic)
+            issues.Add(new(Codes.P9, ValidationCategories.ConflictingModifiers,
+                "required nelze použít na static property"));
+
+        // P10: init-only property s private set — podezřelá kombinace
+        if (property.IsInitOnly && property.HasSetter && property.AccessModifier == AccessModifier.Private)
+            issues.Add(new(Codes.P10, ValidationCategories.Warning,
+                "init-only property s private setterem — init-only by měl používat init accessor, ne set"));
 
         return issues;
     }
@@ -176,6 +212,29 @@ public static class CoreValidator
             issues.Add(new(Codes.I5, ValidationCategories.InvalidInheritance,
                 $"Nelze dědit od '{c.BaseClassName}' — typ je sealed"));
 
+        // C13: abstract + sealed + static — třícestný konflikt
+        if (c.IsAbstract && c.IsSealed && c.IsStatic)
+            issues.Add(new(Codes.C13, ValidationCategories.ConflictingModifiers,
+                "abstract sealed static — trojitá konfliktní kombinace"));
+
+        // C14: abstract + sealed + record — record je implicitně sealed (pro record class)
+        if (c.IsAbstract && c.IsSealed && c.IsRecord)
+            issues.Add(new(Codes.C14, ValidationCategories.ConflictingModifiers,
+                "abstract sealed record — record nemůže být zároveň abstract a sealed"));
+
+        // G07: struct s base class — struct nemůže dědit
+        // (handled in StructElement validation if we add it later)
+
+        // G11: partial + record — warning: partial record class může být split
+        if (c.IsPartial && c.IsRecord)
+            issues.Add(new(Codes.G11, ValidationCategories.Warning,
+                "partial record — ujistěte se, že všechny partial deklarace jsou konzistentní"));
+
+        // G12: static + partial — warning
+        if (c.IsStatic && c.IsPartial)
+            issues.Add(new(Codes.G12, ValidationCategories.Warning,
+                "static partial — partial static třídy jsou povoleny, ale vzácné"));
+
         // Validace properties a metod uvnitř třídy
         foreach (var prop in c.Properties)
             issues.AddRange(ValidateProperty(prop));
@@ -199,6 +258,17 @@ public static class CoreValidator
         if (e.UnderlyingType == DataType.Bool)
             issues.Add(new(Codes.E6, ValidationCategories.InvalidType,
                 "bool není validní underlying typ pro enum (pouze celočíselné typy)"));
+
+        return issues;
+    }
+
+    private static IReadOnlyList<ValidationIssue> ValidateStruct(StructElement s)
+    {
+        var issues = new List<ValidationIssue>();
+
+        // G07: struct nemůže mít base class
+        // StructElement nemá BaseClassName, takže toto je preventivní check
+        // (pokud by se BaseClassName přidalo v budoucnu)
 
         return issues;
     }

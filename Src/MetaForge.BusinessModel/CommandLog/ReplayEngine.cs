@@ -1,22 +1,49 @@
 using MetaForge.BusinessModel.Models;
+using MetaForge.BusinessModel.Migration;
 
 namespace MetaForge.BusinessModel.CommandLog;
 
 /// <summary>
 /// Autoritativní rekonstrukce stavu — přehraje commandy a vytvoří BusinessAuthoringDocument.
+/// Automaticky migruje commandy na aktuální verzi schématu před replayem.
 /// Používá immutable pattern — každý krok vrací nový dokument.
 /// </summary>
 public sealed class ReplayEngine
 {
+    private readonly CommandMigrationEngine? _migrationEngine;
+
+    /// <summary>
+    /// Vytvoří ReplayEngine bez migrace (zpětná kompatibilita).
+    /// </summary>
+    public ReplayEngine()
+    {
+        _migrationEngine = null;
+    }
+
+    /// <summary>
+    /// Vytvoří ReplayEngine s automatickou migrací commandů.
+    /// </summary>
+    /// <param name="migrationEngine">Engine pro migraci starších command formátů.</param>
+    public ReplayEngine(CommandMigrationEngine migrationEngine)
+    {
+        _migrationEngine = migrationEngine ?? throw new ArgumentNullException(nameof(migrationEngine));
+    }
+
     /// <summary>
     /// Přehraje všechny commandy a vytvoří aktuální stav dokumentu.
+    /// Před replayem automaticky migruje commandy, pokud je k dispozici CommandMigrationEngine.
     /// Toto je autoritativní způsob, jak získat stav — ne cache, ne databáze.
     /// </summary>
     public BusinessAuthoringDocument Replay(IReadOnlyList<CommandEnvelope> commands)
     {
+        // Automatická migrace před replayem
+        var migrated = _migrationEngine != null
+            ? _migrationEngine.MigrateAll(commands)
+            : commands;
+
         var document = new BusinessAuthoringDocument();
 
-        foreach (var command in commands)
+        foreach (var command in migrated)
         {
             document = ApplyCommand(document, command);
         }

@@ -4,7 +4,7 @@ Datum: 2026-04-07
 PROP: PROP-025
 Soubor: `Src/MetaForge.Generators/IncrementalCodeGenerator.cs`
 Závažnost: ⚠️ Střední
-Stav: Open
+Stav: Resolved (2026-07-08)
 Owner:
 Poslední revize: 2026-04-07
 
@@ -33,6 +33,7 @@ Předat `GeneratorLicense` do metody nebo číst `_license.MaxEntities` místo h
 ## 6. Rozhodnutí
 
 *(Vyplní se po rozhodnutí usera/ownera.)*
+- 2026-07-08: `GetMaxEntities()` nyní čte `_license.MaxEntities`. `_license` field přidán do `IncrementalCodeGenerator`.
 
 ---
 

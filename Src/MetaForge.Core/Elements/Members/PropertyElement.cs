@@ -6,7 +6,7 @@ namespace MetaForge.Core.Elements.Members;
 /// <summary>
 /// Reprezentuje C# property (vlastnost) na třídě, interfacu nebo structu.
 /// </summary>
-public sealed class PropertyElement
+public sealed class PropertyElement : IMemberElement
 {
     /// <summary>Název property.</summary>
     public string Name { get; set; } = string.Empty;
@@ -23,6 +23,15 @@ public sealed class PropertyElement
 
     /// <summary>Výchozí hodnota jako string (např. "0", "null", "\"hello\"").</summary>
     public string? DefaultValue { get; set; }
+
+    /// <summary>
+    /// XML dokumentační komentář pro property.
+    /// Používá se pro generování &lt;summary&gt; XML docs.
+    /// </summary>
+    public string? XmlSummary { get; set; }
+
+    /// <summary>Atributy na property (např. [Required], [MaxLength]).</summary>
+    public List<AttributeElement> Attributes { get; init; } = new();
 
     /// <summary>
     /// Univerzální key-value anotace (dokumentace, validace, generátorové hinty).

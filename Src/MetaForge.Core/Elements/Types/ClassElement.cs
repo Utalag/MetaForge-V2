@@ -51,8 +51,15 @@ public sealed class ClassElement : RootElement
     /// <summary>Metody třídy.</summary>
     public List<MethodElement> Methods { get; } = new();
 
+    /// <summary>Konstruktory třídy.</summary>
+    public List<ConstructorElement> Constructors { get; init; } = new();
+
+    /// <summary>Pole (fields) třídy.</summary>
+    public List<FieldElement> Fields { get; init; } = new();
+
     public override int TotalCoin =>
-        Coin + Properties.Sum(p => p.Coin) + Methods.Sum(m => m.TotalCoin);
+        Coin + Properties.Sum(p => p.Coin) + Methods.Sum(m => m.TotalCoin)
+             + Constructors.Sum(c => c.TotalCoin) + Fields.Sum(f => f.Coin);
 
     // === Statické factory metody pro modifikátorové kombinace (C1-C8 matice) ===
 
@@ -164,6 +171,20 @@ public sealed class ClassElement : RootElement
     public ClassElement WithMethod(MethodElement method)
     {
         Methods.Add(method);
+        return this;
+    }
+
+    /// <summary>Přidá konstruktor do třídy.</summary>
+    public ClassElement WithConstructor(ConstructorElement ctor)
+    {
+        Constructors.Add(ctor);
+        return this;
+    }
+
+    /// <summary>Přidá pole do třídy.</summary>
+    public ClassElement WithField(FieldElement field)
+    {
+        Fields.Add(field);
         return this;
     }
 }

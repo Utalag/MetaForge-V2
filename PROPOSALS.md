@@ -5,25 +5,24 @@
 
 ## Aktivní návrhy
 
-> ⚠️ **Pořadí implementace řídí** [`Docs/Plans/Implementation-Roadmap.md`](Docs/Plans/Implementation-Roadmap.md).
-> Fáze určují, co se implementuje teď a co až později. Paralelní streamy mohou běžet současně.
-
 | ID | Název | Priorita | Odhad | Závislosti | Odkaz |
 |----|-------|----------|-------|------------|-------|
-| PROP-036 | **Core Specification Layer** — InvariantDefinition, booleovský AST, IInvariantEvaluator | 🟡 Vysoká | 5–8 dní | PROP-035 ✅, PROP-038 ✅, PROP-031 ✅ | [Detail](Docs/Plans/PROP-036-Core-Specification-Layer.md) |
-| PROP-037 | **C# Completeness** — Delegate, Event, Operator, Roslyn Importer | 🟢 Střední | 6–9 dní | PROP-035 ✅, PROP-038 ✅, PROP-031 ✅ | [Detail](Docs/Plans/PROP-037-CSharp-Completeness-Importer.md) |
-| **OSTATNÍ** | | | | | |
-| PROP-034 | Core Reference Documentation + Support Matrix | 🟡 Vysoká | 4 dny | — | [Detail](Docs/Plans/PROP-034-Core-Reference-Documentation.md) |
-| PROP-039 | Core Composability — Mixin/Trait, ConventionRegistry | 🟢 Střední | 1,5–2 dny | PROP-038 | [Detail](Docs/Plans/PROP-039-Core-Composability.md) |
-| PROP-032 | Integrační testy Core + Generators | 🟡 Vysoká | 7 dní | PROP-031 ✅ | [Detail](Docs/Plans/PROP-032-Integration-Tests-Core-Generators.md) |
 | PROP-023 | DX vylepšení — Typový SyncState, Layer stack, YAML DSL, Undo/redo | ⚪ Na zvážení | 5–9 dní | ∞ | [Detail](Docs/Plans/PROP-023-DX-Architecture-Improvements-Future.md) |
-| PROP-033 | Core Element Factory Methods & CoreValidator | 🟢 Schváleno | — | PROP-031 ✅, PROP-032 ✅ | [Detail](Docs/Plans/PROP-033-Core-Element-Factories-Validation.md) |
 
 
 ## Dokončené návrhy
 
 | ID | Název | Datum dokončení | Odkaz |
 |----|-------|-----------------|-------|
+| PROP-040 | Core Member Consistency — IMemberElement, PropertyElement Attributes+XmlSummary, MethodElement XmlSummary | 2026-07-08 | [Docs/Plans/PROP-040-Core-Member-Consistency.md](Docs/Plans/PROP-040-Core-Member-Consistency.md) |
+| PROP-041 | ConstructorElement + FieldElement, integrace do ClassElement | 2026-07-08 | [Docs/Plans/PROP-041-ConstructorElement-FieldElement.md](Docs/Plans/PROP-041-ConstructorElement-FieldElement.md) |
+| PROP-042 | Core Test Expansion — Guard validace (8 nových), GuardValidationTests (12 testů), MemberConsistencyTests (11), ConstructorFieldTests (16) | 2026-07-08 | [Docs/Plans/PROP-042-Core-Test-Expansion.md](Docs/Plans/PROP-042-Core-Test-Expansion.md) |
+| PROP-037 | C# Completeness — DelegateElement, EventElement, OperatorElement (28 OperatorKind), ProjectElement rozšíření (TargetFramework, PackageReference, AnalyzerReference, ProjectReference, ImplicitUsings, RootNamespace, NullableEnabled) | 2026-07-08 | [Docs/Plans/PROP-037-CSharp-Completeness-Importer.md](Docs/Plans/PROP-037-CSharp-Completeness-Importer.md) |
+| PROP-039 | Core Composability — ElementMixin (ConflictStrategy), BuiltInMixins (Auditable, SoftDelete), ConventionRegistry (IConvention, 3 vestavěné: PascalCase, InterfacePrefix, AsyncSuffix), ElementFingerprint (SHA256 dirty-tracking), 26 testů | 2026-07-08 | [Docs/Plans/PROP-039-Core-Composability.md](Docs/Plans/PROP-039-Core-Composability.md) |
+| PROP-032 | Integrační testy Core + Generators — SnapshotComparer, 48 integration testů (7 Scenarios + SyntaxValidator), Validation testy (24 testů) | 2026-07-08 | [Docs/Plans/PROP-032-Integration-Tests-Core-Generators.md](Docs/Plans/PROP-032-Integration-Tests-Core-Generators.md) |
+| PROP-033 | Core Element Factory Methods & CoreValidator — statické factory na ClassElement (8), EnumElement (5), StructElement (4), PropertyElement (6), MethodElement (7), InterfaceElement (1); CoreValidator s 19 kódy pokrývající ❌ řádky matice (C9-C12, A3-A5, I5, E5-E6, P7, T19-T21, M9-M12, B11-B13); 24 validačních testů | 2026-07-08 | [Docs/Plans/PROP-033-Core-Element-Factories-Validation.md](Docs/Plans/PROP-033-Core-Element-Factories-Validation.md) |
+| PROP-034 | Core Reference Documentation — Docs/Core/ sada (8 dokumentů): 00-Overview, 00-Support-Matrix (65 Supported, 9 Partial, 5 Planned, 2 Unsupported), 01-Type-System, 02-Type-Kinds, 03-Value-Objects, 04-Methods, 05-Expressions-and-AST, 06-Roundtrip-Boundary, 07-Examples | 2026-07-08 | [Docs/Plans/PROP-034-Core-Reference-Documentation.md](Docs/Plans/PROP-034-Core-Reference-Documentation.md) |
+| PROP-036 | Core Specification Layer — InvariantDefinition, InvariantExpression (boolean AST), InvariantScope, IInvariantEvaluator, ReflectionBasedInvariantEvaluator, BuiltInInvariants (12 pravidel), EvaluationResult, GeneratorIntent, InvariantProvenance | 2026-07-08 | [Docs/Plans/PROP-036-Core-Specification-Layer.md](Docs/Plans/PROP-036-Core-Specification-Layer.md) |
 | PROP-031 | Core Statement System — rozšíření: Switch, ForEach, TryCatch, Using, UsingDeclaration, LocalFunction; StatementKind rozšířen o 6 hodnot | 2026-07-08 | [Docs/Plans/PROP-031-Core-Statement-System.md](Docs/Plans/PROP-031-Core-Statement-System.md) |
 | PROP-038 | Core DX & Diagnostics — Fluent Builder API (8 builderů), MetadataBag, DiagnosticBag+BuildResult, TransformPipeline+AttributeReflection | 2026-07-08 | [Docs/Plans/PROP-038-Core-DX-Diagnostics.md](Docs/Plans/PROP-038-Core-DX-Diagnostics.md) |
 | PROP-035 | C#-First Core Migration — RootElement, ClassElement, MethodElement, 8 expression typů, GenericConstraint, LanguageCapabilityProfile | 2026-07-08 | [Docs/Plans/PROP-035-CSharp-First-Core-Migration.md](Docs/Plans/PROP-035-CSharp-First-Core-Migration.md) |

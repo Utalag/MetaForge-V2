@@ -8,6 +8,11 @@
 
 | ID | Název | Vrstva | Priorita | Odhad | Poznámka |
 |----|-------|--------|----------|-------|----------|
+| **NOVÉ** | | | | | |
+| PROP-040 | Core Member Consistency — IMemberElement, PropertyElement Attributes, XmlSummary | Core | 🟡 Vysoká | 2-3 dny | Perplexity Deep Research: architektonické nekonzistence členů |
+| PROP-041 | ConstructorElement + FieldElement | Core | 🟡 Vysoká | 2-3 dny | Perplexity Deep Research: chybějící elementy pro DI/generování |
+| PROP-042 | Core Test Expansion — FsCheck, snapshoty, guard testy, Roslyn integrace | Tests | 🟡 Vysoká | 3-4 dny | Perplexity Deep Research: kompletní testovací matice |
+| **STÁVAJÍCÍ** | | | | | |
 | PROP-010 | Infrastructure — persistence CommandLogu | Infrastr. | 🟡 Vysoká | — | ⚠️ Sloučeno do PROP-028 |
 | PROP-011 | WebApi host surface | Host | 🟢 Nízká | — | ⚠️ Sloučeno do PROP-026 |
 | PROP-012 | Payload escaping — JSON místo pipe-delimited | BusinessModel | 🟡 Vysoká | — | ⚠️ Řešeno v rámci PROP-020 |
@@ -50,18 +55,18 @@
 
 | # | Datum | PROP | Soubor | Závažnost | Popis | Doporučené řešení | Issue soubor |
 |---|-------|------|--------|-----------|-------|-------------------|--------------|
-| 1 | 4.7.2026 | PROP-028 | `InfrastructureServiceRegistration.cs` | ⚠️ Střední | `AddSingleton` místo `TryAddSingleton` — duplicitní DI registrace. | Nahradit `AddSingleton` → `TryAddSingleton`. | [`ISS-001`](Docs/Issues/ISS-001_PROP-028_Singleton-vs-TryAddSingleton.md) |
-| 2 | 4.7.2026 | PROP-028 | `JsonCommandLogRepository.cs` | ⚠️ Nízká | `AppendAsync` synchronní I/O uvnitř `lock`. | Použít `File.AppendAllTextAsync` nebo `Task.Run`. | [`ISS-002`](Docs/Issues/ISS-002_PROP-028_AppendAsync-sync-over-async.md) |
-| 3 | 4.7.2026 | PROP-027 | `AiServiceRegistration.cs` | ⚠️ Nízká | `AddMetaForgeAi()` neregistruje `PromptRegistry` ani `PromptEvaluationService`. | Přidat `services.AddSingleton<PromptRegistry>()` a `PromptEvaluationService`. | [`ISS-003`](Docs/Issues/ISS-003_PROP-027_Missing-PromptRegistry-DI.md) |
+| 1 | 4.7.2026 | PROP-028 | `InfrastructureServiceRegistration.cs` | ✅ Vyřešeno | `AddSingleton` → `TryAddSingleton`. | ISS-001 — fixed 2026-07-08 |
+| 2 | 4.7.2026 | PROP-028 | `JsonCommandLogRepository.cs` | ✅ Vyřešeno | `AppendAsync` používá `Task.Run` pro offload sync I/O. | ISS-002 — fixed 2026-07-08 |
+| 3 | 4.7.2026 | PROP-027 | `AiServiceRegistration.cs` | ✅ Vyřešeno | `AddMetaForgeAi()` nyní registruje `PromptRegistry` a `PromptEvaluationService`. | ISS-003 — fixed 2026-07-08 |
 | 4 | 4.7.2026 | PROP-024 | `Expression.cs` | 💡 Návrh | Redundantní `Kind` string a `ExpressionKind` enum. | Při major verzi odstranit `string Kind`. | [`ISS-004`](Docs/Issues/ISS-004_PROP-024_Kind-ExpressionKind-redundancy.md) |
-| 5 | 4.7.2026 | PROP-025 | `IncrementalCodeGenerator.cs` | ⚠️ Střední | `GetMaxEntities()` hardcodované 3 místo z licence. | Číst `_license.MaxEntities`. | [`ISS-005`](Docs/Issues/ISS-005_PROP-025_GetMaxEntities-hardcoded.md) |
+| 5 | 4.7.2026 | PROP-025 | `IncrementalCodeGenerator.cs` | ✅ Vyřešeno | `GetMaxEntities()` nyní čte `_license.MaxEntities`. | ISS-005 — fixed 2026-07-08 |
 | 6 | 4.7.2026 | PROP-025 | `CodeGenerator.cs` | ⚠️ Nízká | `sealed` → `class` kvůli dědičnosti, možnost nechtěného přepsání. | Zvážit kompozici místo dědičnosti. | [`ISS-006`](Docs/Issues/ISS-006_PROP-025_CodeGenerator-sealed-vs-composition.md) |
 | 7 | 4.7.2026 | PROP-019 | `OllamaAiTranslator.cs` | ⚠️ Nízká | Duplikuje logiku Ollama HTTP API volání z `OllamaAdapter`. | Po stabilizaci MetaForge.Ai sjednotit. | [`ISS-007`](Docs/Issues/ISS-007_PROP-019_OllamaAiTranslator-duplicate-logic.md) |
 | 8 | 4.7.2026 | PROP-019 | `DefaultBusinessTranslator.cs` | ⚠️ Nízká | `TryEnrichAsync` není v `IBusinessTranslator`, obchází rozhraní. | Přidat do rozhraní nebo vytvořit `IAsyncBusinessTranslator`. | [`ISS-008`](Docs/Issues/ISS-008_PROP-019_TryEnrichAsync-missing-interface.md) |
 | 9 | 4.7.2026 | PROP-026 | `Program.cs` (CLI) | ⚠️ Nízká | CLI používá root `IServiceProvider` pro scoped služby. | Scope per command nebo singleton Facade. | [`ISS-009`](Docs/Issues/ISS-009_PROP-026_CLI-scoped-services.md) |
 | 10 | 4.7.2026 | PROP-029 | `EfCoreForgeBlock.cs` | ⚠️ Nízká | `RequiredTier` není v `IForgeBlockCapabilityPackage`, nevynuceno. | Přidat do rozhraní nebo použít atribut. | [`ISS-010`](Docs/Issues/ISS-010_PROP-029_RequiredTier-not-enforced.md) |
 | 11 | 4.7.2026 | PROP-029 | ForgeBlock projekty | ⚠️ Nízká | ForgeBlocky bez Scriban šablon — jen metadata. | Implementovat šablony v další iteraci. | [`ISS-011`](Docs/Issues/ISS-011_PROP-029_ForgeBlock-missing-templates.md) |
-| 12 | 4.7.2026 | PROP-030 | `ReplayEngine.cs` | ⚠️ Střední | `CommandMigrationEngine` není integrován do `ReplayEngine`. | Přidat jako závislost a volat automaticky. | [`ISS-012`](Docs/Issues/ISS-012_PROP-030_CommandMigration-not-integrated.md) |
+| 12 | 4.7.2026 | PROP-030 | `ReplayEngine.cs` | ✅ Vyřešeno | `CommandMigrationEngine` integrován — automatická migrace před replayem. | ISS-012 — fixed 2026-07-08 |
 | 13 | 4.7.2026 | PROP-022 | `BusinessDocumentDiffer.cs` | ⚠️ Nízká | Diff nezachycuje Modify, relace, workflow. | Rozšířit o detekci Modified a dalších uzlů. | [`ISS-013`](Docs/Issues/ISS-013_PROP-022_Diff-Modify-not-detected.md) |
 
 ---

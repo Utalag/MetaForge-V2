@@ -320,6 +320,95 @@ ClassElement.SealedRecord("Foo")    // public sealed record class Foo
 .WithMethod(methodElement)
 ```
 
+---
+
+## DelegateElement (PROP-037)
+
+```csharp
+public sealed class DelegateElement : RootElement
+{
+    public override string Kind => "delegate";
+    public TypeModel ReturnType { get; set; } = TypeModel.Void;
+    public List<ParameterElement> Parameters { get; init; } = new();
+    public List<string> TypeParameters { get; init; } = new();
+    public List<GenericConstraint> TypeConstraints { get; init; } = new();
+    public AccessModifier AccessModifier { get; set; } = AccessModifier.Public;
+}
+```
+
+Factory: `DelegateElement.Basic("MyFunc", returnType)`, `DelegateElement.Generic("Func", returnType, "T")`
+
+---
+
+## EventElement (PROP-037)
+
+```csharp
+public sealed class EventElement
+{
+    public string Name { get; set; } = string.Empty;
+    public TypeModel EventType { get; set; }
+    public bool IsStatic { get; set; }
+    public AccessModifier AccessModifier { get; set; } = AccessModifier.Public;
+    public AccessModifier? AddAccessor { get; set; }
+    public AccessModifier? RemoveAccessor { get; set; }
+}
+```
+
+Factory: `EventElement.Basic("MyEvent", eventType)`, `EventElement.Static("MyEvent", eventType)`
+
+---
+
+## OperatorElement + OperatorKind (PROP-037)
+
+```csharp
+public enum OperatorKind
+{
+    // Unary: UnaryPlus, UnaryMinus, LogicalNot, BitwiseNot, Increment, Decrement, True, False
+    // Binary: Addition, Subtraction, Multiply, Divide, Modulo, BitwiseAnd, BitwiseOr, BitwiseXor,
+    //         LeftShift, RightShift, UnsignedRightShift
+    // Comparison: Equality, Inequality, LessThan, GreaterThan, LessThanOrEqual, GreaterThanOrEqual
+    // Conversion: Implicit, Explicit
+}
+
+public sealed class OperatorElement
+{
+    public OperatorKind OperatorKind { get; set; }
+    public TypeModel ReturnType { get; set; } = TypeModel.Void;
+    public List<ParameterElement> Parameters { get; init; } = new();
+    public BlockStatement? Body { get; set; }
+    public Expression? ExpressionBody { get; set; }
+}
+```
+
+Factory: `OperatorElement.Unary(kind, returnType, operand)`, `OperatorElement.Binary(kind, returnType, left, right)`, `OperatorElement.Conversion(kind, targetType, source)`
+
+---
+
+## ProjectElement rozšíření (PROP-037)
+
+```csharp
+public sealed class ProjectElement
+{
+    // Existující
+    public string Name { get; set; }
+    public string? DefaultNamespace { get; set; }
+    public List<RootElement> RootElements { get; }
+
+    // Nové (PROP-037)
+    public string? TargetFramework { get; set; }        // "net10.0"
+    public string? RootNamespace { get; set; }
+    public bool NullableEnabled { get; set; } = true;
+    public List<string> ImplicitUsings { get; init; }
+    public List<PackageReference> PackageReferences { get; init; }
+    public List<AnalyzerReference> AnalyzerReferences { get; init; }
+    public List<ProjectReference> ProjectReferences { get; init; }
+}
+
+public sealed record PackageReference(string Name, string Version);
+public sealed record AnalyzerReference(string Name, string Path);
+public sealed record ProjectReference(string Name, string RelativePath);
+```
+
 ### EnumElement — factory metody
 
 ```csharp
@@ -389,4 +478,62 @@ var propIssues = CoreValidator.ValidateProperty(propertyElement);
 ```
 
 Pokryté ❌ řádky matice: C9, C10, C12, A3-A5, I5, E5-E6, P7, T19-T21, M9-M12, B11-B13.
+Nové guard kódy (PROP-042): C13, C14, M13, M14, P9, P10, G11, G12.
+
+---
+
+## IMemberElement (PROP-040)
+
+> Společný interface pro všechny členské elementy — umožňuje polymorfní iteraci.
+
+```csharp
+// Složka: Src/MetaForge.Core/Abstractions/
+public interface IMemberElement
+{
+    string Name { get; }
+    List<AttributeElement> Attributes { get; }
+    MetadataBag Metadata { get; }
+    string? XmlSummary { get; set; }
+    int Coin { get; }
+}
+```
+
+Implementováno na: `MethodElement`, `PropertyElement`, `EventElement`, `OperatorElement`, `ConstructorElement`, `FieldElement`.
+
+---
+
+## ConstructorElement (PROP-041)
+
+```csharp
+public sealed class ConstructorElement : IMemberElement
+{
+    public string Name { get; set; }
+    public List<ParameterElement> Parameters { get; init; } = new();
+    public AccessModifier AccessModifier { get; set; } = Public;
+    public BlockStatement? Body { get; set; }
+    public string? Initializer { get; set; }  // "this(x)" / "base(name)"
+    public bool IsStatic { get; set; }
+}
+```
+
+Factory: `ConstructorElement.Basic("Foo", params)`, `ConstructorElement.Private("Foo")`, `ConstructorElement.Static("Foo")`
+
+---
+
+## FieldElement (PROP-041)
+
+```csharp
+public sealed class FieldElement : IMemberElement
+{
+    public string Name { get; set; }
+    public TypeModel Type { get; set; }
+    public AccessModifier AccessModifier { get; set; } = Private;
+    public bool IsReadOnly { get; set; }
+    public bool IsStatic { get; set; }
+    public bool IsConst { get; set; }
+    public string? DefaultValue { get; set; }
+}
+```
+
+Factory: `FieldElement.Basic("_field", type)`, `FieldElement.ReadOnly("_field", type)`, `FieldElement.StaticReadOnly("_field", type)`, `FieldElement.Const("MAX", Int32, "100")`
 

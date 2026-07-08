@@ -20,8 +20,8 @@
 | # | Soubor | Obsah | Stav |
 |---|--------|-------|------|
 | 03 | `03-Core-Abstractions.md` | AppRoot, RootElement, TypeModel, DataType, SemanticCollection, MetadataBag (PROP-038) | ✅ *(PROP-035, PROP-038)* |
-| 04 | `04-Core-Elements.md` | Class, Interface, Enum, Struct, Property, Method, Parameter elem. + MetadataBag (PROP-038) | ✅ *(PROP-035, PROP-038)* |
-| 05 | `05-Core-Behaviors.md` | Expression System (11+8 druhů), Statement System (PROP-031), DiagnosticBag, BuildResult\<T\>, TransformPipeline (PROP-038) | ✅ *(PROP-024, PROP-031, PROP-035, PROP-038)* |
+| 04 | `04-Core-Elements.md` | Class, Interface, Enum, Struct, Property, Method, Parameter elem. + MetadataBag (PROP-038) + DelegateElement, EventElement, OperatorElement (PROP-037) + ConstructorElement, FieldElement (PROP-041) + IMemberElement (PROP-040) | ✅ *(PROP-035, PROP-037, PROP-038, PROP-040, PROP-041)* |
+| 05 | `05-Core-Behaviors.md` | Expression System (11+8 druhů), Statement System (PROP-031), DiagnosticBag, BuildResult\<T\>, TransformPipeline (PROP-038), InvariantDefinition + InvariantExpression AST (PROP-036), ElementMixin + ConventionRegistry (PROP-039), ElementFingerprint (PROP-039), Guard validace (PROP-042) | ✅ *(PROP-024, PROP-031, PROP-035, PROP-036, PROP-038, PROP-039, PROP-042)* |
 | 06 | `06-Core-Services.md` | CatalogManager, ICatalogProvider, StrongType/ValueObject, IConstraintInferencer | ✅ *(PROP-024)* |
 
 ### Business a Translator vrstva
@@ -48,7 +48,7 @@
 ### Kvalita a testování
 | # | Soubor | Obsah | Stav |
 |---|--------|-------|------|
-| 15 | `15-Test-Scaffold.md` | Struktura testů, testování Core | ✅ |
+| 15 | `15-Test-Scaffold.md` | Struktura testů, testování Core, Snapshot-based integrační testy (PROP-032) | ✅ |
 | 16 | `16-Risks-and-Rollback.md` | Rizika, rollback strategie | ✅ |
 
 ### Agents a governance

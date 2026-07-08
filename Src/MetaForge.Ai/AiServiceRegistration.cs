@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MetaForge.Ai.Abstractions;
 using MetaForge.Ai.Adapters;
 using MetaForge.Ai.Inference;
+using MetaForge.Ai.Prompts;
 using MetaForge.Ai.Translation;
 using MetaForge.Core.Inference;
 using MetaForge.Translator.Translation;
@@ -29,6 +30,10 @@ public static class AiServiceRegistration
         // AI implementace — nahradí deterministické fallbacky
         services.AddSingleton<IConstraintInferencer, AiConstraintInferencer>();
         services.AddSingleton<ITranslationService, AiTranslationService>();
+
+        // Prompt registry a evaluace
+        services.AddSingleton<PromptRegistry>();
+        services.AddSingleton<PromptEvaluationService>();
 
         return services;
     }

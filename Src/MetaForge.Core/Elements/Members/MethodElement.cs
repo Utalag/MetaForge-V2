@@ -9,7 +9,7 @@ namespace MetaForge.Core.Elements.Members;
 /// <summary>
 /// Reprezentuje C# metodu na třídě, interfacu nebo structu.
 /// </summary>
-public sealed class MethodElement
+public sealed class MethodElement : IMemberElement
 {
     /// <summary>Název metody.</summary>
     public string Name { get; set; } = string.Empty;
@@ -49,6 +49,12 @@ public sealed class MethodElement
 
     /// <summary>Parametry metody.</summary>
     public List<ParameterElement> Parameters { get; } = new();
+
+    /// <summary>
+    /// XML dokumentační komentář pro metodu.
+    /// Používá se pro generování &lt;summary&gt; XML docs.
+    /// </summary>
+    public string? XmlSummary { get; set; }
 
     /// <summary>Atributy na metodě.</summary>
     public List<AttributeElement> Attributes { get; } = new();

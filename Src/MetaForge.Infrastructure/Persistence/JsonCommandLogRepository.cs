@@ -36,11 +36,14 @@ public sealed class JsonCommandLogRepository : ICommandLogRepository
     {
         ct.ThrowIfCancellationRequested();
         var line = JsonSerializer.Serialize(envelope, JsonOptions);
-        lock (_writeLock)
+        // Offload sync I/O from calling thread to avoid blocking
+        return Task.Run(() =>
         {
-            File.AppendAllText(_filePath, line + Environment.NewLine);
-        }
-        return Task.CompletedTask;
+            lock (_writeLock)
+            {
+                File.AppendAllText(_filePath, line + Environment.NewLine);
+            }
+        }, ct);
     }
 
     /// <inheritdoc />

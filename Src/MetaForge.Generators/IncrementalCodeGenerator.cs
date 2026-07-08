@@ -12,6 +12,7 @@ namespace MetaForge.Generators;
 public sealed class IncrementalCodeGenerator : TieredCodeGenerator
 {
     private readonly Dictionary<string, string> _outputCache = new();
+    private readonly GeneratorLicense _license;
     private int _entityCount;
 
     /// <summary>
@@ -19,6 +20,7 @@ public sealed class IncrementalCodeGenerator : TieredCodeGenerator
     /// </summary>
     public IncrementalCodeGenerator(GeneratorLicense license) : base(license)
     {
+        _license = license;
     }
 
     /// <summary>
@@ -79,7 +81,6 @@ public sealed class IncrementalCodeGenerator : TieredCodeGenerator
     /// </summary>
     private int GetMaxEntities()
     {
-        // Sandbox = 3, ostatní = neomezeno
-        return 3; // Zjednodušeně — plná implementace by četla z licence
+        return _license.MaxEntities;
     }
 }

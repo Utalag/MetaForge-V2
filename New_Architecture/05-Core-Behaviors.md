@@ -1,12 +1,14 @@
 # Core — Behaviors
 
-> Expression System (PROP-024, PROP-031), Statement System (PROP-031), Constraints, Boundary Analysis, StandardLibraries
+> Expression System (PROP-024, PROP-031), Statement System (PROP-031), Constraints, Boundary Analysis, StandardLibraries, Specification Layer (PROP-036), Composability (PROP-039)
 
 **Aktualizace:** PROP-024 (2026-07-04) — Expression hierarchie.
 **Aktualizace:** PROP-031 (2026-07-05) — Statement hierarchie, odstraněn ComputedExpression (nahrazen Statement AST).
 **Aktualizace:** PROP-031 rozšíření (2026-07-08) — 6 nových statement typů: SwitchStatement, ForEachStatement, TryCatchStatement+CatchClause, UsingStatement, UsingDeclarationStatement, LocalFunctionStatement.
 **Aktualizace:** PROP-035 (2026-07-08) — Nové expression typy (LambdaExpression, NewExpression, DefaultExpression, ConversionExpression, AwaitExpression, SwitchExpression, IsPatternExpression, NullCoalescingExpression), NamedArgument v MethodCallExpression, ExpressionKind rozšířen o Await, Switch, IsPattern, NullCoalescing.
 **Aktualizace:** PROP-038 (2026-07-08) — Fluent Builder API, MetadataBag, DiagnosticBag+BuildResult\<T\>, TransformPipeline+AttributeReflectionTransform.
+**Aktualizace:** PROP-036 (2026-07-08) — Specification Layer: InvariantDefinition, InvariantExpression boolean AST, IInvariantEvaluator, ReflectionBasedInvariantEvaluator, BuiltInInvariants (12 pravidel).
+**Aktualizace:** PROP-039 (2026-07-08) — Composability: ElementMixin (ConflictStrategy), ConventionRegistry (3 konvence), ElementFingerprint (SHA256 dirty-tracking).
 
 ---
 
@@ -329,4 +331,76 @@ Factory metody jsou atomické — každá vytváří právě jednu ✅ kombinaci
 Fluent `With*` metody slouží pro vlastnosti bez konfliktů (access modifier, base class, parametry).
 
 Viz [`04-Core-Elements.md`](04-Core-Elements.md) pro kompletní výčet factory metod.
+
+---
+
+## Specification Layer (PROP-036)
+
+> Invarianty jako first-class artefakt — deklarativní, serializovatelná pravidla pro validaci a test generation.
+
+```csharp
+// Složka: Src/MetaForge.Core/Specifications/
+
+// Invariantní výrazový AST
+public abstract record InvariantExpression;
+public sealed record PropertyRef(string Path) : InvariantExpression;
+public sealed record ConstantExpression(object? Value) : InvariantExpression;
+public sealed record EqExpression(InvariantExpression Left, InvariantExpression Right) : InvariantExpression;
+public sealed record NotExpression(InvariantExpression Inner) : InvariantExpression;
+public sealed record AndExpression(IReadOnlyList<InvariantExpression> Items) : InvariantExpression;
+public sealed record OrExpression(IReadOnlyList<InvariantExpression> Items) : InvariantExpression;
+public sealed record ExistsExpression(string Path) : InvariantExpression;
+
+// Definice invariantu: WHEN (podmínka) THEN MUST (platí)
+public sealed record InvariantDefinition(
+    string Code, string TargetKind, string Description,
+    InvariantSeverity Severity, InvariantScope Scope,
+    InvariantExpression? When, InvariantExpression? Must,
+    GeneratorIntent? GeneratorIntent, InvariantProvenance? Provenance
+);
+
+// Scope: Local | Scoped | Relational | Global
+// Severity: Info | Warning | Error | Fatal
+
+// Evaluátor (reflection-based)
+public sealed class ReflectionBasedInvariantEvaluator : IInvariantEvaluator;
+
+// Vestavěné invarianty (12 pravidel)
+BuiltInInvariants.All  // 6x MethodElement, 4x ClassElement, 2x PropertyElement
+```
+
+---
+
+## Composability (PROP-039)
+
+> Mixin/Trait, ConventionRegistry a Incremental dirty-tracking.
+
+```csharp
+// Složka: Src/MetaForge.Core/Composability/
+
+// Mixin: build-time expanze sdíleného chování
+public sealed record ElementMixin(string Name, IReadOnlyList<PropertyElement> Properties,
+    IReadOnlyList<MethodElement> Methods, IReadOnlyList<AttributeElement>? Attributes,
+    ConflictStrategy OnConflict);
+
+public enum ConflictStrategy { Skip, Throw, Replace }
+
+// Vestavěné mixiny
+BuiltInMixins.Auditable   // CreatedAt, UpdatedAt, CreatedBy
+BuiltInMixins.SoftDelete  // IsDeleted, DeletedAt, SoftDelete(), Restore()
+
+// ConventionRegistry: globální konvence s per-element override
+public interface IConvention { ... }
+public sealed class ConventionRegistry { ... }
+
+// Vestavěné konvence
+new PascalCasePropertiesConvention()  // MF-CONV-001
+new InterfacePrefixConvention()       // MF-CONV-002
+new AsyncSuffixConvention()           // MF-CONV-003
+
+// Dirty-tracking: SHA256 fingerprint pro incremental build
+public sealed class ElementFingerprint : IEquatable<ElementFingerprint>;
+public static ElementFingerprint Compute(this ClassElement cls, int pipelineVersion);
+public static ElementFingerprint Compute(this MethodElement method, int pipelineVersion);
+```
 

@@ -4,7 +4,7 @@ Datum: 2026-04-07
 PROP: PROP-030
 Soubor: `Src/MetaForge.BusinessModel/Replay/ReplayEngine.cs`
 Závažnost: ⚠️ Střední
-Stav: Open
+Stav: Resolved (2026-07-08)
 Owner:
 Poslední revize: 2026-04-07
 
@@ -33,6 +33,7 @@ Přidat `CommandMigrationEngine` jako závislost `ReplayEngine` (přes DI nebo k
 ## 6. Rozhodnutí
 
 *(Vyplní se po rozhodnutí usera/ownera.)*
+- 2026-07-08: `CommandMigrationEngine` integrován jako volitelná constructor dependency. `Replay()` automaticky volá `_migrationEngine.MigrateAll()` před replayem.
 
 ---
 
