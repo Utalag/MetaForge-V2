@@ -8,15 +8,25 @@
 > ⚠️ **Pořadí implementace řídí** [`Docs/Plans/Implementation-Roadmap.md`](Docs/Plans/Implementation-Roadmap.md).
 > Fáze určují, co se implementuje teď a co až později. Paralelní streamy mohou běžet současně.
 
-| ID | Název | Stav | Odhad | Fáze | Odkaz |
-|----|-------|------|-------|------|-------|
-| **BUDOUCNOST — na zvážení** | | | | |
-| PROP-023 | DX vylepšení — Typový SyncState, Layer stack, YAML DSL, Undo/redo | ⚪ Na zvážení | 5-9 dní | ∞ | [Docs/Plans/PROP-023-DX-Architecture-Improvements-Future.md](Docs/Plans/PROP-023-DX-Architecture-Improvements-Future.md) |
+| ID | Název | Priorita | Odhad | Závislosti | Odkaz |
+|----|-------|----------|-------|------------|-------|
+| PROP-036 | **Core Specification Layer** — InvariantDefinition, booleovský AST, IInvariantEvaluator | 🟡 Vysoká | 5–8 dní | PROP-035 ✅, PROP-038 ✅, PROP-031 ✅ | [Detail](Docs/Plans/PROP-036-Core-Specification-Layer.md) |
+| PROP-037 | **C# Completeness** — Delegate, Event, Operator, Roslyn Importer | 🟢 Střední | 6–9 dní | PROP-035 ✅, PROP-038 ✅, PROP-031 ✅ | [Detail](Docs/Plans/PROP-037-CSharp-Completeness-Importer.md) |
+| **OSTATNÍ** | | | | | |
+| PROP-034 | Core Reference Documentation + Support Matrix | 🟡 Vysoká | 4 dny | — | [Detail](Docs/Plans/PROP-034-Core-Reference-Documentation.md) |
+| PROP-039 | Core Composability — Mixin/Trait, ConventionRegistry | 🟢 Střední | 1,5–2 dny | PROP-038 | [Detail](Docs/Plans/PROP-039-Core-Composability.md) |
+| PROP-032 | Integrační testy Core + Generators | 🟡 Vysoká | 7 dní | PROP-031 ✅ | [Detail](Docs/Plans/PROP-032-Integration-Tests-Core-Generators.md) |
+| PROP-023 | DX vylepšení — Typový SyncState, Layer stack, YAML DSL, Undo/redo | ⚪ Na zvážení | 5–9 dní | ∞ | [Detail](Docs/Plans/PROP-023-DX-Architecture-Improvements-Future.md) |
+| PROP-033 | Core Element Factory Methods & CoreValidator | 🟢 Schváleno | — | PROP-031 ✅, PROP-032 ✅ | [Detail](Docs/Plans/PROP-033-Core-Element-Factories-Validation.md) |
+
 
 ## Dokončené návrhy
 
 | ID | Název | Datum dokončení | Odkaz |
 |----|-------|-----------------|-------|
+| PROP-031 | Core Statement System — rozšíření: Switch, ForEach, TryCatch, Using, UsingDeclaration, LocalFunction; StatementKind rozšířen o 6 hodnot | 2026-07-08 | [Docs/Plans/PROP-031-Core-Statement-System.md](Docs/Plans/PROP-031-Core-Statement-System.md) |
+| PROP-038 | Core DX & Diagnostics — Fluent Builder API (8 builderů), MetadataBag, DiagnosticBag+BuildResult, TransformPipeline+AttributeReflection | 2026-07-08 | [Docs/Plans/PROP-038-Core-DX-Diagnostics.md](Docs/Plans/PROP-038-Core-DX-Diagnostics.md) |
+| PROP-035 | C#-First Core Migration — RootElement, ClassElement, MethodElement, 8 expression typů, GenericConstraint, LanguageCapabilityProfile | 2026-07-08 | [Docs/Plans/PROP-035-CSharp-First-Core-Migration.md](Docs/Plans/PROP-035-CSharp-First-Core-Migration.md) |
 | PROP-020 | BusinessModel — architektonický upgrade | 2026-07-04 | [Docs/Plans/PROP-020-BusinessModel-Architecture-Upgrade.md](Docs/Plans/PROP-020-BusinessModel-Architecture-Upgrade.md) |
 | PROP-001 | Governance a Project Scaffold | 2026-07-04 | [Docs/Plans/PROP-001-Governance.md](Docs/Plans/PROP-001-Governance.md) |
 | PROP-002 | Core vrstva — typový model, elementy, katalog | 2026-07-04 | [Docs/Plans/PROP-002-Core.md](Docs/Plans/PROP-002-Core.md) |
