@@ -7,6 +7,7 @@
 
 | Datum | Epic/Slice | Popis | Autor |
 |-------|-----------|-------|-------|
+| 2026-07-08 | PROP-043 — Generator Completeness | Plné pokrytí Core→C# generování: 15/15 expression typů (New, Await, Conversion, Default, IsPattern, Lambda, NullCoalescing, Switch expression), 13/13 statement typů (ForEach, Switch, TryCatch, Using, UsingDeclaration, LocalFunction), Event+Operator generování, Constructor/Field šablony napojeny, Delegate generování, MapType varování. Build: 0 chyb. | Copilot |
 | 2026-07-08 | PROP-040 — Core Member Consistency | IMemberElement interface, PropertyElement +Attributes+XmlSummary+IMemberElement, MethodElement +XmlSummary+IMemberElement, EventElement/OperatorElement +IMemberElement. 11 testů (MemberConsistencyTests). | Copilot |
 | 2026-07-08 | PROP-041 — ConstructorElement + FieldElement | ConstructorElement (factory: Basic/Private/Static, fluent: WithAccess/WithParameter/WithInitializer/WithBody), FieldElement (factory: Basic/ReadOnly/StaticReadOnly/Const, fluent: WithAccess/WithDefault), integrace do ClassElement (+Constructors/+Fields/+WithConstructor/+WithField). 16 testů (ConstructorFieldTests). | Copilot |
 | 2026-07-08 | PROP-042 — Core Test Expansion | 8 nových guard kódů v CoreValidator (C13, C14, M13, M14, P9, P10, G11, G12), ValidateStruct metoda, 12 GuardValidationTests, celkem 45 nových testů (405 celkem). Build: 0 chyb. | Copilot |

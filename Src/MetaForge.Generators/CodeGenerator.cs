@@ -36,7 +36,9 @@ public class CodeGenerator : BaseCodeGenerator
             EnumElement enm => GenerateEnum(enm),
             StructElement str => GenerateStruct(str),
             DelegateElement del => GenerateDelegate(del),
-            _ => $"// Nepodporovaný element typu: {element.GetType().Name}"
+            _ => string.IsNullOrWhiteSpace(element.Name)
+                ? "// ERROR: Element bez názvu"
+                : $"// Nepodporovaný element typu: {element.GetType().Name} ({element.Kind})"
         };
 
         var diagnostics = new List<DiagnosticInfo>();
@@ -309,6 +311,65 @@ public class CodeGenerator : BaseCodeGenerator
         return $@"{usings}{ns}{access} delegate {returnType} {del.Name}{typeParams}({parameters});";
     }
 
+    /// <summary>
+    /// Vygeneruje event (jako member jiného typu, ne samostatný soubor).
+    /// EventElement se generuje inline v rámci Class/Interface/Struct.
+    /// </summary>
+    public string GenerateEvent(EventElement evt)
+    {
+        var access = MapAccessModifier(evt.AccessModifier);
+        var staticMod = evt.IsStatic ? "static " : "";
+        var eventType = evt.EventType?.CustomTypeName ?? "EventHandler";
+        return $"{access} {staticMod}event {eventType} {evt.Name};";
+    }
+
+    /// <summary>
+    /// Vygeneruje operátor (jako member třídy).
+    /// OperatorElement se generuje inline v rámci Class/Struct.
+    /// </summary>
+    public string GenerateOperator(OperatorElement op)
+    {
+        var opSymbol = RenderOperatorSymbol(op.OperatorKind);
+        var returnType = MapType(op.ReturnType);
+        var parameters = string.Join(", ", op.Parameters.Select(p =>
+        {
+            var type = MapType(p.Type);
+            return $"{type} {p.Name}";
+        }));
+        return $"public static {returnType} operator {opSymbol}({parameters}) => throw new NotImplementedException();";
+    }
+
+    private static string RenderOperatorSymbol(OperatorKind kind) => kind switch
+    {
+        OperatorKind.UnaryPlus => "+",
+        OperatorKind.UnaryMinus => "-",
+        OperatorKind.LogicalNot => "!",
+        OperatorKind.BitwiseNot => "~",
+        OperatorKind.Increment => "++",
+        OperatorKind.Decrement => "--",
+        OperatorKind.True => "true",
+        OperatorKind.False => "false",
+        OperatorKind.Addition => "+",
+        OperatorKind.Subtraction => "-",
+        OperatorKind.Multiply => "*",
+        OperatorKind.Divide => "/",
+        OperatorKind.Modulo => "%",
+        OperatorKind.BitwiseAnd => "&",
+        OperatorKind.BitwiseOr => "|",
+        OperatorKind.BitwiseXor => "^",
+        OperatorKind.LeftShift => "<<",
+        OperatorKind.RightShift => ">>",
+        OperatorKind.Equality => "==",
+        OperatorKind.Inequality => "!=",
+        OperatorKind.LessThan => "<",
+        OperatorKind.GreaterThan => ">",
+        OperatorKind.LessThanOrEqual => "<=",
+        OperatorKind.GreaterThanOrEqual => ">=",
+        OperatorKind.Implicit => "implicit operator",
+        OperatorKind.Explicit => "explicit operator",
+        _ => "?"
+    };
+
     private static string RenderAttribute(AttributeElement attr)
     {
         var args = attr.Arguments.Count > 0
@@ -392,12 +453,12 @@ public class CodeGenerator : BaseCodeGenerator
         DataType.Object => "object",
         DataType.Void => "void",
         DataType.Dynamic => "dynamic",
-        DataType.Entity => "object",
+        DataType.Entity => "object /* TODO: Replace with actual entity type */",
         DataType.EnumValue => "int",
-        DataType.Array => "object[]",
-        DataType.Nullable => "object",
-        DataType.Struct => "object",
-        DataType.Record => "object",
+        DataType.Array => "object[]/* TODO: Replace with actual array type */",
+        DataType.Nullable => "object /* TODO: Replace with actual nullable type */",
+        DataType.Struct => "object /* TODO: Replace with actual struct type */",
+        DataType.Record => "object /* TODO: Replace with actual record type */",
         _ => "object"
     };
 }

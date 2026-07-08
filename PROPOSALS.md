@@ -14,6 +14,7 @@
 
 | ID | Název | Datum dokončení | Odkaz |
 |----|-------|-----------------|-------|
+| PROP-043 | Generator Completeness — Expression/Statement renderery (15/15 expressionů, 13/13 statementů), Event/Operator generování, Constructor/Field šablony, MapType varování, Delegate generování | 2026-07-08 | [Docs/Plans/PROP-043-Generator-Completeness.md](Docs/Plans/PROP-043-Generator-Completeness.md) |
 | PROP-040 | Core Member Consistency — IMemberElement, PropertyElement Attributes+XmlSummary, MethodElement XmlSummary | 2026-07-08 | [Docs/Plans/PROP-040-Core-Member-Consistency.md](Docs/Plans/PROP-040-Core-Member-Consistency.md) |
 | PROP-041 | ConstructorElement + FieldElement, integrace do ClassElement | 2026-07-08 | [Docs/Plans/PROP-041-ConstructorElement-FieldElement.md](Docs/Plans/PROP-041-ConstructorElement-FieldElement.md) |
 | PROP-042 | Core Test Expansion — Guard validace (8 nových), GuardValidationTests (12 testů), MemberConsistencyTests (11), ConstructorFieldTests (16) | 2026-07-08 | [Docs/Plans/PROP-042-Core-Test-Expansion.md](Docs/Plans/PROP-042-Core-Test-Expansion.md) |
