@@ -1,6 +1,9 @@
 using MetaForge.BusinessModel.Models;
+using MetaForge.Core.Abstractions;
 using MetaForge.Core.Catalog;
 using MetaForge.Core.DataTypes;
+using MetaForge.Core.Elements.Members;
+using MetaForge.Core.Elements.Types;
 using MetaForge.Translator.Prompting;
 using MetaForge.Translator.Prompting.ModelPrompts;
 
@@ -174,4 +177,89 @@ public sealed class DefaultBusinessTranslator : IBusinessTranslator
         // 2. Fallback na deterministický enrichment
         return TryEnrich(attribute);
     }
+
+    // === Strong Type Mapping (PROP-047) ===
+
+    /// <summary>
+    /// Přeloží celý BusinessAuthoringDocument na Core elementy.
+    /// Detekuje strong types (ValueObjectElement) přes CoreDetail.IsStrongType.
+    /// </summary>
+    public IReadOnlyList<RootElement> TranslateDocument(BusinessAuthoringDocument document)
+    {
+        ArgumentNullException.ThrowIfNull(document);
+
+        var result = new List<RootElement>();
+        var translationSource = DetermineTranslationSource(document);
+
+        foreach (var entity in document.Entities)
+        {
+            var classElement = new ClassElement { Name = entity.Name };
+
+            // Translation source metadata
+            if (translationSource != null)
+                classElement.Metadata.Set("Generation.TranslationSource", translationSource);
+
+            foreach (var attr in entity.Attributes)
+            {
+                // Strong type detekce přes CoreDetail
+                if (attr.CoreDetail?.IsStrongType == true && attr.CoreDetail?.ValueObjectName != null)
+                {
+                    var ctd = document.CustomTypes
+                        .FirstOrDefault(ct => ct.Name == attr.CoreDetail.ValueObjectName);
+
+                    if (ctd != null)
+                    {
+                        // Vytvořit ValueObjectElement (Vogen-annotated target)
+                        var vo = new ValueObjectElement
+                        {
+                            Name = ctd.Name,
+                            IsReadOnly = true,
+                        };
+
+                        // Translation source metadata na value object
+                        if (translationSource != null)
+                            vo.Metadata.Set("Generation.TranslationSource", translationSource);
+
+                        // Property s odkazem na strong type
+                        classElement.InlineStrongTypes.Add(vo);
+                        classElement.Properties.Add(PropertyElement.GetSet(attr.Name,
+                            TypeModel.Of(DataType.Struct).WithCustomName(ctd.Name)));
+                        continue;
+                    }
+                }
+
+                // Fallback na primitivum
+                classElement.Properties.Add(PropertyElement.GetSet(attr.Name, Translate(attr)));
+            }
+
+            result.Add(classElement);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Určí zdroj překladu — AI nebo deterministický.
+    /// </summary>
+    private static string? DetermineTranslationSource(BusinessAuthoringDocument document)
+    {
+        // Default: Deterministic, dokud AI vrstva nezapíše metadata
+        return "Deterministic";
+    }
+
+    /// <summary>
+    /// Převede base type string z CustomTypeDefinition na TypeModel.
+    /// </summary>
+    private static TypeModel MapBaseType(string baseType) => baseType.ToLowerInvariant() switch
+    {
+        "string" or "text" => TypeModel.String,
+        "int" or "integer" or "int32" => TypeModel.Int32,
+        "long" or "int64" => TypeModel.Of(DataType.Int64),
+        "decimal" or "money" => TypeModel.Decimal,
+        "double" => TypeModel.Of(DataType.Double),
+        "bool" or "boolean" => TypeModel.Bool,
+        "datetime" => TypeModel.DateTime,
+        "guid" => TypeModel.Guid,
+        _ => TypeModel.Object,
+    };
 }

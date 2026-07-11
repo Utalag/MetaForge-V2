@@ -1,0 +1,42 @@
+{{~ ## C# Vogen Value Object Scriban Template ~}}
+{{~ ## Generuje Vogen-annotated value object: [ValueObject] partial struct/class ~}}
+
+{{~ ## Usingy ~}}
+{{- for using in usings -}}
+using {{ using }};
+{{- end }}
+{{- if usings.size > 0 }}
+
+{{- end }}
+{{~ ## Atributy (včetně [ValueObject]) ~}}
+{{- if vogen_conversions != "None" }}
+[global::Vogen.ValueObject(conversions: {{ vogen_conversions }})]
+{{- else }}
+[global::Vogen.ValueObject]
+{{- end }}
+{{~ ## Další atributy ~}}
+{{- for attribute in attributes -}}
+{{ attribute }}
+{{- end }}
+{{~ ## Deklarace ~}}
+{{ access_modifier }} readonly partial struct {{ name }}{{ if type_parameters.size > 0 }}<{{- for tp in type_parameters -}}{{ if !for.first }}, {{ end }}{{ tp }}{{ end }}>{{ end }}{{ if primary_constructor_params }}({{- for pcp in primary_constructor_params -}}{{ if !for.first }}, {{ end }}{{ pcp.type }} {{ pcp.name }}{{ end }}){{- end }}
+{
+{{~ ## Properties ~}}
+{{- for property in properties }}
+    {{ property }}
+{{- end }}
+{{- if properties.size > 0 && constructors.size > 0 }}
+
+{{- end }}
+{{~ ## Konstruktory ~}}
+{{- for constructor in constructors }}
+    {{ constructor }}
+{{- end }}
+{{- if constructors.size > 0 && methods.size > 0 }}
+
+{{- end }}
+{{~ ## Metody ~}}
+{{- for method in methods }}
+    {{ method }}
+{{- end }}
+}

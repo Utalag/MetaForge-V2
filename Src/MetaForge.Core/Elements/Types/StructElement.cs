@@ -6,7 +6,7 @@ namespace MetaForge.Core.Elements.Types;
 /// <summary>
 /// Reprezentuje C# struct (včetně record struct).
 /// </summary>
-public sealed class StructElement : RootElement
+public class StructElement : RootElement
 {
     public override string Kind => "struct";
     public AccessModifier AccessModifier { get; set; } = AccessModifier.Public;
@@ -31,8 +31,15 @@ public sealed class StructElement : RootElement
     public List<PropertyElement> Properties { get; } = new();
     public List<MethodElement> Methods { get; } = new();
 
+    /// <summary>Konstruktory structu.</summary>
+    public List<ConstructorElement> Constructors { get; init; } = new();
+
+    /// <summary>Pole (fields) structu.</summary>
+    public List<FieldElement> Fields { get; init; } = new();
+
     public override int TotalCoin =>
-        Coin + Properties.Sum(p => p.Coin) + Methods.Sum(m => m.TotalCoin);
+        Coin + Properties.Sum(p => p.Coin) + Methods.Sum(m => m.TotalCoin)
+             + Constructors.Sum(c => c.TotalCoin) + Fields.Sum(f => f.Coin);
 
     // === Statické factory metody (S1-S4 matice) ===
 
@@ -87,6 +94,13 @@ public sealed class StructElement : RootElement
     public StructElement WithMethod(MethodElement method)
     {
         Methods.Add(method);
+        return this;
+    }
+
+    /// <summary>Nastaví parametry primary konstruktoru (C# 12+ record struct).</summary>
+    public StructElement WithPrimaryConstructor(params ParameterElement[] parameters)
+    {
+        PrimaryConstructorParameters = parameters.ToList();
         return this;
     }
 }

@@ -13,6 +13,7 @@ namespace MetaForge.Translator.Host;
 public sealed class BusinessAuthoringHostFacade
 {
     private BusinessAuthoringDocument _document;
+    private readonly object _documentLock = new();
     private readonly CommandLogStore _logStore;
     private readonly PatchEngine _patchEngine;
     private readonly ReplayEngine _replayEngine;
@@ -47,7 +48,7 @@ public sealed class BusinessAuthoringHostFacade
             throw new ArgumentException("Název entity nesmí být prázdný.", nameof(name));
 
         var op = new AddEntityOp(name);
-        _document = _patchEngine.Apply(_document, op);
+        lock (_documentLock) { _document = _patchEngine.Apply(_document, op); }
         return op.EntityId;
     }
 
@@ -62,7 +63,7 @@ public sealed class BusinessAuthoringHostFacade
             ?? throw new InvalidOperationException($"Entita s Id '{entityId}' neexistuje.");
 
         var op = new UpdateEntityOp(entityId, newName);
-        _document = _patchEngine.Apply(_document, op);
+        lock (_documentLock) { _document = _patchEngine.Apply(_document, op); }
     }
 
     /// <summary>Smaže entitu a všechny její relace.</summary>
@@ -72,7 +73,7 @@ public sealed class BusinessAuthoringHostFacade
             ?? throw new InvalidOperationException($"Entita s Id '{entityId}' neexistuje.");
 
         var op = new DeleteEntityOp(entityId);
-        _document = _patchEngine.Apply(_document, op);
+        lock (_documentLock) { _document = _patchEngine.Apply(_document, op); }
     }
 
     /// <summary>Přidá atribut k entitě.</summary>
@@ -85,28 +86,28 @@ public sealed class BusinessAuthoringHostFacade
             ?? throw new InvalidOperationException($"Entita s Id '{entityId}' neexistuje.");
 
         var op = new AddAttributeOp(entityId, name, type, isRequired);
-        _document = _patchEngine.Apply(_document, op);
+        lock (_documentLock) { _document = _patchEngine.Apply(_document, op); }
         return op.AttributeId;
     }
 
     /// <summary>Aplikuje enrichment data na atribut.</summary>
     public void ApplyEnrichment(string entityId, EnrichmentResult enrichment)
     {
-        _document = _writeBackService.ApplyEnrichment(_document, entityId, enrichment);
+        lock (_documentLock) { _document = _writeBackService.ApplyEnrichment(_document, entityId, enrichment); }
     }
 
     /// <summary>Nastaví CoreDetail na atributu (přes SetCoreDetailOp).</summary>
     public void SetCoreDetail(string entityId, string attributeId, BusinessAttributeCoreDetail coreDetail)
     {
         var op = new SetCoreDetailOp(entityId, attributeId, coreDetail);
-        _document = _patchEngine.Apply(_document, op);
+        lock (_documentLock) { _document = _patchEngine.Apply(_document, op); }
     }
 
     /// <summary>Aktualizuje SyncState na atributu.</summary>
     public void UpdateSyncState(string entityId, string attributeId, AttributeSyncState newState)
     {
         var op = new UpdateSyncStateOp(entityId, attributeId, newState);
-        _document = _patchEngine.Apply(_document, op);
+        lock (_documentLock) { _document = _patchEngine.Apply(_document, op); }
     }
 
     // === WORKFLOW OPERATIONS ===
@@ -118,7 +119,7 @@ public sealed class BusinessAuthoringHostFacade
             throw new ArgumentException("Název workflow nesmí být prázdný.", nameof(name));
 
         var op = new AddWorkflowOp(name, description);
-        _document = _patchEngine.Apply(_document, op);
+        lock (_documentLock) { _document = _patchEngine.Apply(_document, op); }
         return op.WorkflowId;
     }
 
@@ -129,7 +130,7 @@ public sealed class BusinessAuthoringHostFacade
             throw new ArgumentException("Název kroku nesmí být prázdný.", nameof(stepName));
 
         var op = new AddWorkflowStepOp(workflowId, stepName, kind);
-        _document = _patchEngine.Apply(_document, op);
+        lock (_documentLock) { _document = _patchEngine.Apply(_document, op); }
         return op.StepId;
     }
 
@@ -137,7 +138,7 @@ public sealed class BusinessAuthoringHostFacade
     public string AddWorkflowTransition(string workflowId, string fromStepId, string toStepId, string? condition = null, string? label = null)
     {
         var op = new AddWorkflowTransitionOp(workflowId, fromStepId, toStepId, condition, label);
-        _document = _patchEngine.Apply(_document, op);
+        lock (_documentLock) { _document = _patchEngine.Apply(_document, op); }
         return op.TransitionId;
     }
 
@@ -148,7 +149,7 @@ public sealed class BusinessAuthoringHostFacade
         _projectionService.GetProjection(_document);
 
     /// <summary>Vrátí samotný dokument (pro debugging).</summary>
-    public BusinessAuthoringDocument GetDocument() => _document;
+    public BusinessAuthoringDocument GetDocument() { lock (_documentLock) { return _document; } }
 
     /// <summary>Vrátí počet commandů v logu.</summary>
     public int GetCommandCount() => _logStore.Count;

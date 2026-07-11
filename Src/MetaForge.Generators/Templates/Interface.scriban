@@ -12,14 +12,15 @@ using {{ using }};
 {{ access_modifier }} interface {{ name }}
 {
 {{~ ## Properties ~}}
-{{- for property in properties -}}
+{{- for property in properties }}
     {{ property }}
 {{- end }}
 {{- if properties.size > 0 && methods.size > 0 }}
 
 {{- end }}
 {{~ ## Metody (pouze signatury) ~}}
-{{- for method in methods -}}
+{{- for method in methods }}
     {{ method }};
 {{- end }}
 }
+

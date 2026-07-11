@@ -1,4 +1,5 @@
 using MetaForge.BusinessModel.Models;
+using MetaForge.Core.Abstractions;
 using MetaForge.Core.DataTypes;
 
 namespace MetaForge.Translator.Translation;
@@ -13,6 +14,9 @@ public interface IBusinessTranslator
 
     /// <summary>Pokusí se o enrichment (AI/deterministický). Vrací null pokud nic.</summary>
     EnrichmentResult? TryEnrich(BusinessAttributeNode attribute);
+
+    /// <summary>Přeloží celý BusinessAuthoringDocument na Core elementy.</summary>
+    IReadOnlyList<RootElement> TranslateDocument(BusinessAuthoringDocument document);
 }
 
 /// <summary>

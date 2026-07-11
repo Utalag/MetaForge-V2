@@ -57,6 +57,13 @@ public sealed class ClassElement : RootElement
     /// <summary>Pole (fields) třídy.</summary>
     public List<FieldElement> Fields { get; init; } = new();
 
+    /// <summary>
+    /// Inline definice strong typů (value objectů), které se renderují
+    /// před deklarací třídy ve stejném .cs souboru.
+    /// Např. CustomerId, PersonName — readonly record structy.
+    /// </summary>
+    public List<StructElement> InlineStrongTypes { get; init; } = new();
+
     public override int TotalCoin =>
         Coin + Properties.Sum(p => p.Coin) + Methods.Sum(m => m.TotalCoin)
              + Constructors.Sum(c => c.TotalCoin) + Fields.Sum(f => f.Coin);

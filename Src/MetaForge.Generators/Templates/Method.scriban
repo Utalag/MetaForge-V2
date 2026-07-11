@@ -13,4 +13,4 @@
     throw new NotImplementedException();
 {{- end }}
 }
-{{- end }}
+{{ end }}

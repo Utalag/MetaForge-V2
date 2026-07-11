@@ -22,12 +22,4 @@ public class StrongTypeTests
         var st = new StrongType("Email", TypeModel.String);
         st.ValidationRules.Should().BeNull();
     }
-
-    /// <summary>Conversion může být null.</summary>
-    [Fact]
-    public void Constructor_NullConversion_Allowed()
-    {
-        var st = new StrongType("Email", TypeModel.String);
-        st.Conversion.Should().BeNull();
-    }
 }

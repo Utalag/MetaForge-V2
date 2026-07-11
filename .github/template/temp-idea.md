@@ -2,7 +2,7 @@
 
 Stav: Idea
 Oblast: Core / BusinessModel / Workflow / AI / Docs / Product / Monetizace / Governance
-Zdroj: Koumák / User / Bug / Trh / Interní pozorování
+Zdroj: Koumák / Perplexity / Koumák + Perplexity / User / Bug / Trh / Interní pozorování
 Datum vytvoření: YYYY-MM-DD
 Poslední revize: YYYY-MM-DD
 

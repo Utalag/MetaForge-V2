@@ -3,6 +3,7 @@ using MetaForge.Core.DataTypes;
 using MetaForge.Core.Elements.Members;
 using MetaForge.Core.Elements.Statements;
 using MetaForge.Core.Elements.Types;
+using MetaForge.Core.ValueObjects;
 
 namespace MetaForge.Generators;
 
@@ -31,6 +32,7 @@ public class CodeGenerator : BaseCodeGenerator
 
         var code = element switch
         {
+            ValueObjectElement vo => GenerateValueObject(vo),
             ClassElement cls => GenerateClass(cls),
             InterfaceElement iface => GenerateInterface(iface),
             EnumElement enm => GenerateEnum(enm),
@@ -68,6 +70,14 @@ public class CodeGenerator : BaseCodeGenerator
             inheritance.Add(cls.BaseClassName);
         inheritance.AddRange(cls.ImplementedInterfaces);
 
+        // Translation source annotation
+        var translationSource = cls.Metadata.Get<string>("Generation.TranslationSource");
+
+        // Inline strong types (pre-rendered — Vogen value objects or plain structs)
+        var inlineStrongTypes = cls.InlineStrongTypes.Select(s => s is ValueObjectElement vo
+            ? GenerateValueObject(vo)
+            : GenerateStruct(s)).ToList();
+
         var model = new Dictionary<string, object?>
         {
             { "name", cls.Name },
@@ -78,6 +88,8 @@ public class CodeGenerator : BaseCodeGenerator
             { "is_partial", cls.IsPartial },
             { "is_record", cls.IsRecord },
             { "inheritance", inheritance.Count > 0 ? string.Join(", ", inheritance) : null },
+            { "translation_source", translationSource },
+            { "inline_strong_types", inlineStrongTypes },
             { "usings", cls.Usings },
             { "attributes", cls.Attributes.Select(RenderAttribute).ToList() },
             { "properties", cls.Properties.Select(RenderProperty).ToList() },
@@ -131,13 +143,64 @@ public class CodeGenerator : BaseCodeGenerator
             { "access_modifier", MapAccessModifier(str.AccessModifier) },
             { "is_readonly", str.IsReadOnly },
             { "is_record", str.IsRecord },
+            { "type_parameters", str.TypeParameters.Select(tp => tp).ToList() },
+            { "primary_constructor_params", str.PrimaryConstructorParameters?.Select(p => new Dictionary<string, object?>
+            {
+                { "name", p.Name },
+                { "type", MapType(p.Type) },
+            }).ToList() },
             { "usings", str.Usings },
             { "attributes", str.Attributes.Select(RenderAttribute).ToList() },
             { "properties", str.Properties.Select(RenderProperty).ToList() },
-            { "methods", str.Methods.Select(RenderMethod).ToList() }
+            { "methods", str.Methods.Select(RenderMethod).ToList() },
+            { "constructors", str.Constructors.Select(RenderConstructor).ToList() },
+            { "fields", str.Fields.Select(RenderField).ToList() }
         };
 
         return RenderTemplate("Struct", model);
+    }
+
+    private string GenerateValueObject(ValueObjectElement vo)
+    {
+        var model = new Dictionary<string, object?>
+        {
+            { "name", vo.Name },
+            { "access_modifier", MapAccessModifier(vo.AccessModifier) },
+            { "is_readonly", vo.IsReadOnly },
+            { "is_record", vo.IsRecord },
+            { "type_parameters", vo.TypeParameters.Select(tp => tp).ToList() },
+            { "primary_constructor_params", vo.PrimaryConstructorParameters?.Select(p => new Dictionary<string, object?>
+            {
+                { "name", p.Name },
+                { "type", MapType(p.Type) },
+            }).ToList() },
+            { "vogen_conversions", FormatVogenConversions(vo.Conversions) },
+            { "usings", vo.Usings },
+            { "attributes", vo.Attributes.Select(RenderAttribute).ToList() },
+            { "properties", vo.Properties.Select(RenderProperty).ToList() },
+            { "methods", vo.Methods.Select(RenderMethod).ToList() },
+            { "constructors", vo.Constructors.Select(RenderConstructor).ToList() },
+            { "fields", vo.Fields.Select(RenderField).ToList() }
+        };
+
+        return RenderTemplate("VogenValueObject", model);
+    }
+
+    /// <summary>Převede VogenConversions flags na C# výraz pro Scriban template.</summary>
+    private static string FormatVogenConversions(VogenConversions conversions)
+    {
+        if (conversions == VogenConversions.None)
+            return "None";
+
+        var flags = new List<string>();
+        foreach (VogenConversions flag in Enum.GetValues<VogenConversions>())
+        {
+            if (flag == VogenConversions.None) continue;
+            if (conversions.HasFlag(flag))
+                flags.Add($"global::Vogen.Conversions.{flag}");
+        }
+
+        return flags.Count > 0 ? string.Join(" | ", flags) : "None";
     }
 
     // === Renderování memberů do stringů pro šablony ===
@@ -168,6 +231,10 @@ public class CodeGenerator : BaseCodeGenerator
 
     private string RenderMethod(MethodElement method)
     {
+        // Expression-bodied methods — render inline: signature => expr;
+        if (method.ExpressionBody != null)
+            return RenderExpressionBodiedMethod(method);
+
         var parameters = method.Parameters.Select(p => new Dictionary<string, object?>
         {
             { "name", p.Name },
@@ -229,13 +296,27 @@ public class CodeGenerator : BaseCodeGenerator
     /// <summary>
     /// Vyrenderuje tělo metody — buď pomocí AST (BlockStatement) nebo vrátí prázdný string.
     /// Abstraktní metody (Body == null) vracejí ";" (bez těla).
+    /// Nevkládá { } — ty zajišťuje Method.scriban.
     /// </summary>
     private string RenderMethodBody(MethodElement method)
     {
-        if (method.IsAbstract || method.Body is null)
+        if (method.IsAbstract || (method.Body is null && method.ExpressionBody is null))
             return ";";
 
-        return _renderer.Render(method.Body);
+        // Render only inner statements, NOT the outer { }
+        return _renderer.RenderBodyOnly(method.Body!);
+    }
+
+    /// <summary>
+    /// Vyrenderuje expression-bodied metodu — signatura + => expr;
+    /// Např. public static int Add(int a, int b) => a + b;
+    /// Končí newline, aby se metody v {{- for loop }} nelepily k sobě.
+    /// </summary>
+    private string RenderExpressionBodiedMethod(MethodElement method)
+    {
+        var signature = RenderMethodSignature(method);
+        var expr = _renderer.RenderExpression(method.ExpressionBody!);
+        return $"{signature} => {expr};" + "\n";
     }
 
     /// <summary>
@@ -243,25 +324,23 @@ public class CodeGenerator : BaseCodeGenerator
     /// </summary>
     private string RenderConstructor(ConstructorElement ctor)
     {
-        var parameters = string.Join(", ", ctor.Parameters.Select(p =>
+        var parameters = ctor.Parameters.Select(p => new Dictionary<string, object?>
         {
-            var modifier = MapParameterModifier(p.Modifier);
-            var modifierStr = modifier.Length > 0 ? $"{modifier} " : "";
-            var type = MapType(p.Type);
-            var defaultValue = p.HasDefaultValue && p.DefaultValue is not null
-                ? $" = {p.DefaultValue}" : "";
-            return $"{modifierStr}{type} {p.Name}{defaultValue}";
-        }));
+            { "name", p.Name },
+            { "type", MapType(p.Type) },
+            { "modifier", MapParameterModifier(p.Modifier) },
+            { "default_value", p.HasDefaultValue && p.DefaultValue is not null ? p.DefaultValue : null }
+        }).ToList();
+
+        var body = ctor.Body != null ? _renderer.RenderBodyOnly(ctor.Body) : null;
 
         var model = new Dictionary<string, object?>
         {
-            { "name", ctor.Name },
+            { "class_name", ctor.Name },
             { "access_modifier", MapAccessModifier(ctor.AccessModifier) },
             { "is_static", ctor.IsStatic },
             { "parameters", parameters },
-            { "initializer", ctor.Initializer },
-            { "has_body", ctor.Body != null },
-            { "body", ctor.Body != null ? _renderer.Render(ctor.Body) : null }
+            { "body", body }
         };
 
         return RenderTemplate("Constructor", model);
@@ -405,9 +484,17 @@ public class CodeGenerator : BaseCodeGenerator
         var nullable = type.IsNullable ? "?" : "";
         var baseType = MapDataType(type.BaseType);
 
-        // Custom název
+        // Custom název (např. ValueTuple, Task, user-defined typy)
         if (!string.IsNullOrWhiteSpace(type.CustomTypeName))
-            return $"{type.CustomTypeName}{nullable}";
+        {
+            var typeName = type.CustomTypeName;
+            if (type.GenericArguments.Count > 0)
+            {
+                var genericArgs = string.Join(", ", type.GenericArguments.Select(MapType));
+                return $"{typeName}<{genericArgs}>{nullable}";
+            }
+            return $"{typeName}{nullable}";
+        }
 
         // Kolekce
         if (type.IsCollection)
@@ -457,8 +544,8 @@ public class CodeGenerator : BaseCodeGenerator
         DataType.EnumValue => "int",
         DataType.Array => "object[]/* TODO: Replace with actual array type */",
         DataType.Nullable => "object /* TODO: Replace with actual nullable type */",
-        DataType.Struct => "object /* TODO: Replace with actual struct type */",
-        DataType.Record => "object /* TODO: Replace with actual record type */",
+        DataType.Struct => "object /* Resolved via CustomTypeName in MapType */",
+        DataType.Record => "object /* Resolved via CustomTypeName in MapType */",
         _ => "object"
     };
 }

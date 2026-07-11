@@ -2,45 +2,26 @@
 
 > Návrhy, které jsou identifikované, ale zatím neschválené k implementaci.
 > Nikdy neimplementovat přímo z tohoto souboru — vždy přesunout do PROPOSALS.md.
-> plány jsou uloženy v Docs/Plans/PROP-XXX-*.md a jsou součástí návrhu.
+> Plány jsou uloženy v `Docs/Plans/PROP-XXX-*.md` a jsou součástí návrhu.
 
 ## Kandidátní návrhy
 
 | ID | Název | Vrstva | Priorita | Odhad | Poznámka |
 |----|-------|--------|----------|-------|----------|
-| **NOVÉ** | | | | | |
-| PROP-043 | Generator Completeness — Expression/Statement renderery, Constructor/Field integrace, Delegate generování | Generators | 🔴 Kritická | 2-3 dny | Perplexity Deep Research: 9/15 expressionů a 6/13 statementů chybí |
-| PROP-040 | Core Member Consistency — IMemberElement, PropertyElement Attributes, XmlSummary | Core | 🟡 Vysoká | 2-3 dny | Perplexity Deep Research: architektonické nekonzistence členů |
-| PROP-041 | ConstructorElement + FieldElement | Core | 🟡 Vysoká | 2-3 dny | Perplexity Deep Research: chybějící elementy pro DI/generování |
-| PROP-042 | Core Test Expansion — FsCheck, snapshoty, guard testy, Roslyn integrace | Tests | 🟡 Vysoká | 3-4 dny | Perplexity Deep Research: kompletní testovací matice |
-| **STÁVAJÍCÍ** | | | | | |
-| PROP-010 | Infrastructure — persistence CommandLogu | Infrastr. | 🟡 Vysoká | — | ⚠️ Sloučeno do PROP-028 |
-| PROP-011 | WebApi host surface | Host | 🟢 Nízká | — | ⚠️ Sloučeno do PROP-026 |
-| PROP-012 | Payload escaping — JSON místo pipe-delimited | BusinessModel | 🟡 Vysoká | — | ⚠️ Řešeno v rámci PROP-020 |
-| PROP-013 | Integrační testy celé pipeline | Tests | 🟢 Nízká | 2-3 dny | CLI → Facade → Patch → Log → Replay → Projection. ⚠️ Core+Generators část pokrývá PROP-032 |
-| PROP-014 | AI test project | AI | 🟢 Nízká | 2 dny | MetaForge.Ai.Tests s mockovaným HttpClient |
-| PROP-015 | ForgeBlock → CatalogManager propojení | Core | 🟡 Vysoká | — | ⚠️ Sloučeno do PROP-029 |
-| PROP-016 | Ollama konfigurace přes DI/IOptions | AI | 🟢 Nízká | — | ⚠️ Sloučeno do PROP-027 |
-| PROP-017 | Generators — ForgeBlock packaging a katalog | Generators | 🟢 Nízká | — | ⚠️ Sloučeno do PROP-029 |
-| PROP-019 | Translator — IAiTranslator a AI-assisted překlad | Translator | 🟡 Vysoká | 2,25 dne | AI enrichment atributů. ⚠️ Závisí na PROP-020 |
-| PROP-021 | Testování — Property-based (FsCheck) a Snapshot (Verify) | Tests | 🟢 Nízká | 1,75 dne | ⚠️ Závisí na PROP-020 |
-| PROP-022 | Observabilita — OpenTelemetry tracing a BusinessModel diff | Infrastr. | 🟢 Nízká | 2,5 dne | ⚠️ Závisí na PROP-020 |
-| PROP-023 | DX a architektonická vylepšení (na zvážení) | Průřezové | ⚪ Na zvážení | 5-9 dní | Typový SyncState, Layer stack, YAML DSL, Undo/redo |
-| PROP-024 | Core — StrongType, Expression, Record elementy | Core | 🟡 Vysoká | 6 dní | ValueObject, Expression hierarchy, Record support, Source Gen |
-| PROP-025 | Generators — Incremental, partial class, scaffolding + Monetization | Generators | 🔴 Kritická | 8 dní | Tier model, sandbox, project scaffolding, license middleware |
-| PROP-026 | Host Surfaces — CLI/MCP/WebApi/REPL upgrade | Host | 🟡 Vysoká | 7,5 dne | System.CommandLine, Spectre.Console, Minimal API, REPL |
-| PROP-027 | AI Layer — MetaForge.Ai projekt, Ollama, PromptRegistry | AI | 🟡 Vysoká | 6 dní | OllamaAdapter, PromptRegistry, PromptEvaluator |
-| PROP-028 | Infrastructure — Persistence, konfigurace, caching | Infrastr. | 🟡 Vysoká | 5,25 dne | JSONL persistence, IOptions<T>, checkpoint cache |
-| PROP-029 | ForgeBlocks — Rozšíření a marketplace | ForgeBlocks | 🟡 Vysoká | 8 dní | EF Core, AutoMapper, FluentValidation, NuGet distribuce |
-| PROP-030 | Bezpečnost a stabilita — Schema migration, validace, health | Průřezové | 🟡 Vysoká | 4 dny | CommandMigration, ValidationPipeline, HealthChecks |
-| PROP-031 | Core — Statement System a upgrade Expression pro těla metod | Core | ✅ Hotovo | 5,25 dne | Statement hierarchie (Switch, ForEach, TryCatch+CatchClause, Using, UsingDeclaration, LocalFunction) — 6 nových statement typů. StatementKind rozšířen. 6 testů (283 celkem). Dokončeno 2026-07-08. |
-| PROP-032 | Integrační testy — Core + Generators (Snapshot-based) | Tests | 🟡 Vysoká | 7 dní | SnapshotComparer, matice testů, reálné příklady metod, AST statementy |
-| PROP-034 | Core Reference Documentation + Support Matrix | Core, Docs | 🟡 Vysoká | 4 dny | Docs/Core/ sada referenčních dokumentů, support matice jako backlog, roundtrip boundary. Vychází z IDEA-001/002/003. |
-| PROP-035 | C#-First Core Migration + Expression/Statement Completeness | Core, Translator, Tests | ✅ Hotovo | 4,5-8 dní | 7 commitů provedeno: RootElement (Namespace, XmlSummary), Class/Interface/Struct (TypeParameters, TypeConstraints, PrimaryConstructor, GenericConstraint), MethodElement (ExpressionBody, IsExtension, TypeParameters), 8 nových expression typů (Lambda, New, Default, Conversion, Await, Switch, IsPattern, NullCoalescing + NamedArgument), LanguageCapabilityProfile (zjednodušeno na C#-first licensing gate). Dokončeno 2026-07-08. |
-| PROP-036 | Core Specification Layer | Core, Tests, AI | 🟡 Vysoká | 5-8 dní | InvariantDefinition, boolean AST, IInvariantEvaluator, test generation. Vychází z Perplexity konverzace 05663298. |
-| PROP-037 | C# Completeness — Chybějící konstrukty + Projektová metadata + Roslyn Importer | Core, Infra | 🟢 Střední | 6-9 dní | DelegateElement, EventElement, OperatorElement; rozšířený ProjectElement; MetaForge.Core.Framework; MetaForge.Importer (Roslyn). Pokrývá GitHub task kroky 4-6. |
-| PROP-038 | Core DX, Diagnostics & Pipeline — Fluent Builder, MetadataBag, DiagnosticBag, TransformPipeline | Core | ✅ Hotovo | 1,5-2 dny | 3 fáze: (1) Fluent Builder API (8 builderů), MetadataBag+MetadataScope+MergeStrategy, integrace do RootElement+PropertyElement+MethodElement; (2) DiagnosticBag, DiagnosticSeverity, ElementPath, BuildResult\<T\> s monadickým .Then(), 3 reportéry (Console/JSON/InMemory); (3) TransformPipeline, IModelTransform, TransformContext, AttributeReflectionTransform. 15 nových testů (277 celkem). Dokončeno 2026-07-08. |
-| PROP-039 | Core Composability — Mixin/Trait, ConventionRegistry, Incremental dirty-tracking | Core | 🟢 Střední | 1,5-2 dny | Mixin/Trait systém (build-time expanze, ConflictStrategy); ConventionRegistry (PascalCase, I-prefix, AsyncSuffix); Incremental dirty-tracking (StructuralHash + PipelineVersion). TransformPipeline přesunut do PROP-038. |
+| **PROP-047** | Translator — Strong Type Mapping (čte `CoreDetail.IsStrongType`, vytváří `ValueObjectElement` + `PropertyElement`, translation source anotace, fallback na primitiva) | Translator | 🔴 Vysoká | 1-2 dny | Navazuje na hotovou infrastrukturu Core+Generator+Vogen architekturu. Pipeline: AI→BusinessModel→Translator→Core→Generator. |
+| **PROP-045** | Generator E2E Completeness — 7 nových scénářů (Scénáře 7-12) pokrývajících async/await, foreach/while, try-catch, event/operator/delegate, lambda, struct | Generators, Tests | 🟡 Vysoká | 2-3 dny | Follow-up k PROP-043. 5/12 scénářů hotovo. |
+| **PROP-044** | Translator & BusinessModel — Workflow opravy, SyncState konsolidace, Facade thread safety | Translator, BusinessModel | 🟡 Vysoká | 2-3 dny | Fixes known from PROP-020 implementation. |
+| **PROP-018** | Translator — ExpertProjection a ProjectionOptions | Translator | 🟡 Střední | 2-3 dny | Potřebuje PROP-044 jako základ. |
+| **PROP-046** | AI Model Benchmarking — Referenční vs lokální modely, strukturální komparátor, prompt varianty, matice pass/fail | AI, Tests | 🟡 Střední | 4 dny | Cíl: najít nejslabší lokální model srovnatelný s GPT-4o/Claude. |
+| **PROP-017** | Generators — ForgeBlock Packaging (BlueprintBuilder, catalog entries) | Generators, ForgeBlocks | 🟢 Nízká | — | Až budou existovat první ForgeBlock balíky. |
+| **PROP-023** | DX a architektonická vylepšení (na zvážení) — Typový SyncState, Layer stack, YAML DSL, Undo/redo | Průřezové | ⚪ Na zvážení | 5-9 dní | Neimplementovat bez schválení. |
+
+## Odložené návrhy
+
+| ID | Název | Důvod odložení | Datum |
+|----|-------|-----------------|-------|
+| PROP-018 | Translator — ExpertProjection a ProjectionOptions | nejsem si jist správnou funkcionalitou pro host surfaces | 4.7.2026 |
+| PROP-020-F5 | BusinessModel — Fáze 5: BusinessBehaviorInputNode, PendingQuestion rozšíření | nízká priorita, neblokuje core flow; PROP-020 Fáze 1–4 dokončeny | 4.7.2026 |
 
 ## Odložené návrhy
 

@@ -68,7 +68,7 @@ public sealed class EfCoreForgeBlock : IForgeBlockCapabilityPackage
 }
 ```
 
-Všechny implementované ForgeBlocky jsou **metadata-only** — definují capability a catalog entries, ale negenerují zatím reálný kód (codegen je plánován v PROP-025).
+Všechny implementované ForgeBlocky jsou **metadata-only** — definují capability a catalog entries. (codegen je v PROP-025).
 
 ---
 
@@ -171,7 +171,7 @@ catalog:
 
 | Knihovna | ForgeBlock vhodnost | Zdůvodnění |
 |----------|-------------------|------------|
-| **Vogen** | ⭐⭐⭐⭐⭐ | ValueObject source-generator. Přirozený partner pro `CustomTypeDefinition` → generovat StrongType třídy. |
+| **Vogen** | ⭐⭐⭐⭐⭐ | ValueObject source-generator s integrací do EF Core, Dapper, JSON, BSON, Orleans, MessagePack ad. MetaForge generuje Vogen-annotated kód z `CustomTypeDefinition` — StrongType je metareprezentace, `ValueObjectElement` nese Vogen-specific properties. Vogen source-generuje konvertory při kompilaci target projektu. Konverzní flags se volí až při výběru infrastruktury (default: `None`). |
 | **Ardalis.SmartEnum** | ⭐⭐⭐⭐⭐ | Typované enumy. ForgeBlock generuje SmartEnum třídy z business enumů (s výčtem hodnot, popisem, implicitní konverzí). |
 | **OneOf** | ⭐⭐⭐⭐ | Discriminované unie. Užitečné pro výsledkové typy (Success/Error/ValidationResult). |
 | **LanguageExt** | ⭐⭐⭐⭐ | Funkcionální knihovna (Option, Either, Chain, Reader). ForgeBlock generuje funkční wrapper patterny. |
@@ -181,11 +181,28 @@ catalog:
 ```yaml
 capability: value-object-vogen
 family: domain-types
-handles: [value-object, vogen, strong-type, custom-type, primitive-obsession]
+handles: [value-object, vogen, strong-type, custom-type, primitive-obsession,
+          ef-core-converter, dapper-handler, json-converter, bson-serializer]
+parameters:
+  - name: conversions
+    type: string[]
+    description: Target integrace pro Vogen Conversions flags. Default: None (┼ż├ídn├ę konvertory). Konverze se vol├ş a┼ż p┼Öi v├Żb─Ťru infrastruktury.
+    options: [ef-core, dapper, system-text-json, newtonsoft-json, bson,
+              messagepack, orleans, xml, linq2db, servicestack, type-converter]
+    default: []
 generator:
-  csharp: Vogen ValueObject třídy
+  csharp: >
+    Vogen [ValueObject] readonly partial struct/class.
+    MetaForge generuje atribut s Conversions flags,
+    Vogen source-generuje konvertory p┼Öi kompilaci.
   typescript: branded types
   python: dataclass + validace
+catalog:
+  presets:
+    - vogen-no-conversions: []
+    - vogen-ef-core: [ef-core, system-text-json]
+    - vogen-fullstack: [ef-core, dapper, system-text-json, bson, messagepack]
+    - vogen-api-only: [system-text-json, type-converter]
 ```
 
 ```yaml
@@ -548,20 +565,20 @@ catalog:
 
 | Priorita | ForgeBlock | Strategický důvod |
 |----------|-----------|-------------------|
-| **1** | **Vogen** | Přímý vztah k `CustomTypeDefinition` → ValueObject generování je ukázkový codegen scénář |
-| **2** | **Ardalis.SmartEnum** | Typované enumy jsou všudypřítomné, lehká integrace |
-| **3** | **FluentValidation** | Validace je univerzální průřezová potřeba, přímo navazuje na atributy/constraints |
-| **4** | **Entity Framework Core** | ORM je nejčastější požadavek, demonstruje hodnotu platformy |
-| **5** | **MediatR** | CQRS pattern přirozeně odpovídá business behaviors (command/query) |
+| **1** | **Vogen** | P┼Ö├şm├Ż vztah k `CustomTypeDefinition` — MetaForge generuje `[ValueObject]` k├│d z `ValueObjectElement`, Vogen source-generuje konvertory (EF Core, Dapper, JSON, BSON, ...) p┼Öi kompilaci. Konverze se vol├ş a┼ż p┼Öi v├Żb─Ťru infrastruktury. |
+| **2** | **Ardalis.SmartEnum** | Typovan├ę enumy jsou v┼íudyp┼Ö├ştomn├ę, lehk├í integrace |
+| **3** | **FluentValidation** | Validace je univerz├íln├ş pr┼»┼Öezov├í pot┼Öeba, p┼Ö├şmo navazuje na atributy/constraints |
+| **4** | **Entity Framework Core** | ORM je nej─Źast─Ťj┼í├ş po┼żadavek, demonstruje hodnotu platformy |
+| **5** | **MediatR** | CQRS pattern p┼Öirozen─Ť odpov├şd├í business behaviors (command/query) |
 | **6** | **Mapperly** | Source-generator → MetaForge generuje mapper jako codegen, ne runtime |
-| **7** | **Bogus** | Test data generovaná z business modelu — vysoká viditelnost hodnoty |
-| **8** | **Refit** | REST client generovaný z API entit — silný codegen use-case |
-| **9** | **Serilog** | Logování je průřezové, jednoduchá integrace |
+| **7** | **Bogus** | Test data generovan├í z business modelu — vysok├í viditelnost hodnoty |
+| **8** | **Refit** | REST client generovan├Ż z API entit — siln├Ż codegen use-case |
+| **9** | **Serilog** | Logov├ín├ş je pr┼»┼Öezov├ę, jednoduch├í integrace |
 | **10** | **Hangfire** | Background jobs z business behaviors |
 | **11** | **MassTransit** | Messaging pro event-driven architekturu |
-| **12** | **QuestPDF** | Report generování — častý požadavek |
+| **12** | **QuestPDF** | Report generov├ín├ş — ─Źast├Ż po┼żadavek |
 | **13** | **FusionCache** | Caching vrstva |
-| **14** | **OpenTelemetry** | Observabilita — rostoucí standard |
+| **14** | **OpenTelemetry** | Observabilita — rostouc├ş standard |
 | **15** | **Stateless** | State machine pro business workflow |
 
 ---

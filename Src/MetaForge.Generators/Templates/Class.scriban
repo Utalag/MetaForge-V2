@@ -1,6 +1,18 @@
 {{~ ## C# Class Scriban Template ~}}
-{{~ ## Generuje kompletní C# třídu s usingy, atributy, properties a metodami ~}}
+{{~ ## Generuje kompletní C# třídu s usingy, atributy, fieldy, properties, konstruktory a metodami ~}}
+{{~ ## inline_strong_types se renderuje před deklarací třídy (value objects) ~}}
 
+{{~ ## Translation source annotation ~}}
+{{- if translation_source == "AI" }}
+// Translation source: AI
+{{- else if translation_source == "Deterministic" }}
+// Translation source: Deterministic — AI was unavailable
+{{- end }}
+{{~ ## Inline strong types (value objects) ~}}
+{{- for st in inline_strong_types }}
+{{ st }}
+
+{{- end }}
 {{~ ## Usingy ~}}
 {{- for using in usings -}}
 using {{ using }};
@@ -15,15 +27,30 @@ using {{ using }};
 {{~ ## Deklarace třídy ~}}
 {{ access_modifier }}{{ if is_static }} static{{ end }}{{ if is_abstract }} abstract{{ end }}{{ if is_sealed }} sealed{{ end }}{{ if is_partial }} partial{{ end }}{{ if is_record }} record{{ end }} class {{ name }}{{ if inheritance }} : {{ inheritance }}{{ end }}
 {
+{{~ ## Fieldy ~}}
+{{- for field in fields }}
+    {{ field }}
+{{- end }}
+{{- if fields.size > 0 && properties.size > 0 }}
+
+{{- end }}
 {{~ ## Properties ~}}
-{{- for property in properties -}}
+{{- for property in properties }}
     {{ property }}
 {{- end }}
-{{- if properties.size > 0 && methods.size > 0 }}
+{{- if properties.size > 0 && constructors.size > 0 }}
+
+{{- end }}
+{{~ ## Konstruktory ~}}
+{{- for constructor in constructors }}
+    {{ constructor }}
+{{- end }}
+{{- if constructors.size > 0 && methods.size > 0 }}
 
 {{- end }}
 {{~ ## Metody ~}}
-{{- for method in methods -}}
+{{- for method in methods }}
     {{ method }}
 {{- end }}
 }
+

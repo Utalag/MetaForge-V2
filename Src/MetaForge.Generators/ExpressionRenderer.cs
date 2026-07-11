@@ -25,6 +25,20 @@ public sealed class ExpressionRenderer
     }
 
     /// <summary>
+    /// Vyrenderuje OBSAH bloku — samotné statementy bez { }.
+    /// Scriban šablony (Method.scriban, Constructor.scriban) už { } a odsazení poskytují.
+    /// </summary>
+    public string RenderBodyOnly(BlockStatement block)
+    {
+        var sb = new StringBuilder();
+        foreach (var stmt in block.Statements)
+        {
+            sb.AppendLine(RenderStatement(stmt));
+        }
+        return sb.ToString().TrimEnd();
+    }
+
+    /// <summary>
     /// Vyrenderuje tělo metody s počátečním odsazením.
     /// </summary>
     public string Render(BlockStatement block, int indent)
