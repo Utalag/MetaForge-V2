@@ -7,7 +7,6 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public sealed class LambdaExpression : Expression
 {
-    public override string Kind => "Lambda";
     public override ExpressionKind ExpressionKind => ExpressionKind.Lambda;
 
     /// <summary>Názvy parametrů lambda výrazu. Např. ["x"] nebo ["a", "b"].</summary>

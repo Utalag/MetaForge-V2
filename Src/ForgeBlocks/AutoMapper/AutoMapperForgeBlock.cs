@@ -6,8 +6,9 @@ namespace MetaForge.ForgeBlocks.AutoMapper;
 /// <summary>
 /// ForgeBlock pro AutoMapper — generuje Profile třídy a mapping konfiguraci.
 /// TIER 1+ (Domain).
+/// Poskytuje Scriban šablonu: AutoMapperProfile.
 /// </summary>
-public sealed class AutoMapperForgeBlock : IForgeBlockCapabilityPackage
+public sealed class AutoMapperForgeBlock : IForgeBlockCapabilityPackage, IForgeBlockTemplateProvider
 {
     public string Handle => "mapping-automapper";
     public string Version => "1.0.0";
@@ -45,5 +46,39 @@ public sealed class AutoMapperForgeBlock : IForgeBlockCapabilityPackage
     public void Register(ForgeBlockRegistry registry)
     {
         // Balík je již zaregistrován v registru (voláno z ForgeBlockRegistry.Register).
+        // Šablony jsou automaticky zaregistrovány přes IForgeBlockTemplateProvider.
+    }
+
+    /// <inheritdoc />
+    public IReadOnlyList<ForgeBlockTemplate> GetTemplates()
+    {
+        return new List<ForgeBlockTemplate>
+        {
+            new("AutoMapperProfile", "AutoMapper", Templates.AutoMapperProfile),
+        };
+    }
+
+    private static class Templates
+    {
+        public const string AutoMapperProfile = """
+using AutoMapper;
+
+namespace {{ namespace }}.Mappings;
+
+public class {{ class_name }} : Profile
+{
+    public {{ class_name }}()
+    {
+{{~ for mapping in mappings }}
+        CreateMap<{{ mapping.source }}, {{ mapping.destination }}>()
+{{~ if mapping.reverse_map }}
+            .ReverseMap();
+{{~ else }}
+            ;
+{{~ end }}
+{{~ end }}
+    }
+}
+""";
     }
 }

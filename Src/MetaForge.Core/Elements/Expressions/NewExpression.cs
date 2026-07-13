@@ -8,7 +8,6 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public sealed class NewExpression : Expression
 {
-    public override string Kind => "New";
     public override ExpressionKind ExpressionKind => ExpressionKind.New;
 
     /// <summary>Název typu (např. "Customer", "Point").</summary>

@@ -148,6 +148,10 @@ public sealed class BusinessAuthoringHostFacade
     public ProjectionView GetProjection() =>
         _projectionService.GetProjection(_document);
 
+    /// <summary>Vrátí expertní projekci s diagnostikou a relacemi (PROP-018).</summary>
+    public ExpertProjectionView GetExpertProjection(ProjectionOptions? options = null) =>
+        _projectionService.GetExpertProjection(_document, options);
+
     /// <summary>Vrátí samotný dokument (pro debugging).</summary>
     public BusinessAuthoringDocument GetDocument() { lock (_documentLock) { return _document; } }
 

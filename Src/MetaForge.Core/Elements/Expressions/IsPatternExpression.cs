@@ -7,7 +7,6 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public sealed class IsPatternExpression : Expression
 {
-    public override string Kind => "IsPattern";
     public override ExpressionKind ExpressionKind => ExpressionKind.IsPattern;
 
     /// <summary>Výraz, který se testuje.</summary>

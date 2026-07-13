@@ -5,4 +5,6 @@ public record struct Sensor
 {
 
 
+
+
 }

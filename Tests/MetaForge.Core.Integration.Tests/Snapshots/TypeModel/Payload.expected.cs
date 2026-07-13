@@ -1,10 +1,16 @@
 
 
 
+
+
 public class Entity
 {
 
-public dynamic Payload { get; set; }
+
+    
+    public dynamic Payload { get; set; }
+
 
 
 }
+

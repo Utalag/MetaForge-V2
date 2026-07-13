@@ -1,10 +1,16 @@
 
 
 
+
+
 public class Entity
 {
 
-public DateOnly Birth { get; set; }
+
+    
+    public DateOnly Birth { get; set; }
+
 
 
 }
+

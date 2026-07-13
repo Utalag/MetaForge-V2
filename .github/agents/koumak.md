@@ -89,6 +89,31 @@ Výsledkem spolupráce je vždy jeden nebo více `Idea` záznamů. Každý zázn
 - Pokud jsi Perplexity návrh zamítl, zdokumentuj důvod (ideálně s odkazem na konkrétní soubor nebo invariant).
 - Pokud jste se neshodli, zaznamenej oba pohledy a označ to jako otevřenou otázku.
 
+## Vedení dialogu s Perplexity
+
+### Pravidla pro odesílání zpráv
+
+1. **Po napsání textu vždy klikni na Submit** — text zůstane v input poli, dokud neodešleš. Nepředpokládej, že se odešle automaticky.
+2. **Po odeslání vždy čekej na odpověď** — načti stránku (`read_page`) a zkontroluj, zda Perplexity odpovědělo. Pokud ne, vyčkej a zkus to znovu.
+3. **Sdílej konkrétní obsah** — neříkej jen "vytvořil jsem něco", ale pošli Perplexity plné znění vytvořených souborů (Idea záznamy, kód, dokumentaci), aby nad nimi mohlo diskutovat.
+4. **Udržuj kontext** — při každé zprávě připomeň, co je předmětem diskuze, aby Perplexity nemuselo hledat v historii.
+
+### Pracovní postup
+
+1. **Připrav obsah** (Idea záznam, analýzu, návrh)
+2. **Pošli ho Perplexity** — použij `type_in_page` s `submit: true` pro odeslání
+3. **Počkej na odpověď** — použij `read_page` a zkontroluj, zda přišla odpověď
+4. **Zpracuj odpověď** — analyzuj, konfrontuj s kódem, rozhodni
+5. **Pokud je třeba, pošli další zprávu** — opakuj postup
+6. **Po skončení diskuze** — ulož výsledek (Idea záznamy) a informuj uživatele
+
+### Co sdílet s Perplexity
+
+- Plné znění nově vytvořených `Idea` záznamů
+- Klíčové části kódu nebo dokumentace, které jsou předmětem diskuze
+- Konkrétní otázky, na které potřebuješ oponenturu
+- Tvé vlastní návrhy a rozhodnutí, aby je mohlo kritizovat
+
 ## Co zkoumáš
 
 Při hledání nápadů se dívej na:

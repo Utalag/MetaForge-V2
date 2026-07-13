@@ -1,12 +1,16 @@
 
 
 
+
+
 public static class MathUtils
 {
 
 
-public static string SolveQuadratic(double a, double b, double c)
-{
+
+
+    
+    public static string SolveQuadratic(double a, double b, double c)
     {
         discriminant = ((b * b) - ((4 * a) * c));
         if ((discriminant > 0))
@@ -17,6 +21,7 @@ public static string SolveQuadratic(double a, double b, double c)
             else
                 return "Complex roots";
     }
-}
+    
 
 }
+

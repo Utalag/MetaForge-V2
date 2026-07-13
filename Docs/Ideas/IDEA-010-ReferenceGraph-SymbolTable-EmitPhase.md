@@ -1,33 +1,30 @@
-# IDEA-010 ReferenceGraph + SymbolTable + EmitPhase
+# IDEA-010 SymbolTable + EmitPhase
 
-Stav: Idea
+Stav: Idea (ReferenceGraph vyčleněn jako PROP-055)
 Oblast: Core, Generators
 Zdroj: Koumák — Perplexity konverzace e0609fe1 (návrhy 1,2,4)
 Datum vytvoření: 2026-07-07
-Poslední revize: 2026-07-07
+Poslední revize: 2026-07-13
 
 ## 1. Kontext
 
-Perplexity navrhlo 3 koncepty pro sémantickou vrstvu a generátorovou pipeline:
-- **ReferenceGraph** — orientovaný graf závislostí mezi ClassElement, InterfaceElement a TypeModel pro detekci cirkulárních referencí.
-- **SymbolTable/ScopeChain** — sdílený registry pojmenovaných symbolů pro validaci Expression a Statement (inspirace Roslyn SemanticModel).
-- **EmitPhase** — fázovaný output model (Syntax → Text → File) s hooky před/po každé fázi.
+Původní Perplexity návrh obsahoval 3 koncepty:
+- ~~**ReferenceGraph**~~ → ✅ **PROP-055** (2026-07-13)
+- **SymbolTable/ScopeChain** — sdílený registr pojmenovaných symbolů pro validaci Expression a Statement (inspirace Roslyn SemanticModel)
+- **EmitPhase** — fázovaný output model (Syntax → Text → File) s hooky před/po každé fázi
 
 ## 2. Problém dnes
 
-- Cirkulární reference se detekují až při generování, ne v modelu.
 - Expression a Statement nemají kontext pro validaci — např. `a * a` funguje, i když `a` není deklarované.
 - Generátor nemá fáze — vše se renderuje najednou.
 
 ## 3. Předběžný směr řešení
 
-- ReferenceGraph jako `Dictionary<TypeModel, HashSet<TypeModel>>`.
 - SymbolTable jako `Dictionary<string, SymbolInfo>` per-scope.
 - EmitPhase pipeline: `SyntaxPhase → TextPhase → FilePhase` s `IEmitHook`.
 
 ## 4. Signál hodnoty
 
-- Včasná detekce cirkulárních referencí.
 - Validace výrazů v kontextu.
 - Rozšiřitelná generátorová pipeline.
 
@@ -38,5 +35,5 @@ Perplexity navrhlo 3 koncepty pro sémantickou vrstvu a generátorovou pipeline:
 
 ## 6. Doporučený další krok
 
-- Zatím jen zapisovat, neaktivovat.
+- Oba koncepty zůstávají jako Idea — neaktivovat.
 - Po dokončení PROP-037 (Roslyn importer) znovu zvážit — SymbolTable se váže na importer.

@@ -22,8 +22,33 @@
 | `MetaForge.Core.Tests` | Typový model, katalog, ForgeBlock registrace, discovery, validace (CoreValidator) | Unit |
 | `MetaForge.BusinessModel.Tests` | Dokument, CommandLog, replay, patches, validation | Unit |
 | `MetaForge.Translator.Tests` | Facade, projekce, překlad, write-back, enrichment | Unit + Integration |
-| `MetaForge.Generators.Tests` | C# output, template rendering, kompilabilnost | Unit + Snapshot |
-| **`MetaForge.Core.Integration.Tests`** | **Core → Generators pipeline (snapshot-based), AppRoot traversal, AST rendering** | **Integration + Snapshot** |
+| `MetaForge.Generators.Tests` | C# output, template rendering, kompilabilnost, ExpressionRenderer (58 testů) + TemplateManager (6 testů) | Unit + Snapshot |
+| **`MetaForge.Core.Integration.Tests`** | **Core → Generators pipeline (snapshot-based), AppRoot traversal, AST rendering, UPDATE_SNAPSHOTS env var** | **Integration + Snapshot** |
+
+---
+
+## Snapshot testování
+
+Snapshot testy používají `SnapshotComparer` (v `Integration.Tests/Snapshots/`):
+- Porovnává generovaný C# kód s `.expected.cs` soubory.
+- Při prvním spuštění vytvoří expected soubor a failne (first-run).
+- `$env:UPDATE_SNAPSHOTS="true"` — tichý přepis expected souborů při refactoringu.
+- Expected files jsou uloženy v `Snapshots/{Category}/{TestName}.expected.cs` a zkopírovány do bin při build.
+
+Aktuální snapshot kategorie:
+- **Class** (8 modifikátorů: C1-C8)
+- **Struct** (4 varianty: S1-S4)
+- **Enum** (4 varianty: E1-E4)
+- **Property** (6 variant: P1-P5, P8; P6,P7 chybí)
+- **Method** (5 E2E scénářů)
+- **TypeModel** (18 variant)
+- **Delegate** (4 varianty: D1-D4 — PROP-052)
+
+## Support Matrix
+
+Strojově čitelný YAML contract map v `Docs/Core/00-Support-Matrix.yaml` (73 položek).
+Rozlišuje contract statusy: `public-supported`, `advanced`, `internal`, `experimental`.
+Slouží jako rozhodovací vstup pro AI agenty. PROP-051.
 
 ---
 

@@ -9,6 +9,13 @@ namespace MetaForge.Core.Integration.Tests;
 public static class SnapshotComparer
 {
     /// <summary>
+    /// When set to "true", overwrites expected snapshot files with actual output
+    /// instead of failing on mismatch. Usage: $env:UPDATE_SNAPSHOTS="true"; dotnet test
+    /// </summary>
+    private static readonly bool UpdateSnapshots =
+        string.Equals(Environment.GetEnvironmentVariable("UPDATE_SNAPSHOTS"), "true", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
     /// Cesta ke Snapshots/ složce v projektu.
     /// </summary>
     private static string GetSnapshotsDir()
@@ -30,7 +37,7 @@ public static class SnapshotComparer
     /// <summary>
     /// Ověří, že generatedCode odpovídá Snapshots/{category}/{testName}.expected.cs.
     /// Pokud soubor neexistuje → vytvoří ho (first-run).
-    /// Pokud se liší → fail s diff zprávou.
+    /// Pokud se liší → fail s diff zprávou (unless UPDATE_SNAPSHOTS=true → overwrite).
     /// </summary>
     public static void Verify(string category, string testName, string generatedCode)
     {
@@ -46,6 +53,13 @@ public static class SnapshotComparer
         }
 
         var expected = File.ReadAllText(filePath);
+
+        if (UpdateSnapshots && expected != generatedCode)
+        {
+            File.WriteAllText(filePath, generatedCode);
+            return; // silent update
+        }
+
         generatedCode.Should().Be(expected, $"snapshot mismatch pro {category}/{testName}");
     }
 

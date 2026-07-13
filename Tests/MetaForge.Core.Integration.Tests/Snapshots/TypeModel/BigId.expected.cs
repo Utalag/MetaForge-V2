@@ -1,10 +1,16 @@
 
 
 
+
+
 public class Entity
 {
 
-public long BigId { get; set; }
+
+    
+    public long BigId { get; set; }
+
 
 
 }
+

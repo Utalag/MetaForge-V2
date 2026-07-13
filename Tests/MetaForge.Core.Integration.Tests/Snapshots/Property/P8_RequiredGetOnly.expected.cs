@@ -1,10 +1,16 @@
 
 
 
+
+
 public class Customer
 {
 
-public required Guid Id { get; }
+
+    
+    public required Guid Id { get; }
+
 
 
 }
+

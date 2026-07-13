@@ -8,7 +8,6 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public sealed class UnaryExpression : Expression
 {
-    public override string Kind => "Unary";
     public override ExpressionKind ExpressionKind => ExpressionKind.Unary;
 
     /// <summary>Unární operátor.</summary>

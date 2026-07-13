@@ -1,0 +1,1 @@
+public delegate bool Filter(int id, string name);

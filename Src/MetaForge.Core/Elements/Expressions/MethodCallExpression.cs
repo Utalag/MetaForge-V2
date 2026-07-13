@@ -8,7 +8,6 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public sealed class MethodCallExpression : Expression
 {
-    public override string Kind => "MethodCall";
     public override ExpressionKind ExpressionKind => ExpressionKind.MethodCall;
 
     /// <summary>Název metody (např. "string.IsNullOrEmpty").</summary>

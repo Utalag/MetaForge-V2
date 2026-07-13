@@ -8,7 +8,6 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public sealed class MemberAccessExpression : Expression
 {
-    public override string Kind => "MemberAccess";
     public override ExpressionKind ExpressionKind => ExpressionKind.MemberAccess;
 
     /// <summary>Cesta ke členu oddělená tečkami (např. "Customer.Address.City").</summary>

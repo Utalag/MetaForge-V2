@@ -1,0 +1,401 @@
+# Support Matrix — MetaForge Core + Generators
+# Contract statusy:
+#   public-supported: garantovaná stabilita, testy povinné
+#   advanced: stabilní, ale vyžaduje zkušeného uživatele
+#   internal: generátor umí, ale není oficiálně vystaveno
+#   experimental: může se změnit nebo zmizet
+#
+# Test coverage:
+#   snapshot: kategorie testu (true/false/path)
+#   syntax: true/false — Roslyn syntax validation
+#   unit: true/false — unit test rendereru
+
+version: "1.0"
+updated: 2026-07-11
+
+type_kinds:
+  - name: Class
+    status: public-supported
+    core: ClassElement
+    generator: true
+    tests:
+      snapshot: Class
+      syntax: true
+      unit: true
+  - name: Sealed Class
+    status: public-supported
+    core: ClassElement.IsSealed
+    generator: true
+    tests:
+      snapshot: C3_SealedClass
+      syntax: true
+  - name: Abstract Class
+    status: public-supported
+    core: ClassElement.IsAbstract
+    generator: true
+    tests:
+      snapshot: C2_AbstractClass
+      syntax: true
+  - name: Static Class
+    status: public-supported
+    core: ClassElement.IsStatic
+    generator: true
+    tests:
+      snapshot: C4_StaticClass
+      syntax: true
+  - name: Partial Class
+    status: advanced
+    core: ClassElement.IsPartial
+    generator: true
+    tests:
+      snapshot: C5_PartialClass
+      syntax: true
+  - name: Record Class
+    status: public-supported
+    core: ClassElement.IsRecord
+    generator: true
+    tests:
+      snapshot: C6_RecordClass
+      syntax: true
+  - name: Interface
+    status: public-supported
+    core: InterfaceElement
+    generator: true
+    tests:
+      snapshot: false
+      syntax: true
+  - name: Struct
+    status: public-supported
+    core: StructElement
+    generator: true
+    tests:
+      snapshot: Struct
+      syntax: true
+  - name: ReadOnly Struct
+    status: public-supported
+    core: StructElement.IsReadOnly
+    generator: true
+    tests:
+      snapshot: S2_ReadOnlyStruct
+      syntax: true
+  - name: Record Struct
+    status: advanced
+    core: StructElement.IsRecord
+    generator: true
+    tests:
+      snapshot: S3_RecordStruct
+      syntax: true
+  - name: Enum
+    status: public-supported
+    core: EnumElement
+    generator: true
+    tests:
+      snapshot: Enum
+      syntax: true
+  - name: Flags Enum
+    status: public-supported
+    core: EnumElement.IsFlags
+    generator: true
+    tests:
+      snapshot: E4_FlagsEnum
+      syntax: true
+  - name: Delegate
+    status: public-supported
+    core: DelegateElement
+    generator: true
+    tests:
+      snapshot: Delegate
+      syntax: true
+  - name: Event
+    status: public-supported
+    core: EventElement
+    generator: true
+    tests:
+      snapshot: false
+      syntax: true
+  - name: Operator
+    status: public-supported
+    core: OperatorElement
+    generator: true
+    tests:
+      snapshot: false
+      syntax: true
+
+members:
+  - name: Method
+    status: public-supported
+    core: MethodElement
+    generator: true
+    tests:
+      snapshot: Method
+      syntax: true
+      unit: true
+  - name: Property (get/set)
+    status: public-supported
+    core: PropertyElement
+    generator: true
+    tests:
+      snapshot: P1_GetSet
+      syntax: true
+  - name: Property (get-only)
+    status: public-supported
+    core: PropertyElement
+    generator: true
+    tests:
+      snapshot: P2_GetOnly
+      syntax: true
+  - name: Property (init-only)
+    status: public-supported
+    core: PropertyElement.IsInitOnly
+    generator: true
+    tests:
+      snapshot: P3_InitOnly
+      syntax: true
+  - name: Property (required)
+    status: public-supported
+    core: PropertyElement.IsRequired
+    generator: true
+    tests:
+      snapshot: P4_Required
+      syntax: true
+  - name: Property (static)
+    status: public-supported
+    core: PropertyElement.IsStatic
+    generator: true
+    tests:
+      snapshot: P5_StaticProperty
+      syntax: true
+  - name: Constructor
+    status: public-supported
+    core: ConstructorElement
+    generator: true
+    tests:
+      snapshot: false
+      syntax: true
+  - name: Field
+    status: public-supported
+    core: FieldElement
+    generator: true
+    tests:
+      snapshot: false
+      syntax: true
+
+expressions:
+  - name: Constant
+    status: public-supported
+    core: ConstantExpression
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Binary Operation
+    status: public-supported
+    core: BinaryExpression
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Unary Operation
+    status: public-supported
+    core: UnaryExpression
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Method Call
+    status: public-supported
+    core: MethodCallExpression
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Member Access
+    status: public-supported
+    core: MemberAccessExpression
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Conditional (ternary)
+    status: public-supported
+    core: ConditionalExpression
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Object Creation (new)
+    status: public-supported
+    core: NewExpression
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Await
+    status: public-supported
+    core: AwaitExpression
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Conversion (cast)
+    status: public-supported
+    core: ConversionExpression
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Default
+    status: public-supported
+    core: DefaultExpression
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Is Pattern
+    status: public-supported
+    core: IsPatternExpression
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Lambda
+    status: public-supported
+    core: LambdaExpression
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Null Coalescing
+    status: public-supported
+    core: NullCoalescingExpression
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Switch Expression
+    status: public-supported
+    core: SwitchExpression
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+
+statements:
+  - name: Block
+    status: public-supported
+    core: BlockStatement
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Return
+    status: public-supported
+    core: ReturnStatement
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: If/Else
+    status: public-supported
+    core: IfStatement
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: For
+    status: public-supported
+    core: ForStatement
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: While
+    status: public-supported
+    core: WhileStatement
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Assignment
+    status: public-supported
+    core: AssignmentStatement
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Expression Statement
+    status: public-supported
+    core: ExpressionStatement
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: ForEach
+    status: public-supported
+    core: ForEachStatement
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Switch
+    status: public-supported
+    core: SwitchStatement
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: TryCatch
+    status: public-supported
+    core: TryCatchStatement
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Using (block)
+    status: public-supported
+    core: UsingStatement
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Using Declaration
+    status: public-supported
+    core: UsingDeclarationStatement
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true
+  - name: Local Function
+    status: public-supported
+    core: LocalFunctionStatement
+    generator: true
+    tests:
+      snapshot: true
+      syntax: true
+      unit: true

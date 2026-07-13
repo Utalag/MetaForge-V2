@@ -12,7 +12,7 @@ namespace MetaForge.Generators;
 /// Převádí Core elementy na kompilovatelný C# kód pomocí Scriban šablon.
 /// Není sealed — umožňuje rozšíření o TieredCodeGenerator.
 /// </summary>
-public class CodeGenerator : BaseCodeGenerator
+public sealed class CodeGenerator : BaseCodeGenerator
 {
     private const string FileExtension = ".cs";
 

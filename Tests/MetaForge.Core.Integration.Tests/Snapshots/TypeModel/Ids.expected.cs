@@ -1,10 +1,16 @@
 
 
 
+
+
 public class Entity
 {
 
-public List<object> Ids { get; set; }
+
+    
+    public List<object> Ids { get; set; }
+
 
 
 }
+

@@ -3,99 +3,33 @@
 > Návrhy, které jsou identifikované, ale zatím neschválené k implementaci.
 > Nikdy neimplementovat přímo z tohoto souboru — vždy přesunout do PROPOSALS.md.
 > Plány jsou uloženy v `Docs/Plans/PROP-XXX-*.md` a jsou součástí návrhu.
+> Poslední aktualizace: 2026-07-12
 
 ## Kandidátní návrhy
 
 | ID | Název | Vrstva | Priorita | Odhad | Poznámka |
 |----|-------|--------|----------|-------|----------|
-| **PROP-047** | Translator — Strong Type Mapping (čte `CoreDetail.IsStrongType`, vytváří `ValueObjectElement` + `PropertyElement`, translation source anotace, fallback na primitiva) | Translator | 🔴 Vysoká | 1-2 dny | Navazuje na hotovou infrastrukturu Core+Generator+Vogen architekturu. Pipeline: AI→BusinessModel→Translator→Core→Generator. |
-| **PROP-045** | Generator E2E Completeness — 7 nových scénářů (Scénáře 7-12) pokrývajících async/await, foreach/while, try-catch, event/operator/delegate, lambda, struct | Generators, Tests | 🟡 Vysoká | 2-3 dny | Follow-up k PROP-043. 5/12 scénářů hotovo. |
-| **PROP-044** | Translator & BusinessModel — Workflow opravy, SyncState konsolidace, Facade thread safety | Translator, BusinessModel | 🟡 Vysoká | 2-3 dny | Fixes known from PROP-020 implementation. |
-| **PROP-018** | Translator — ExpertProjection a ProjectionOptions | Translator | 🟡 Střední | 2-3 dny | Potřebuje PROP-044 jako základ. |
-| **PROP-046** | AI Model Benchmarking — Referenční vs lokální modely, strukturální komparátor, prompt varianty, matice pass/fail | AI, Tests | 🟡 Střední | 4 dny | Cíl: najít nejslabší lokální model srovnatelný s GPT-4o/Claude. |
-| **PROP-017** | Generators — ForgeBlock Packaging (BlueprintBuilder, catalog entries) | Generators, ForgeBlocks | 🟢 Nízká | — | Až budou existovat první ForgeBlock balíky. |
-| **PROP-023** | DX a architektonická vylepšení (na zvážení) — Typový SyncState, Layer stack, YAML DSL, Undo/redo | Průřezové | ⚪ Na zvážení | 5-9 dní | Neimplementovat bez schválení. |
+| **CODE-001** | CLI — `generate`/`export` command | Host Surfaces | 🔴 Kritická | 2-3 dny | Blokátor B2: pipeline BusinessModel→Core→C# není v CLI propojená. Nutno přidat command, který propojí Translator + CodeGenerator. |
+| **CODE-002** | Perzistence v CLI/MCP — JsonCommandLogRepository + JsonDocumentRepository | Infrastructure | 🔴 Kritická | 1-2 dny | Blokátor B3: obě host surfaces používají in-memory storage. Data přežijí jen do restartu. |
+| **CODE-003** | Monetizace — IGenerationCostPolicy, tier licence, billing gate | Generators, Monetization | 🟡 Vysoká | 3-5 dní | Blokátor B4: chybí jakákoli implementace monetizace. Nutno před produkcí. |
+| **PROP-053** | Web Frontend — Blazor Server s MudBlazor (strom modelu, konfigurace, ForgeBlock výběr) | Frontend | ⚪ Na zvážení | ~5 dní | Návrh: `Docs/Plans/PROP-053-Web-Frontend-Blazor.md` |
 
 ## Odložené návrhy
 
 | ID | Název | Důvod odložení | Datum |
 |----|-------|-----------------|-------|
-| PROP-018 | Translator — ExpertProjection a ProjectionOptions | nejsem si jist správnou funkcionalitou pro host surfaces | 4.7.2026 |
-| PROP-020-F5 | BusinessModel — Fáze 5: BusinessBehaviorInputNode, PendingQuestion rozšíření | nízká priorita, neblokuje core flow; PROP-020 Fáze 1–4 dokončeny | 4.7.2026 |
+| PROP-018 | Translator — ExpertProjection a ProjectionOptions | Nejasná funkcionalita pro host surfaces — potřeba upřesnit scope | 4.7.2026 |
+| PROP-020-F5 | BusinessModel — Fáze 5: BusinessBehaviorInputNode, PendingQuestion rozšíření | Nízká priorita, neblokuje core flow; PROP-020 Fáze 1–4 dokončeny | 4.7.2026 |
 
-## Odložené návrhy
+## Issues — Stav k 2026-07-12
 
-| ID | Název | Důvod odložení | Datum |
-|----|-------|----------------|-------|
-| PROP-018 | Translator — ExpertProjection a ProjectionOptions | nejsem si jist správnou funkcionalitou pro host surfaces | 4.7.2026 |
-| PROP-020-F5 | BusinessModel — Fáze 5: BusinessBehaviorInputNode, PendingQuestion rozšíření | nízká priorita, neblokuje core flow; PROP-020 Fáze 1–4 dokončeny | 4.7.2026 |
+> Všechny issues vyřešeny. 15 přesunuto do `Docs/Issues/Solved-Issues/`.
+> Jediná zbývající: ISS-007 (OllamaAiTranslator duplicita) — **By design** (PROP-019 Varianta A).
 
-## Issues — Známé problémy k opravě
-
-> Problémy zjištěné při Code Review po implementaci. Každý issue má vlastní detailní soubor v `Docs/Issues/ISS-xxx_nazev.md`.
-> Při opravě přesunout do `PROPOSALS.md` jako nový PROP nebo task.
-
-| # | Datum | PROP | Soubor | Závažnost | Popis | Doporučené řešení | Issue soubor |
-|---|-------|------|--------|-----------|-------|-------------------|--------------|
-| 1 | 4.7.2026 | PROP-028 | `InfrastructureServiceRegistration.cs` | ✅ Vyřešeno | `AddSingleton` → `TryAddSingleton`. | ISS-001 — fixed 2026-07-08 |
-| 2 | 4.7.2026 | PROP-028 | `JsonCommandLogRepository.cs` | ✅ Vyřešeno | `AppendAsync` používá `Task.Run` pro offload sync I/O. | ISS-002 — fixed 2026-07-08 |
-| 3 | 4.7.2026 | PROP-027 | `AiServiceRegistration.cs` | ✅ Vyřešeno | `AddMetaForgeAi()` nyní registruje `PromptRegistry` a `PromptEvaluationService`. | ISS-003 — fixed 2026-07-08 |
-| 4 | 4.7.2026 | PROP-024 | `Expression.cs` | 💡 Návrh | Redundantní `Kind` string a `ExpressionKind` enum. | Při major verzi odstranit `string Kind`. | [`ISS-004`](Docs/Issues/ISS-004_PROP-024_Kind-ExpressionKind-redundancy.md) |
-| 5 | 4.7.2026 | PROP-025 | `IncrementalCodeGenerator.cs` | ✅ Vyřešeno | `GetMaxEntities()` nyní čte `_license.MaxEntities`. | ISS-005 — fixed 2026-07-08 |
-| 6 | 4.7.2026 | PROP-025 | `CodeGenerator.cs` | ⚠️ Nízká | `sealed` → `class` kvůli dědičnosti, možnost nechtěného přepsání. | Zvážit kompozici místo dědičnosti. | [`ISS-006`](Docs/Issues/ISS-006_PROP-025_CodeGenerator-sealed-vs-composition.md) |
-| 7 | 4.7.2026 | PROP-019 | `OllamaAiTranslator.cs` | ⚠️ Nízká | Duplikuje logiku Ollama HTTP API volání z `OllamaAdapter`. | Po stabilizaci MetaForge.Ai sjednotit. | [`ISS-007`](Docs/Issues/ISS-007_PROP-019_OllamaAiTranslator-duplicate-logic.md) |
-| 8 | 4.7.2026 | PROP-019 | `DefaultBusinessTranslator.cs` | ⚠️ Nízká | `TryEnrichAsync` není v `IBusinessTranslator`, obchází rozhraní. | Přidat do rozhraní nebo vytvořit `IAsyncBusinessTranslator`. | [`ISS-008`](Docs/Issues/ISS-008_PROP-019_TryEnrichAsync-missing-interface.md) |
-| 9 | 4.7.2026 | PROP-026 | `Program.cs` (CLI) | ⚠️ Nízká | CLI používá root `IServiceProvider` pro scoped služby. | Scope per command nebo singleton Facade. | [`ISS-009`](Docs/Issues/ISS-009_PROP-026_CLI-scoped-services.md) |
-| 10 | 4.7.2026 | PROP-029 | `EfCoreForgeBlock.cs` | ⚠️ Nízká | `RequiredTier` není v `IForgeBlockCapabilityPackage`, nevynuceno. | Přidat do rozhraní nebo použít atribut. | [`ISS-010`](Docs/Issues/ISS-010_PROP-029_RequiredTier-not-enforced.md) |
-| 11 | 4.7.2026 | PROP-029 | ForgeBlock projekty | ⚠️ Nízká | ForgeBlocky bez Scriban šablon — jen metadata. | Implementovat šablony v další iteraci. | [`ISS-011`](Docs/Issues/ISS-011_PROP-029_ForgeBlock-missing-templates.md) |
-| 12 | 4.7.2026 | PROP-030 | `ReplayEngine.cs` | ✅ Vyřešeno | `CommandMigrationEngine` integrován — automatická migrace před replayem. | ISS-012 — fixed 2026-07-08 |
-| 13 | 4.7.2026 | PROP-022 | `BusinessDocumentDiffer.cs` | ⚠️ Nízká | Diff nezachycuje Modify, relace, workflow. | Rozšířit o detekci Modified a dalších uzlů. | [`ISS-013`](Docs/Issues/ISS-013_PROP-022_Diff-Modify-not-detected.md) |
-
----
-
-## Detaily návrhů
-
-### PROP-017: Generators — ForgeBlock packaging a katalog
-
-Více: [`Docs/Plans/PROP-017-Generators-ForgeBlock-Packaging.md`](Docs/Plans/PROP-017-Generators-ForgeBlock-Packaging.md)
-
-### PROP-018: Translator — ExpertProjection a ProjectionOptions
-
-Více: [`Docs/Plans/PROP-018-Translator-ExpertProjection.md`](Docs/Plans/PROP-018-Translator-ExpertProjection.md)
-
-### PROP-019: Translator — IAiTranslator a AI-assisted překlad
-
-Více: [`Docs/Plans/PROP-019-Translator-AiTranslator.md`](Docs/Plans/PROP-019-Translator-AiTranslator.md)
-
-### PROP-020: BusinessModel — Architektonický upgrade dle původního konceptu
-
-Více: [`Docs/Plans/PROP-020-BusinessModel-Architecture-Upgrade.md`](Docs/Plans/PROP-020-BusinessModel-Architecture-Upgrade.md)
-
-> **Stav:** 🟢 Schváleno — přesunuto do PROPOSALS.md
-
-### PROP-021: Testování — Property-based (FsCheck) a Snapshot (Verify)
-
-Více: [`Docs/Plans/PROP-021-Tests-PropertyBased-Snapshot.md`](Docs/Plans/PROP-021-Tests-PropertyBased-Snapshot.md)
-
-### PROP-022: Observabilita — OpenTelemetry tracing a BusinessModel diff
-
-Více: [`Docs/Plans/PROP-022-Observability-Tracing-Diff.md`](Docs/Plans/PROP-022-Observability-Tracing-Diff.md)
-
-### PROP-023: DX a architektonická vylepšení na zvážení
-
-Více: [`Docs/Plans/PROP-023-DX-Architecture-Improvements-Future.md`](Docs/Plans/PROP-023-DX-Architecture-Improvements-Future.md)
-
-### PROP-024: Core — StrongType/ValueObject, Expression System, Record elementy
-
-Více: [`Docs/Plans/PROP-024-Core-StrongType-Expression-Record.md`](Docs/Plans/PROP-024-Core-StrongType-Expression-Record.md)
-
-### PROP-025: Generators — Incremental, Partial Class, Scaffolding + Monetization
-
-Více: [`Docs/Plans/PROP-025-Generators-Incremental-Monetization.md`](Docs/Plans/PROP-025-Generators-Incremental-Monetization.md)
-
-### PROP-026: Host Surfaces — CLI, MCP, WebApi, REPL upgrade
-
-Více: [`Docs/Plans/PROP-026-Host-Surfaces-CLI-MCP-WebApi-REPL.md`](Docs/Plans/PROP-026-Host-Surfaces-CLI-MCP-WebApi-REPL.md)
+| # | Stav | Popis |
+|---|------|-------|
+| ISS-001..ISS-016 | ✅ Vyřešeno | 15 issues přesunuto do `Docs/Issues/Solved-Issues/` |
+| ISS-007 | ℹ️ By design | Duplicita OllamaAiTranslator — PROP-019 Varianta A, řešit po stabilizaci AI API |
 
 ### PROP-027: AI Layer — MetaForge.Ai projekt, OllamaAdapter, PromptRegistry
 

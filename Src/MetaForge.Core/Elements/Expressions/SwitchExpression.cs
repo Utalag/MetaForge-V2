@@ -7,7 +7,6 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public sealed class SwitchExpression : Expression
 {
-    public override string Kind => "Switch";
     public override ExpressionKind ExpressionKind => ExpressionKind.Switch;
 
     /// <summary>Výraz, který se vyhodnocuje (selector).</summary>

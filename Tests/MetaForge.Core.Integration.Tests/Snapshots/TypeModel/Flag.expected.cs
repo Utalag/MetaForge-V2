@@ -1,10 +1,16 @@
 
 
 
+
+
 public class Entity
 {
 
-public byte Flag { get; set; }
+
+    
+    public byte Flag { get; set; }
+
 
 
 }
+

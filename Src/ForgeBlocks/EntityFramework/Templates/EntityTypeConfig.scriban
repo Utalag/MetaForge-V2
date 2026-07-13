@@ -1,0 +1,29 @@
+{{~ ## EF Core EntityTypeConfiguration Scriban Template ~}}
+{{~ ## Generuje IEntityTypeConfiguration<T> pro jednu entitu ~}}
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace {{ namespace }}.Configurations;
+
+/// <summary>
+/// Konfigurace entity {{ entity_name }} — generováno MetaForge EF Core ForgeBlockem.
+/// </summary>
+public class {{ entity_name }}Configuration : IEntityTypeConfiguration<{{ entity_name }}>
+{
+    public void Configure(EntityTypeBuilder<{{ entity_name }}> builder)
+    {
+        builder.ToTable("{{ table_name }}");
+
+{{~ for property in properties }}
+{{~ if property.is_key }}
+        builder.HasKey(e => e.{{ property.name }});
+{{~ end }}
+{{~ if property.is_required }}
+        builder.Property(e => e.{{ property.name }}).IsRequired();
+{{~ end }}
+{{~ if property.max_length }}
+        builder.Property(e => e.{{ property.name }}).HasMaxLength({{ property.max_length }});
+{{~ end }}
+{{~ end }}
+    }
+}

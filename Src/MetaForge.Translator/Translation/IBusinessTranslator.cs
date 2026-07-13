@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using MetaForge.BusinessModel.Models;
 using MetaForge.Core.Abstractions;
 using MetaForge.Core.DataTypes;
@@ -14,6 +17,13 @@ public interface IBusinessTranslator
 
     /// <summary>Pokusí se o enrichment (AI/deterministický). Vrací null pokud nic.</summary>
     EnrichmentResult? TryEnrich(BusinessAttributeNode attribute);
+
+    /// <summary>AI-assisted enrichment — použije IAiTranslator pro hlubší analýzu.</summary>
+    Task<EnrichmentResult?> TryEnrichAsync(
+        BusinessAttributeNode attribute,
+        IEnumerable<string> siblingAttributes,
+        string? entityName = null,
+        CancellationToken ct = default);
 
     /// <summary>Přeloží celý BusinessAuthoringDocument na Core elementy.</summary>
     IReadOnlyList<RootElement> TranslateDocument(BusinessAuthoringDocument document);

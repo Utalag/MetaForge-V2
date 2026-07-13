@@ -1,10 +1,16 @@
 
 
 
+
+
 public class Entity
 {
 
-public Guid Key { get; set; }
+
+    
+    public Guid Key { get; set; }
+
 
 
 }
+

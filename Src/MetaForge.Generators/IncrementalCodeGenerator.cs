@@ -8,18 +8,21 @@ namespace MetaForge.Generators;
 /// <summary>
 /// Inkrementální generátor — generuje pouze elementy, jejichž kód se změnil.
 /// Používá SHA256 hash pro detekci změn.
+/// [IncrementalCodeGenerator je Experimental — cíl je dirty-tracking na úrovni BusinessModel]
 /// </summary>
-public sealed class IncrementalCodeGenerator : TieredCodeGenerator
+public sealed class IncrementalCodeGenerator
 {
     private readonly Dictionary<string, string> _outputCache = new();
+    private readonly TieredCodeGenerator _tiered;
     private readonly GeneratorLicense _license;
     private int _entityCount;
 
     /// <summary>
     /// Vytvoří inkrementální generátor s licencí.
     /// </summary>
-    public IncrementalCodeGenerator(GeneratorLicense license) : base(license)
+    public IncrementalCodeGenerator(GeneratorLicense license)
     {
+        _tiered = new TieredCodeGenerator(license);
         _license = license;
     }
 
@@ -44,7 +47,7 @@ public sealed class IncrementalCodeGenerator : TieredCodeGenerator
                 throw LicenseException.EntityLimitExceeded(GetMaxEntities(), _entityCount);
             }
 
-            var artifact = Generate(element);
+            var artifact = _tiered.Generate(element);
             var filePath = Path.Combine(outputDirectory, artifact.FileName);
             var newHash = ComputeHash(artifact.SourceCode);
 

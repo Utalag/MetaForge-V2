@@ -1,0 +1,1 @@
+public delegate TResult Transformer<TInput>(TInput input);

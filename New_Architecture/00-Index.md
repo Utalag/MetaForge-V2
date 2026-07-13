@@ -2,8 +2,7 @@
 
 > Kompletní architektonická dokumentace MetaForge pro C#-first implementaci.
 > Dokumenty jsou řazeny do tematických celků a vzájemně na sebe navazují.
-
-⚠️ **Aktuální stav: work-in-progress.** 03 je částečný (potřeba dočistit starý scaffold content ze staré 06).
+> Poslední aktualizace: 2026-07-13
 
 ---
 
@@ -19,25 +18,25 @@
 ### Core vrstva
 | # | Soubor | Obsah | Stav |
 |---|--------|-------|------|
-| 03 | `03-Core-Abstractions.md` | AppRoot, RootElement, TypeModel, DataType, SemanticCollection, MetadataBag (PROP-038) | ✅ *(PROP-035, PROP-038)* |
-| 04 | `04-Core-Elements.md` | Class, Interface, Enum, Struct, Property, Method, Parameter elem. + MetadataBag (PROP-038) + DelegateElement, EventElement, OperatorElement (PROP-037) + ConstructorElement, FieldElement (PROP-041) + IMemberElement (PROP-040) | ✅ *(PROP-035, PROP-037, PROP-038, PROP-040, PROP-041)* |
-| 05 | `05-Core-Behaviors.md` | Expression System (11+8 druhů), Statement System (PROP-031), DiagnosticBag, BuildResult\<T\>, TransformPipeline (PROP-038), InvariantDefinition + InvariantExpression AST (PROP-036), ElementMixin + ConventionRegistry (PROP-039), ElementFingerprint (PROP-039), Guard validace (PROP-042) | ✅ *(PROP-024, PROP-031, PROP-035, PROP-036, PROP-038, PROP-039, PROP-042)* |
-| 06 | `06-Core-Services.md` | CatalogManager, ICatalogProvider, StrongType/ValueObject, IConstraintInferencer | ✅ *(PROP-024)* |
+| 03 | `03-Core-Abstractions.md` | AppRoot, RootElement, TypeModel, DataType, SemanticCollection, MetadataBag | ✅ |
+| 04 | `04-Core-Elements.md` | Všechny elementy: Class, Interface, Enum, Struct, Delegate, Event, Operator, Constructor, Field, Property, Method, Parameter, IMemberElement (PROP-040), MetadataBag (PROP-038) | ✅ |
+| 05 | `05-Core-Behaviors.md` | Expression System (14 druhů), Statement System (13 typů), DiagnosticBag, BuildResult\<T\>, TransformPipeline (PROP-038), InvariantDefinition + InvariantExpression AST (PROP-036), ElementMixin + ConventionRegistry (PROP-039), ElementFingerprint (PROP-039), CoreValidator (19 kódů) | ✅ |
+| 06 | `06-Core-Services.md` | CatalogManager, ICatalogProvider, StrongType/ValueObject, IConstraintInferencer, ForgeBlockRegistry | ✅ |
 
 ### Business a Translator vrstva
 | # | Soubor | Obsah | Stav |
 |---|--------|-------|------|
-| 07 | `07-BusinessModel.md` | BusinessAuthoringDocument, CommandLog, Patches, Workflow, Validace, Identity | ✅ *(PROP-020)* |
-| 08 | `08-Translator.md` | Facade, Projection, WriteBack, ITranslationService, DefaultBusinessTranslator, LanguageCapabilityProfile (PROP-035) | ✅ *(PROP-020, PROP-035)* |
-| 09 | `09-AI-Layer.md` | IAiBackendAdapter, OllamaAdapter, PromptRegistry, PromptEvaluator, AiServiceRegistration | ✅ *(PROP-027)* |
+| 07 | `07-BusinessModel.md` | BusinessAuthoringDocument, CommandLog, PatchEngine, ReplayEngine, Workflow, Validace, BusinessDocumentDiffer (vč. Modify detekce ISS-013) | ✅ |
+| 08 | `08-Translator.md` | Facade, Projection + ExpertProjection (PROP-018), WriteBack, IBusinessTranslator (vč. TryEnrichAsync ISS-008), DefaultBusinessTranslator, LanguageCapabilityProfile | ✅ |
+| 09 | `09-AI-Layer.md` | IAiBackendAdapter, OllamaAdapter, PromptRegistry, PromptEvaluator, AiTranslationService, AiServiceRegistration | ✅ |
 
 ### Generátory, Infrastructure a Monetizace
 | # | Soubor | Obsah | Stav |
 |---|--------|-------|------|
-| 10 | `10-Generators.md` | CodeGenerator, Scriban šablony, ExpressionRenderer, Packaging | ✅ |
-| 11 | `11-Infrastructure.md` | Persistence (JSONL), IOptions konfigurace, checkpoint caching, FileSystem | ✅ *(PROP-028)* |
-| 12 | `12-Host-Surfaces.md` | CLI (System.CommandLine + Spectre.Console), MCP (JSON-RPC + discovery), WebApi (neimplementováno) | ✅ *(PROP-026)* |
-| 29 | `29-Monetization.md` | Kreditový systém, tier licence, MCP-ready billing gate | ✅ |
+| 10 | `10-Generators.md` | CodeGenerator (sealed), Scriban šablony, ExpressionRenderer (58 unit testů), StatementRenderer (13 unit testů), TemplateManager (vč. RegisterInlineTemplate), 13 E2E scénářů (async/await, foreach, try-catch, lambda, switch, while, local function), ForgeBlock Packaging — BlueprintBuilder + PackageIntegrator (PROP-017), ForgeBlock plugin šablony — IForgeBlockTemplateProvider (ISS-011), TieredCodeGenerator/IncrementalCodeGenerator — wrapper pattern (ISS-006) | ✅ |
+| 11 | `11-Infrastructure.md` | Persistence: JsonCommandLogRepository (true async I/O ISS-002), JsonDocumentRepository, InMemoryCommandLogRepository, IOptions konfigurace, CheckpointProjectionCache, FileSystemProvider, InfrastructureServiceRegistration | ✅ |
+| 12 | `12-Host-Surfaces.md` | CLI: 8 commandů (add-entity, list-entities, projection, add-attribute, delete-entity, info, generate, save), per-command IServiceScope (ISS-009), persistence v DI (CODE-002), generate pipeline (CODE-001). MCP: JSON-RPC + discovery. WebApi: odloženo. | ✅ |
+| 29 | `29-Monetization.md` | Kreditový systém, tier licence, MCP-ready billing gate. Implementace odložena (CODE-003). | ⏳ Odloženo |
 
 ### Plánování a proces
 | # | Soubor | Obsah | Stav |
@@ -48,7 +47,7 @@
 ### Kvalita a testování
 | # | Soubor | Obsah | Stav |
 |---|--------|-------|------|
-| 15 | `15-Test-Scaffold.md` | Struktura testů, testování Core, Snapshot-based integrační testy (PROP-032) | ✅ |
+| 15 | `15-Test-Scaffold.md` | Struktura testů (~500+ unit, 48 snapshot, 13 E2E), SnapshotComparer s UPDATE_SNAPSHOTS, SyntaxValidator, Support Matrix YAML (73 položek) | ✅ |
 | 16 | `16-Risks-and-Rollback.md` | Rizika, rollback strategie | ✅ |
 
 ### Agents a governance
@@ -59,14 +58,14 @@
 | 19 | `19-Error-Handling.md` | Error handling, exception politika | ✅ |
 | 20 | `20-Security.md` | Bezpečnostní model | ✅ |
 | 21 | `21-Telemetry.md` | Telemetrie a observabilita | ✅ |
-| 22 | `22-CI-CD.md` | CI/CD pipeline | ✅ |
+| 22 | `22-CI-CD.md` | CI/CD pipeline — `.github/workflows/build.yml` ✅ Build+testy, Docker a NuGet ⏳ odloženo | ✅ build.yml |
 | 23 | `23-Governance.md` | Decision log, ADRs, dokumentační standardy | ✅ |
 | 24 | `24-Markdown-First-Workflow.md` | Pravidla pro markdown-first vývoj | ✅ |
 
 ### DI a scaffold
 | # | Soubor | Obsah | Stav |
 |---|--------|-------|------|
-| 25 | `25-DI-and-Composition-Root.md` | DI registrace, lifetime, Composition Root | ✅ |
+| 25 | `25-DI-and-Composition-Root.md` | DI registrace, lifetime, Composition Root. **ForgeBlock DI extension methods naplánovány (PROP-054).** | ⏳ PROP-054 |
 | 26 | `26-Scaffold-Projects-and-Folders.md` | Scaffold projektů a složek | ✅ |
 
 ### ForgeBlock knihovny
@@ -77,7 +76,7 @@
 ### Konceptuální přehled
 | # | Soubor | Obsah | Stav |
 |---|--------|-------|------|
-| 30 | `30-Architecture-Summary.md` | Konceptuální přehled platformy, editační matice, principy, data flow | ✅ *(2026-07-08)* |
+| 30 | `ReadMe-Architecture-Summary.md` | Konceptuální přehled platformy, editační matice, principy, data flow | ✅ |
 
 ---
 
@@ -85,19 +84,42 @@
 
 ```
 ┌─────────────────────────────────────────────┐
-│           12-Host-Surfaces.md                │  CLI · MCP · WebApi
+│           12-Host-Surfaces.md                │  CLI (8 cmd) · MCP · ~~WebApi~~ (odloženo)
 ├─────────────────────────────────────────────┤
-│           08-Translator.md                   │  Facade · Projection · WriteBack
+│           08-Translator.md                   │  Facade · Projection · ExpertProjection · WriteBack
 │           09-AI-Layer.md                     │  AI inference · Translation
 ├─────────────────────────────────────────────┤
-│           07-BusinessModel.md                │  Document · CommandLog · Events
+│           07-BusinessModel.md                │  Document · CommandLog · Replay · Diff
 ├─────────────────────────────────────────────┤
 │  03-Abstractions  04-Elements                │
 │  05-Behaviors     06-Services                │  Core vrstva
 ├─────────────────────────────────────────────┤
-│           11-Infrastructure.md               │  Persistence · FileSystem
+│           11-Infrastructure.md               │  Persistence · Config · FileSystem
 ├─────────────────────────────────────────────┤
-│           10-Generators.md                   │  Code export · Templating
+│           10-Generators.md                   │  Code export · Templates · Packaging
+├─────────────────────────────────────────────┤
+│           27-ForgeBlock-External-Libraries.md│  EF Core · AutoMapper · FluentValidation
+└─────────────────────────────────────────────┘
+```
+
+## Stav implementace — klíčové milestone
+
+| Milestone | Stav | Datum |
+|-----------|------|-------|
+| Core vrstva — kompletní (všechny elementy, expressions, statements) | ✅ | 2026-07-08 |
+| BusinessModel — dokument, CommandLog, PatchEngine, ReplayEngine, Workflow | ✅ | 2026-07-04 |
+| Translator — Facade, Projection, WriteBack, ExpertProjection | ✅ | 2026-07-12 |
+| AI Layer — OllamaAdapter, PromptRegistry, graceful fallback | ✅ | 2026-07-04 |
+| Generators — CodeGenerator, ExpressionRenderer, 13 E2E scénářů | ✅ | 2026-07-11 |
+| ForgeBlock Packaging — BlueprintBuilder, PackageIntegrator, plugin šablony | ✅ | 2026-07-12 |
+| Testy — ~500+ unit, 48 snapshot, 13 E2E, UPDATE_SNAPSHOTS | ✅ | 2026-07-11 |
+| CLI — generate command, perzistence, 8 commandů | ✅ | 2026-07-12 |
+| ExpertProjection — 6 modelů, ProjectionOptions, diagnostika | ✅ | 2026-07-12 |
+| Issues cleanup — 15/16 resolved | ✅ | 2026-07-12 |
+| **ForgeBlock DI extension methods** | ⏳ PROP-054 plán | 2026-07-13 |
+| **CI/CD pipeline** | �N | — |
+| **Monetizace** | ⏳ Odloženo | — |
+| **WebApi** | ⏳ Odloženo | — |
 ├─────────────────────────────────────────────┤
 |  13-14 Planning · 15-28 Quality/Scaffold/Agents · 29 Monetizace · 30 Architecture Summary │
 └─────────────────────────────────────────────┘

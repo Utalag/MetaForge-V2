@@ -2,6 +2,7 @@ using System.Text.Json;
 using MetaForge.BusinessModel.CommandLog;
 using MetaForge.Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
+using System.Threading;
 
 namespace MetaForge.Infrastructure.Persistence;
 
@@ -18,7 +19,7 @@ public sealed class JsonCommandLogRepository : ICommandLogRepository
     };
 
     private readonly string _filePath;
-    private readonly object _writeLock = new();
+    private readonly SemaphoreSlim _writeLock = new(1, 1);
 
     /// <summary>
     /// Vytvoří JSONL repository s cestou z konfigurace.
@@ -32,18 +33,20 @@ public sealed class JsonCommandLogRepository : ICommandLogRepository
     }
 
     /// <inheritdoc />
-    public Task AppendAsync(CommandEnvelope envelope, CancellationToken ct = default)
+    public async Task AppendAsync(CommandEnvelope envelope, CancellationToken ct = default)
     {
         ct.ThrowIfCancellationRequested();
         var line = JsonSerializer.Serialize(envelope, JsonOptions);
-        // Offload sync I/O from calling thread to avoid blocking
-        return Task.Run(() =>
+
+        await _writeLock.WaitAsync(ct);
+        try
         {
-            lock (_writeLock)
-            {
-                File.AppendAllText(_filePath, line + Environment.NewLine);
-            }
-        }, ct);
+            await File.AppendAllTextAsync(_filePath, line + Environment.NewLine, ct);
+        }
+        finally
+        {
+            _writeLock.Release();
+        }
     }
 
     /// <inheritdoc />

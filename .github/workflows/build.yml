@@ -1,0 +1,43 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET 10.0
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore
+      run: dotnet restore MetaForge.slnx
+
+    - name: Build
+      run: dotnet build MetaForge.slnx --no-restore --configuration Release
+
+    - name: Test Core
+      run: dotnet test Tests/MetaForge.Core.Tests --no-build --configuration Release
+
+    - name: Test BusinessModel
+      run: dotnet test Tests/MetaForge.BusinessModel.Tests --no-build --configuration Release
+
+    - name: Test Translator
+      run: dotnet test Tests/MetaForge.Translator.Tests --no-build --configuration Release
+
+    - name: Test Generators (unit)
+      run: dotnet test Tests/MetaForge.Generators.Tests --no-build --configuration Release
+
+    - name: Test Core Integration (snapshots)
+      run: dotnet test Tests/MetaForge.Core.Integration.Tests --no-build --configuration Release
+
+    - name: Test AI
+      run: dotnet test Tests/MetaForge.Ai.Tests --no-build --configuration Release

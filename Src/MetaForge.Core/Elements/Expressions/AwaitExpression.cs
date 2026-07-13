@@ -8,7 +8,6 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public sealed class AwaitExpression : Expression
 {
-    public override string Kind => "Await";
     public override ExpressionKind ExpressionKind => ExpressionKind.Await;
 
     /// <summary>Výraz, na který se čeká (obvykle MethodCallExpression).</summary>

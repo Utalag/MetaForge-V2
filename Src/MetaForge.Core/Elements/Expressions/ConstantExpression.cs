@@ -7,7 +7,6 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public sealed class ConstantExpression : Expression
 {
-    public override string Kind => "Constant";
     public override ExpressionKind ExpressionKind => ExpressionKind.Constant;
 
     /// <summary>Hodnota konstanty (může být null).</summary>

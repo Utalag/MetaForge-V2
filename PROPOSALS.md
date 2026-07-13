@@ -5,16 +5,45 @@
 
 ## Aktivní návrhy — Zásobník dle priority implementace
 
+> Poslední aktualizace: 2026-07-13 (build.yml CI/CD, PROP-055)
+
 | ID | Název | Vrstva | Priorita | Odhad | Závislosti | Odkaz |
 |----|-------|--------|----------|-------|------------|-------|
-| **PROP-018** | Translator — ExpertProjection a ProjectionOptions | Translator | 🟡 Střední | 2-3 dny | PROP-044 (hotovo) | [Detail](Docs/Plans/PROP-018-Translator-ExpertProjection.md) |
-| **PROP-017** | ForgeBlock Packaging — BlueprintBuilder, katalog | Generators, ForgeBlocks | 🟢 Nízká | — | PROP-045 (hotovo) | [Detail](Docs/Plans/PROP-017-Generators-ForgeBlock-Packaging.md) |
+| **PROP-055** | ReferenceGraph — typový graf závislostí, detekce cyklů, správné pořadí generování | Core, Generators | 🟡 Vysoká | ~2 dny | Není | [Detail](Docs/Plans/PROP-055-ReferenceGraph.md) |
+| **PROP-054** | ForgeBlock DI Extension Methods — `IForgeBlockDiProvider`, `AddEfCore()`, `AddAutoMapper()`, `AddFluentValidation()` | ForgeBlocks, Infrastructure | 🟡 Střední | ~2 dny | ISS-011, PROP-017 (hotovo) | [Detail](Docs/Plans/PROP-054-ForgeBlock-DI-Extension-Methods.md) |
+| **PROP-053** | Web Frontend — Blazor Server s MudBlazor | Frontend | ⚪ Na zvážení | ~5 dní | PROP-044, PROP-045 (hotovo) | [Detail](Docs/Plans/PROP-053-Web-Frontend-Blazor.md) |
 | **PROP-023** | DX vylepšení — Typový SyncState, Layer stack, YAML DSL, Undo/redo | Průřezové | ⚪ Na zvážení | 5–9 dní | ∞ | [Detail](Docs/Plans/PROP-023-DX-Architecture-Improvements-Future.md) |
+
+## Odložené návrhy
+
+| ID | Název | Důvod odložení |
+|----|-------|-----------------|
+| **CODE-003** | Monetizace — IGenerationCostPolicy, tier licence, billing gate | Platforma může běžet bez monetizace. Plánováno po ověření trakce. |
+| **B5** | WebApi — REST API host surface | CLI + MCP pro MVP stačí. Až bude poptávka. |
+
+## Zamítnuté návrhy
+
+| ID | Název | Důvod zamítnutí | Datum |
+|----|-------|-----------------|-------|
+| **PROP-050** | Self-Healing Pipeline | Příliš experimentální — složité AST manipulace s rizikem sémantických změn, obtížná testovatelnost. | 2026-07-11 |
 
 ## Dokončené návrhy
 
 | ID | Název | Datum dokončení | Odkaz |
 |----|-------|-----------------|-------|
+| **PROP-052** | Operator/Event/Delegate — 4 Delegate snapshot testy (D1-D4) | 2026-07-11 | [Detail](Docs/Plans/Implemented/PROP-052-OperatorEventDelegate-FollowUp.md) |
+| **PROP-048** | Generator Render Core Tests — 72 ExpressionRenderer + 13 StatementRenderer + 6 TemplateManager = 91 unit testů, 3 bugy v ExpressionRenderer opraveny (MapType, RenderSwitch, decimal) | 2026-07-11 | [Detail](Docs/Plans/PROP-048-Generator-Render-Core-Tests.md) |
+| **PROP-049** | Test Framework Consolidation — UPDATE_SNAPSHOTS env var v SnapshotComparer | 2026-07-11 | [Detail](Docs/Plans/PROP-049-Test-Framework-Consolidation.md) |
+| **PROP-051** | Support Matrix — Strojově čitelný YAML contract map (73 položek, 5 kategorií, 4 contract statusy) | 2026-07-11 | [Detail](Docs/Plans/PROP-051-Support-Matrix-Contract-Map.md) |
+| **CODE-001** | CLI generate/export command — BusinessModel→Core→C# pipeline, `save` command | 2026-07-12 | CLI `generate --output` + `save` commands |
+| **CODE-002** | Perzistence v CLI — JSONL CommandLog + JSON Document, load na startupu | 2026-07-12 | `InfrastructureServiceRegistration` v CLI DI |
+| **PROP-018** | ExpertProjection — 6 modelů, ProjectionOptions, diagnostika, relace | 2026-07-12 | `ExpertProjectionView`, `ProjectionReadService.GetExpertProjection()` |
+| **PROP-017** | ForgeBlock Packaging — BlueprintBuilder, CodePackageDependency, integrator | 2026-07-12 | `ForgeBlockBlueprint`, `ForgeBlockPackageIntegrator` |
+| **CODE-004** | ISS-004 — Kind jako computed property (14 Expression potomků převedeno) | 2026-07-12 | [Detail](Docs/Issues/Solved-Issues/ISS-004_PROP-024_Kind-ExpressionKind-redundancy.md) |
+| **CODE-006** | ISS-006 — CodeGenerator sealed + TieredCodeGenerator/IncrementalCodeGenerator kompozice | 2026-07-12 | [Detail](Docs/Issues/Solved-Issues/ISS-006_PROP-025_CodeGenerator-sealed-vs-composition.md) |
+| **CODE-011** | ISS-011 — ForgeBlock plugin šablony: IForgeBlockTemplateProvider, 4 Scriban šablony | 2026-07-12 | [Detail](Docs/Issues/Solved-Issues/ISS-011_PROP-029_ForgeBlock-missing-templates.md) |
+| **CODE-CLN** | Issues cleanup — 15 issues vyřešeno a přesunuto do Solved-Issues/ | 2026-07-12 | [Detail](Docs/Issues/Solved-Issues/) |
+| **CODE-CI** | CI/CD — build.yml: GitHub Actions, build + testy 6 projektů | 2026-07-13 | `.github/workflows/build.yml` |
 | **PROP-046** | AI Model Benchmarking — CoreElementComparer, strukturální testy | 2026-07-11 | [Detail](Docs/Plans/Implemented/PROP-046-AI-Model-Benchmarking.md) |
 | **PROP-045** | Generator E2E Completeness — 13/13 scénářů (všechny renderery) | 2026-07-11 | [Detail](Docs/Plans/Implemented/PROP-045-Generator-E2E-Completeness.md) |
 | **PROP-047** | Translator — Strong Type Mapping | 2026-07-10 | [Detail](Docs/Plans/Implemented/PROP-047-Translator-StrongType-Mapping.md) |
@@ -51,12 +80,6 @@
 | **PROP-003** | BusinessModel — dokument, CommandLog, replay | 2026-07-04 | [Detail](Docs/Plans/Implemented/PROP-003-BusinessModel.md) |
 | **PROP-002** | Core vrstva — typový model, elementy, katalog | 2026-07-04 | [Detail](Docs/Plans/Implemented/PROP-002-Core.md) |
 | **PROP-001** | Governance a Project Scaffold | 2026-07-04 | [Detail](Docs/Plans/Implemented/PROP-001-Governance.md) |
-
-## Zamítnuté návrhy
-
-| ID | Název | Důvod zamítnutí | Datum |
-|----|-------|-----------------|-------|
-| —  | —     | —               | —     |
 
 ---
 

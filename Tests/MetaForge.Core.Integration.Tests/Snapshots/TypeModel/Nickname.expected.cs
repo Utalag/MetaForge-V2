@@ -1,10 +1,16 @@
 
 
 
+
+
 public class Entity
 {
 
-public string? Nickname { get; set; }
+
+    
+    public string? Nickname { get; set; }
+
 
 
 }
+

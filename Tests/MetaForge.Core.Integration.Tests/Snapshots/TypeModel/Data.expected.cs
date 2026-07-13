@@ -1,10 +1,16 @@
 
 
 
+
+
 public class Entity
 {
 
-public object Data { get; set; }
+
+    
+    public object Data { get; set; }
+
 
 
 }
+

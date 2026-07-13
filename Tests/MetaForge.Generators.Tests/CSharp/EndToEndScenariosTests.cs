@@ -717,7 +717,8 @@ public class EndToEndScenariosTests
         {
             Name = "FetchAsync",
             IsAsync = true,
-            ReturnType = TypeModel.Of(DataType.Entity).WithCustomName("Task").WithGenericArg(TypeModel.String),
+            // Genrátor automaticky obalí návratový typ do Task<>, takže zde stačí string
+            ReturnType = TypeModel.String,
             Body = new BlockStatement(
                 new AssignmentStatement
                 {
@@ -732,6 +733,17 @@ public class EndToEndScenariosTests
 
         var result = _generator.Generate(cls);
         AssertGeneratedCodeIsValid(result);
+        AssertGeneratedCodeMatches(result,
+            """
+            public class DataProcessor
+            {
+                public async Task<string> FetchAsync(IDataService service)
+                {
+                    var data = await service.GetDataAsync;
+                    return data;
+                }
+            }
+            """);
     }
 
     [Fact]

@@ -8,7 +8,6 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public sealed class BinaryExpression : Expression
 {
-    public override string Kind => "Binary";
     public override ExpressionKind ExpressionKind => ExpressionKind.Binary;
 
     /// <summary>Levý operand.</summary>

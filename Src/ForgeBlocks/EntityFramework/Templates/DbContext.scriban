@@ -1,0 +1,33 @@
+{{~ ## EF Core DbContext Scriban Template ~}}
+{{~ ## Generuje AppDbContext s DbSet pro každou entitu ~}}
+{{~ ## Použití: ForgeBlockTemplate("DbContext", "EfCore", content) ~}}
+using Microsoft.EntityFrameworkCore;
+
+namespace {{ namespace }};
+
+/// <summary>
+/// Hlavní DbContext pro aplikaci — generováno MetaForge EF Core ForgeBlockem.
+/// </summary>
+public class {{ class_name }} : DbContext
+{
+    public {{ class_name }}(DbContextOptions<{{ class_name }}> options) : base(options)
+    {
+    }
+
+{{~ ## DbSet properties ~}}
+{{~ for entity in entities }}
+    public DbSet<{{ entity }}> {{ entity }}s { get; set; }
+{{~ end }}
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+{{~ for entity in entities }}
+        modelBuilder.Entity<{{ entity }}>(entity =>
+        {
+            entity.ToTable("{{ entity }}s");
+        });
+{{~ end }}
+    }
+}

@@ -21,7 +21,7 @@ Src/MetaForge.Generators/
 ├── BaseCodeGenerator.cs                 (abstraktní báze)
 ├── TemplateManager.cs                   (Scriban loader + cache)
 ├── CodeGenerator.cs                     (jediný generátor)
-├── ExpressionRenderer.cs                (Expression & Statement AST → C#)
+├── ExpressionRenderer.cs                (Expression & Statement AST → C#, 58 unit testů — PROP-048)
 ├── GeneratedCodeArtifact.cs
 ├── DiagnosticInfo.cs
 ├── Templates/

@@ -7,7 +7,6 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public sealed class NullCoalescingExpression : Expression
 {
-    public override string Kind => "NullCoalescing";
     public override ExpressionKind ExpressionKind => ExpressionKind.NullCoalescing;
 
     /// <summary>Levý operand (testovaný na null).</summary>

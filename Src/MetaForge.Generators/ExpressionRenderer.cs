@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using MetaForge.Core.DataTypes;
 using MetaForge.Core.Elements.Expressions;
@@ -211,8 +212,6 @@ public sealed class ExpressionRenderer
             sb.AppendLine($"{Indent()}case {RenderExpression(c.Pattern)}:");
             _indent++;
             sb.AppendLine(RenderStatement(c.Body));
-            if (!c.Body.ToString()?.Contains("break") == true)
-                sb.AppendLine($"{Indent()}break;");
             _indent--;
         }
         if (sw.DefaultCase != null)
@@ -257,7 +256,10 @@ public sealed class ExpressionRenderer
     private string RenderUsing(UsingStatement u)
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"{Indent()}using ({u.ResourceDeclaration})");
+        var resourceText = u.ResourceDeclaration != null
+            ? RenderStatement(u.ResourceDeclaration).TrimEnd(';').Trim()
+            : "";
+        sb.AppendLine($"{Indent()}using ({resourceText})");
         _indent++;
         sb.AppendLine(u.Body != null ? RenderStatement(u.Body) : $"{Indent()}{{ }}");
         _indent--;
@@ -295,14 +297,8 @@ public sealed class ExpressionRenderer
         return sb.ToString();
     }
 
-    private static string MapType(MetaForge.Core.DataTypes.TypeModel type) => type?.BaseType switch
-    {
-        MetaForge.Core.DataTypes.DataType.Void => "void",
-        MetaForge.Core.DataTypes.DataType.Int32 => "int",
-        MetaForge.Core.DataTypes.DataType.String => "string",
-        MetaForge.Core.DataTypes.DataType.Bool => "bool",
-        _ => type?.CustomTypeName ?? "var"
-    };
+    private static string MapType(MetaForge.Core.DataTypes.TypeModel type) =>
+        CodeGenerator.MapType(type);
 
     private static string RenderParameter(MetaForge.Core.Elements.Members.ParameterElement p)
     {
@@ -352,7 +348,8 @@ public sealed class ExpressionRenderer
             string s => $"\"{s}\"",
             char c => $"'{c}'",
             bool b => b ? "true" : "false",
-            _ => constant.Value.ToString() ?? "null"
+            decimal dm => dm.ToString(CultureInfo.InvariantCulture),
+            _ => Convert.ToString(constant.Value, CultureInfo.InvariantCulture) ?? "null"
         };
     }
 
@@ -409,13 +406,13 @@ public sealed class ExpressionRenderer
     private string RenderConversion(ConversionExpression conv)
     {
         if (conv.IsExplicit)
-            return $"({conv.TargetType}){RenderExpression(conv.Operand)}";
+            return $"({MapType(conv.TargetType)}){RenderExpression(conv.Operand)}";
         return RenderExpression(conv.Operand);
     }
 
     private string RenderDefault(DefaultExpression def)
     {
-        return $"default({def.TargetType})";
+        return $"default({MapType(def.TargetType)})";
     }
 
     private string RenderIsPattern(IsPatternExpression ip)

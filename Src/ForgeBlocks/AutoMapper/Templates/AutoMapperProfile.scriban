@@ -1,0 +1,23 @@
+{{~ ## AutoMapper Profile Scriban Template ~}}
+{{~ ## Generuje AutoMapper Profile s mapováními entit ~}}
+using AutoMapper;
+
+namespace {{ namespace }}.Mappings;
+
+/// <summary>
+/// AutoMapper Profile — generováno MetaForge AutoMapper ForgeBlockem.
+/// </summary>
+public class {{ class_name }} : Profile
+{
+    public {{ class_name }}()
+    {
+{{~ for mapping in mappings }}
+        CreateMap<{{ mapping.source }}, {{ mapping.destination }}>()
+{{~ if mapping.reverse_map }}
+            .ReverseMap();
+{{~ else }}
+            ;
+{{~ end }}
+{{~ end }}
+    }
+}

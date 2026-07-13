@@ -1,10 +1,16 @@
 
 
 
+
+
 public class Entity
 {
 
-public CustomerId CustomerId { get; set; }
+
+    
+    public CustomerId CustomerId { get; set; }
+
 
 
 }
+

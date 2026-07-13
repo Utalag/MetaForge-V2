@@ -7,7 +7,6 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public sealed class ConditionalExpression : Expression
 {
-    public override string Kind => "Conditional";
     public override ExpressionKind ExpressionKind => ExpressionKind.Conditional;
 
     /// <summary>Podmínka (musí být bool).</summary>

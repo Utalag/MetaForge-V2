@@ -1,0 +1,32 @@
+{{~ ## FluentValidation Validator Scriban Template ~}}
+{{~ ## Generuje AbstractValidator<T> pro jednu entitu ~}}
+using FluentValidation;
+
+namespace {{ namespace }}.Validators;
+
+/// <summary>
+/// Validační pravidla pro {{ entity_name }} — generováno MetaForge FluentValidation ForgeBlockem.
+/// </summary>
+public class {{ entity_name }}Validator : AbstractValidator<{{ entity_name }}>
+{
+    public {{ entity_name }}Validator()
+    {
+{{~ for rule in validation_rules }}
+{{~ if rule.type == "not_empty" }}
+        RuleFor(x => x.{{ rule.property }}).NotEmpty();
+{{~ elsif rule.type == "email" }}
+        RuleFor(x => x.{{ rule.property }}).EmailAddress();
+{{~ elsif rule.type == "max_length" }}
+        RuleFor(x => x.{{ rule.property }}).MaximumLength({{ rule.max }});
+{{~ elsif rule.type == "min_length" }}
+        RuleFor(x => x.{{ rule.property }}).MinimumLength({{ rule.min }});
+{{~ elsif rule.type == "inclusive_between" }}
+        RuleFor(x => x.{{ rule.property }}).InclusiveBetween({{ rule.min }}, {{ rule.max }});
+{{~ elsif rule.type == "regex" }}
+        RuleFor(x => x.{{ rule.property }}).Matches(@"{{ rule.pattern }}");
+{{~ else }}
+        RuleFor(x => x.{{ rule.property }}).NotNull();
+{{~ end }}
+{{~ end }}
+    }
+}

@@ -8,8 +8,8 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public abstract class Expression
 {
-    /// <summary>Druh výrazu — implementuje potomek.</summary>
-    public abstract string Kind { get; }
+    /// <summary>Druh výrazu — odvozeno z ExpressionKind (computed, není storage).</summary>
+    public string Kind => ExpressionKind.ToString();
 
     /// <summary>Druh výrazu jako enum (pro rychlý dispatch bez string compare).</summary>
     public abstract ExpressionKind ExpressionKind { get; }

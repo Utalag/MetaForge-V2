@@ -7,7 +7,6 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public sealed class ConversionExpression : Expression
 {
-    public override string Kind => "Conversion";
     public override ExpressionKind ExpressionKind => ExpressionKind.Conversion;
 
     /// <summary>Cílový typ, na který se převádí.</summary>

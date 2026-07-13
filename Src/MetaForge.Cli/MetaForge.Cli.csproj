@@ -8,6 +8,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\MetaForge.Translator\MetaForge.Translator.csproj" />
+    <ProjectReference Include="..\MetaForge.Generators\MetaForge.Generators.csproj" />
+    <ProjectReference Include="..\MetaForge.Infrastructure\MetaForge.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />

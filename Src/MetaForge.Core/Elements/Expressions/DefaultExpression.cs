@@ -7,7 +7,6 @@ namespace MetaForge.Core.Elements.Expressions;
 /// </summary>
 public sealed class DefaultExpression : Expression
 {
-    public override string Kind => "Default";
     public override ExpressionKind ExpressionKind => ExpressionKind.Default;
 
     /// <summary>Typ, pro který se zjišťuje defaultní hodnota.</summary>

@@ -5,10 +5,12 @@ namespace MetaForge.Generators;
 
 /// <summary>
 /// Tier-aware generátor kódu — kontroluje licenci před generováním.
-/// Dědí z CodeGenerator a přidává licenční omezení.
+/// [TieredCodeGenerator je Legacy — cíl je IGenerationCostPolicy ve Facade dle IDEA-026]
+/// Používá kompozici místo dědičnosti: wrapuje CodeGenerator a přidává licenční omezení.
 /// </summary>
-public class TieredCodeGenerator : CodeGenerator
+public sealed class TieredCodeGenerator
 {
+    private readonly CodeGenerator _inner;
     private readonly GeneratorLicense _license;
 
     /// <summary>Vodoznak přidávaný do kódu v Sandbox tieru.</summary>
@@ -26,19 +28,16 @@ public class TieredCodeGenerator : CodeGenerator
     /// </summary>
     public TieredCodeGenerator(GeneratorLicense license)
     {
+        _inner = new CodeGenerator();
         _license = license;
     }
 
-    /// <inheritdoc />
-    public override GeneratedCodeArtifact Generate(RootElement element)
+    /// <summary>
+    /// Vygeneruje kód s ohledem na licenci.
+    /// </summary>
+    public GeneratedCodeArtifact Generate(RootElement element)
     {
-        // Kontrola limitu entit (pro Sandbox)
-        if (_license.Tier == GeneratorTier.Sandbox && _license.MaxEntities > 0)
-        {
-            // Limit check je prováděn v IncrementalCodeGenerator
-        }
-
-        var artifact = base.Generate(element);
+        var artifact = _inner.Generate(element);
 
         // Přidat vodoznak pro Sandbox tier
         if (_license.AddWatermark && artifact.SourceCode.Length > 0)

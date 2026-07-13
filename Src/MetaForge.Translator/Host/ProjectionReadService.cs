@@ -87,4 +87,114 @@ public sealed class ProjectionReadService
 
         return view;
     }
+
+    /// <summary>
+    /// Vytvoří expertní projekci s diagnostikou, relacemi a workflow stavy.
+    /// Respektuje ProjectionOptions pro volitelné sekce.
+    /// </summary>
+    public ExpertProjectionView GetExpertProjection(BusinessAuthoringDocument document, ProjectionOptions? options = null)
+    {
+        options ??= ProjectionOptions.Basic();
+
+        // Entity s atributy
+        var entities = new List<ExpertEntityProjection>();
+        var syncedCount = 0;
+        var pendingCount = 0;
+
+        foreach (var entity in document.Entities)
+        {
+            var attrs = new List<ExpertAttributeProjection>();
+            foreach (var attr in entity.Attributes)
+            {
+                var coreType = _translator.Translate(attr);
+                var isStrongType = attr.CoreDetail?.IsStrongType == true;
+
+                if (attr.CoreDetail?.SyncState == AttributeSyncState.Synced) syncedCount++;
+                else pendingCount++;
+
+                attrs.Add(new ExpertAttributeProjection
+                {
+                    Id = attr.Id,
+                    Name = attr.Name,
+                    BusinessType = attr.Type,
+                    CoreType = isStrongType ? attr.CoreDetail?.ValueObjectName : coreType.ToString(),
+                    IsRequired = attr.IsRequired,
+                    MaxLength = attr.MaxLength,
+                    DefaultValue = attr.DefaultValue,
+                    IsStrongType = isStrongType,
+                    SyncState = attr.CoreDetail?.SyncState ?? AttributeSyncState.New,
+                    Constraints = attr.Metadata?.ContainsKey("constraints") == true
+                        ? (attr.Metadata["constraints"] as IEnumerable<string>)?.ToList() ?? []
+                        : [],
+                });
+            }
+
+            var behaviors = options.Expert
+                ? entity.Behaviors?.Select(b => new ExpertBehaviorProjection
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    Returns = b.ReturnType,
+                    Inputs = b.Parameters?.Select(p => p.Name).ToList() ?? [],
+                    Constraints = [],
+                }).ToList() ?? []
+                : [];
+
+            entities.Add(new ExpertEntityProjection
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                NoteCount = entity.Notes?.Count ?? 0,
+                BehaviorCount = entity.Behaviors?.Count ?? 0,
+                Attributes = attrs,
+                Behaviors = behaviors,
+            });
+        }
+
+        // Relace
+        var relations = options.Expert && document.Relations is not null
+            ? document.Relations.Select(r => new ExpertRelationProjection
+            {
+                From = r.FromEntityId,
+                To = r.ToEntityId,
+                Type = r.RelationType,
+                Navigation = r.FromNavigationName ?? r.ToNavigationName,
+            }).ToList()
+            : [];
+
+        // Pending questions
+        var pendingQuestions = document.PendingQuestions?.Select(q => new ExpertPendingQuestionProjection
+        {
+            Id = q.Id,
+            Text = q.Question,
+            Context = q.ContextEntityId ?? string.Empty,
+            IsBlocking = false,
+        }).ToList() ?? [];
+
+        // Diagnostika
+        var allAttrs = document.Entities.SelectMany(e => e.Attributes).ToList();
+        var diagnostics = new ExpertProjectionDiagnostics
+        {
+            TotalAttributes = allAttrs.Count,
+            WithConstraints = allAttrs.Count(a => a.Metadata?.ContainsKey("constraints") == true),
+            StrongTypes = allAttrs.Count(a => a.CoreDetail?.IsStrongType == true),
+            PresetsUsed = allAttrs.Count(a => a.CoreDetail?.ResolvedPresetId != null),
+            UnsyncedAttributes = allAttrs.Count(a => a.CoreDetail?.SyncState != AttributeSyncState.Synced),
+        };
+
+        return new ExpertProjectionView
+        {
+            SchemaVersion = document.SchemaVersion,
+            ProjectName = document.ProjectName,
+            EntityCount = document.Entities.Count,
+            RelationCount = document.Relations?.Count ?? 0,
+            OpenQuestionCount = document.PendingQuestions?.Count ?? 0,
+            SyncedAttributeCount = syncedCount,
+            PendingAttributeCount = pendingCount,
+            Entities = entities,
+            Relations = relations,
+            PendingQuestions = pendingQuestions,
+            Diagnostics = diagnostics,
+        };
+    }
 }

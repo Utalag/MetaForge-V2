@@ -81,6 +81,32 @@ public sealed class TemplateManager
     }
 
     /// <summary>
+    /// Zaregistruje šablonu z textového obsahu (pro ForgeBlock plugin šablony).
+    /// Pokud šablona se stejným názvem již existuje, přeskočí ji (první registrace vyhrává).
+    /// </summary>
+    /// <param name="templateName">Název šablony (bez přípony).</param>
+    /// <param name="scribanContent">Obsah Scriban šablony.</param>
+    /// <returns>True pokud byla šablona zaregistrována, false pokud již existovala.</returns>
+    public bool RegisterInlineTemplate(string templateName, string scribanContent)
+    {
+        return _cachedTemplates.TryAdd(templateName, ParseTemplate(templateName, scribanContent));
+    }
+
+    /// <summary>
+    /// Načte a zvaliduje Scriban šablonu z textového obsahu.
+    /// </summary>
+    private static Template ParseTemplate(string templateName, string scribanContent)
+    {
+        var template = Template.Parse(scribanContent);
+
+        if (template.HasErrors)
+            throw new InvalidOperationException(
+                $"Chyby při parsování šablony '{templateName}': {string.Join(", ", template.Messages)}");
+
+        return template;
+    }
+
+    /// <summary>
     /// Vyčistí cache šablon.
     /// </summary>
     public void ClearCache()
