@@ -61,3 +61,18 @@ PROP-050 archivován v `Docs/Plans/Dropped/`.
 Candidate Proposal — navazuje na PROP-031 (Statement AST) a PROP-035 (C#-first Core). Měl by být plánován až po stabilizaci Statement systému a Expression rendereru.
 
 Vazby: PROP-031, PROP-035, PROP-036 (Specification Layer — invarianty mohou definovat "co je validní")
+
+## 8. Nový směr (2026-07-16)
+
+Původní koncept Self-Healing Pipeline byl vyhodnocen jako příliš experimentální.  
+PROP-050 byl zamítnut 2026-07-11 (složité AST manipulace, riziko sémantických změn, obtížná testovatelnost).
+
+**Nový směr** vychází z Perplexity konverzace e2801d78 (2026-07-16) a posouvá těžiště od "AST-patchingu" k **"user-facing resilience"**:
+
+- **PROP-057** — ElementContract: elementy nesou svůj sémantický kontrakt (základ pro validní opravy)
+- **PROP-058** — Sandbox Preview Runner: spouštění metod v izolaci (compile gate + execution)
+- **PROP-059** — Resilience & Healing Layer: řízená resilience s audit trailem a 4 politikami
+
+**Klíčový rozdíl**: Místo "AI magicky opraví AST" jde o "řízenou resilience vrstvu, která nepustí uživatele k zemi, ale zároveň nerozbije architektonické invarianty".
+
+Viz [PROP-059 detail](../../Plans/PROP-059-Resilience-Healing-Layer.md) a [PROP-050 srovnání](../../Plans/Dropped/PROP-050-Self-Healing-Pipeline.md#9-nástupnický-návrh-2026-07-16).

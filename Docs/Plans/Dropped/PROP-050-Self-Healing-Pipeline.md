@@ -184,7 +184,27 @@ public sealed class HealingPipeline
 - **Generators**: `RoslynHealingDetector` — Roslyn-based detekce (mimo Core, závislost na Roslyn)
 - **AI nebo Generators**: jednotlivé healery
 - **AI**: `HealingPipeline` orchestrátor
+## 9. Nástupnický návrh (2026-07-16)
 
+Tento návrh byl **zamítnut** 2026-07-11 jako příliš experimentální.  
+Stejnou uživatelskou bolest (nezablokovat uživatele kvůli interní chybě) řeší nová sada návrhů — **zásadně odlišným, bezpečnějším přístupem**:
+
+- **PROP-057: ElementContract + VerificationModel** — sémantické kontrakty jako základ
+- **PROP-058: Sandbox Preview Runner** — izolované spouštění metod
+- **PROP-059: Resilience & Healing Layer** — user-facing resilience s audit trailem
+
+### Klíčové rozdíly oproti PROP-050
+
+| PROP-050 (❌ zamítnut) | PROP-059 (🆕 navržen) |
+|------------------------|----------------------|
+| AST-patching v **Core** | Healing engine **MIMO Core** (Infrastructure) |
+| `RoslynHealingDetector` — technická detekce | Začíná od **ElementContract** — sémantický kontrakt |
+| "Oprav AST, doufej" | **Řízené politiky**: Blocking / RecoverableSilent / RecoverableVisible / NeedsApproval |
+| Bez audit trailu | **HealingAttemptLedger** — každý pokus zalogován |
+| Cíl: technicky opravit kód | Cíl: **nepustit uživatele k zemi** kvůli internímu detailu |
+| Healery v Core/AI vrstvě | Healery v Infrastructure, AI jen jako volitelný suggester |
+
+Zdroj: Perplexity konverzace e2801d78 (2026-07-16)
 ## 7. Implementační dopad
 
 ### Změněné projekty nebo soubory

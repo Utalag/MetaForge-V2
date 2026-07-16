@@ -5,12 +5,15 @@
 
 ## Aktivní návrhy — Zásobník dle priority implementace
 
-> Poslední aktualizace: 2026-07-13 (build.yml CI/CD, PROP-055)
+> Poslední aktualizace: 2026-07-16 (hloubková analýza — přehodnocení priorit)
 
 | ID | Název | Vrstva | Priorita | Odhad | Závislosti | Odkaz |
 |----|-------|--------|----------|-------|------------|-------|
-| **PROP-055** | ReferenceGraph — typový graf závislostí, detekce cyklů, správné pořadí generování | Core, Generators | 🟡 Vysoká | ~2 dny | Není | [Detail](Docs/Plans/PROP-055-ReferenceGraph.md) |
+| **PROP-055** | ReferenceGraph — typový graf závislostí, detekce cyklů, správné pořadí generování | Core, Generators | 🔴 Vysoká | ~2 dny | Není | [Detail](Docs/Plans/PROP-055-ReferenceGraph.md) |
+| **PROP-057** | ElementContract + VerificationModel — sémantické kontrakty pro elementy, fingerprint-based verifikační stavy | Core, Infrastructure | 🔴 Vysoká | 3–4 dny | PROP-024, PROP-036, PROP-039 (hotovo) | [Detail](Docs/Plans/PROP-057-ElementContract-VerificationModel.md) |
 | **PROP-054** | ForgeBlock DI Extension Methods — `IForgeBlockDiProvider`, `AddEfCore()`, `AddAutoMapper()`, `AddFluentValidation()` | ForgeBlocks, Infrastructure | 🟡 Střední | ~2 dny | ISS-011, PROP-017 (hotovo) | [Detail](Docs/Plans/PROP-054-ForgeBlock-DI-Extension-Methods.md) |
+| **PROP-058** | Sandbox Preview Runner — izolované spouštění metod s JSON vstupy, MVP: jen čisté funkce bez závislostí | Generators, CLI, Infrastructure | 🟡 Střední | 3–5 dní | **PROP-057** | [Detail](Docs/Plans/PROP-058-Sandbox-Preview-Runner.md) |
+| **PROP-056** | Projection Unification + JSON Snapshot — sjednocení `ProjectionView` a `ExpertProjectionView` do `DocumentProjection`, `ToJson(filter)` | Translator, BusinessModel | 🟡 Střední | ~3 dny | PROP-018 (hotovo) | [Detail](Docs/Plans/PROP-056-Projection-Unification-JsonSnapshot.md) |
 | **PROP-053** | Web Frontend — Blazor Server s MudBlazor | Frontend | ⚪ Na zvážení | ~5 dní | PROP-044, PROP-045 (hotovo) | [Detail](Docs/Plans/PROP-053-Web-Frontend-Blazor.md) |
 | **PROP-023** | DX vylepšení — Typový SyncState, Layer stack, YAML DSL, Undo/redo | Průřezové | ⚪ Na zvážení | 5–9 dní | ∞ | [Detail](Docs/Plans/PROP-023-DX-Architecture-Improvements-Future.md) |
 
@@ -18,6 +21,7 @@
 
 | ID | Název | Důvod odložení |
 |----|-------|-----------------|
+| **PROP-059** | Resilience & Healing Layer — user-facing resilience, method-level healing s audit trailem | 🔴 **Odloženo 2026-07-16**: PROP-043/045 generátory jsou stabilní. Aktivovat až po PROP-058 v produkci, pokud frekvence chyb > 10 %. Pokud < 5 % → DROPPED. |
 | **CODE-003** | Monetizace — IGenerationCostPolicy, tier licence, billing gate | Platforma může běžet bez monetizace. Plánováno po ověření trakce. |
 | **B5** | WebApi — REST API host surface | CLI + MCP pro MVP stačí. Až bude poptávka. |
 
@@ -25,7 +29,7 @@
 
 | ID | Název | Důvod zamítnutí | Datum |
 |----|-------|-----------------|-------|
-| **PROP-050** | Self-Healing Pipeline | Příliš experimentální — složité AST manipulace s rizikem sémantických změn, obtížná testovatelnost. | 2026-07-11 |
+| **PROP-050** | Self-Healing Pipeline | Příliš experimentální — složité AST manipulace s rizikem sémantických změn, obtížná testovatelnost. PROP-059 (nástupce) je odložen — čeká se na data o reálné frekvenci chyb generování. | 2026-07-11 |
 
 ## Dokončené návrhy
 

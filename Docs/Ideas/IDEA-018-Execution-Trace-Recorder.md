@@ -48,6 +48,24 @@ Dotčené vrstvy: Translator (interface), Infrastructure (OTel), Host (export), 
 - OQ-xxx: Jaký je poměr cena/výnos pro tracing v MVP fázi?
 - OQ-xxx: Patří `IExecutionTraceRecorder` do Translator nebo do samostatného projektu?
 
+## 6. Aktuální stav a doporučení (2026-07-16)
+
+IDEA-018 byla analyzována v kontextu PROP-057/058/059 (ElementContract, Sandbox, Healing).
+
+**Verdikt**: ❌ Implementovat v plné formě (vlastní `IExecutionTraceRecorder` + Mermaid generátor) je **overkill**.
+
+**Důvod**:
+- Přidává další abstrakci, která bude mít jednu implementaci
+- Každá vrstva musí být prošpikovaná trace voláními — kognitivní zátěž a údržba
+- Mermaid diagramy jsou pěkné, ale generují se zřídka
+
+**Doporučená alternativa**:
+- Použít `ILogger` + strukturované eventy (Serilog) pro trasování
+- Mermaid diagramy generovat ad-hoc z logů, ne jako first-class feature
+- Nepřidávat samostatný `IExecutionTraceRecorder` interface, dokud není enterprise poptávka
+
+Viz hloubkovou analýzu v [PROP-057 detail](../Plans/PROP-057-ElementContract-VerificationModel.md).
+
 ## 6. Doporučený další krok
 
 Follow-up k PROP-022. Měl by být plánován až po stabilizaci metrik a pokud je reálná poptávka po detailním tracingu.
