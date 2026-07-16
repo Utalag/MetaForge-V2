@@ -13,6 +13,7 @@ Datum vytvoření: 2026-07-16
 Aktualizováno: 2026-07-16
 
 Navazuje na:
+- **PROP-060** (Element Identity Stabilization) — 🔴 HARD dependency. `ContractScenario.InputsByElementId` vyžaduje stabilní ID pro Property/Method/Parameter.
 - **PROP-024** (StrongType + Expression Record — hotovo) — `StrongType.ValidationRules` jako zdroj property-level constraintů
 - **PROP-036** (Core Specification Layer — hotovo) — `InvariantDefinition` a `InvariantExpression` jako zdroj pravidel
 - **PROP-039** (Core Composability — hotovo) — `ElementFingerprint` a `PipelineVersion` pro verifikační cache
