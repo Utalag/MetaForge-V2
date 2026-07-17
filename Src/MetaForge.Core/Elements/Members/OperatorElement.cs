@@ -58,6 +58,9 @@ public enum OperatorKind
 /// </summary>
 public sealed class OperatorElement : IMemberElement
 {
+    /// <summary>Stable identity for cross-layer traceability (PROP-060).</summary>
+    public Guid Id { get; init; } = Guid.NewGuid();
+
     /// <summary>The kind of operator being overloaded.</summary>
     public OperatorKind OperatorKind { get; set; }
 

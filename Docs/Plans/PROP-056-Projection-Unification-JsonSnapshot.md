@@ -1,19 +1,25 @@
 # PROP-056: Sjednocení projekcí + Structured JSON Snapshot
 
-> **Stav:** 📝 Navrženo
+> **Stav:** 📝 Navrženo (revidováno 2026-07-17 — CoreId synergie)
 > **Datum:** 2026-07-14
+> **Poslední revize:** 2026-07-17
 > **Oblast:** Translator, BusinessModel, Host Surfaces
-> **Odhad:** ~3 dny
+> **Odhad:** ~2.5 dne
 > **Zdroj:** IDEA-011 (Snapshot Testing + Playground/REPL)
+> **Závislosti:**
+> - **PROP-060** (Element Identity Stabilization) — 🔴 HARD. `DocumentProjection` používá `ElementIdMapping` pro `CoreId` pole.
+> - **PROP-055** (ReferenceGraph) — 🟡 SOFT. `DependencyGraphSection` je volitelná sekce projekce konzumující `ReferenceGraph`.
 
 ## Cíl
 
 Nahradit duplicitní `ProjectionView` (basic) a `ExpertProjectionView` (expert) jedním unifikovaným `DocumentProjection` typem s řiditelnou úrovní detailu přes `ProjectionFilter`. Přidat schopnost serializovat projekci do JSON (`ToJson(filter)`) pro:
 
-1. **AI enrichment kontext** — strukturovaný JSON vstup místo string interpolation
+1. **AI enrichment kontext** — strukturovaný JSON vstup místo string interpolation, včetně stabilních CoreId
 2. **CLI / MCP inspect** — `metaforge inspect --json --view expert`
 3. **Custom views** — uživatelem definované filtry co chtějí vidět
 4. **Pročištění codebase** — odstranění duplicitního kódu po refaktoringu
+5. **Traceabilita Business → Core** — `CoreId` (Guid) z PROP-060 vedle `Id` (string)
+6. **Graf závislostí** — `DependencyGraphSection` z PROP-055 jako volitelná sekce
 
 ---
 
@@ -21,7 +27,8 @@ Nahradit duplicitní `ProjectionView` (basic) a `ExpertProjectionView` (expert) 
 
 ### Dnešní problém
 
-V `MetaForge.Translator.Host` existují **dva oddělené projekční typy** se **dvěma oddělenými mappingy**:
+V `MetaForge.Translator.Host` existují **dva oddělené projekční typy** se **dvěma oddělenými mappingy**.
+Navíc **chybí CoreId** — projekce obsahuje jen BusinessModel `string Id`, ale žádné mapování na Core `Guid Id` (PROP-060). To znamená, že z projekce nelze zjistit, který `ClassElement` odpovídá které `BusinessEntityNode`.
 
 | Aspekt | `ProjectionView` | `ExpertProjectionView` |
 |--------|-----------------|----------------------|
@@ -73,11 +80,19 @@ public sealed record DocumentProjection
     public IReadOnlyList<BehaviorProjection> Behaviors { get; init; } = [];
     public IReadOnlyList<PendingQuestionProjection> PendingQuestions { get; init; } = [];
     public ProjectionDiagnostics Diagnostics { get; init; } = new();
+
+    // === PROP-055 synergie — graf závislostí ===
+    public DependencyGraphSection? DependencyGraph { get; init; }
 }
 
 public sealed record EntityProjection
 {
+    /// <summary>BusinessModel ID (string, např. "a1b2c3d4").</summary>
     public string Id { get; init; } = string.Empty;
+
+    /// <summary>Core ID (Guid) — z ElementIdMapping (PROP-060). Null = dosud nepřeloženo.</summary>
+    public Guid? CoreId { get; init; }
+
     public string Name { get; init; } = string.Empty;
     public string? PresetId { get; init; }
     public IReadOnlyList<AttributeProjection> Attributes { get; init; } = [];
@@ -87,7 +102,12 @@ public sealed record EntityProjection
 
 public sealed record AttributeProjection
 {
+    /// <summary>BusinessModel ID (string).</summary>
     public string Id { get; init; } = string.Empty;
+
+    /// <summary>Core ID (Guid) — z ElementIdMapping (PROP-060). Null = dosud nepřeloženo.</summary>
+    public Guid? CoreId { get; init; }
+
     public string Name { get; init; } = string.Empty;
     public string BusinessType { get; init; } = "string";
     public string? CoreType { get; init; }
@@ -117,13 +137,25 @@ public sealed record RelationProjection
 {
     public string FromEntityId { get; init; } = string.Empty;
     public string ToEntityId { get; init; } = string.Empty;
+
+    /// <summary>Core ID zdrojové entity — z ElementIdMapping (PROP-060).</summary>
+    public Guid? FromEntityCoreId { get; init; }
+
+    /// <summary>Core ID cílové entity — z ElementIdMapping (PROP-060).</summary>
+    public Guid? ToEntityCoreId { get; init; }
+
     public string RelationType { get; init; } = string.Empty;
     public string? NavigationName { get; init; }
 }
 
 public sealed record BehaviorProjection
 {
+    /// <summary>BusinessModel ID (string).</summary>
     public string Id { get; init; } = string.Empty;
+
+    /// <summary>Core ID (Guid) — z ElementIdMapping (PROP-060). Null = dosud nepřeloženo.</summary>
+    public Guid? CoreId { get; init; }
+
     public string Name { get; init; } = string.Empty;
     public string? ReturnType { get; init; }
     public IReadOnlyList<string> Parameters { get; init; } = [];
@@ -174,6 +206,12 @@ public sealed record ProjectionFilter
     public bool IncludeConstraints { get; init; }
     public bool IncludeMetadata { get; init; }
     public bool IncludeCoinCost { get; init; }
+
+    // === CoreId (PROP-060 synergie) ===
+    public bool IncludeCoreIds { get; init; }
+
+    // === DependencyGraph (PROP-055 synergie) ===
+    public bool IncludeDependencyGraph { get; init; }
 }
 
 public enum AttributeDetailLevel
@@ -208,14 +246,17 @@ public static class ProjectionPresets
         IncludeConstraints = true,
         IncludeMetadata = true,
         IncludeCoinCost = true,
+        IncludeCoreIds = true,
+        IncludeDependencyGraph = true,
         AttributeDetail = AttributeDetailLevel.Full,
     };
 
-    /// <summary>Pro AI enrichment — typy, validace, kontext.</summary>
+    /// <summary>Pro AI enrichment — typy, validace, kontext + CoreId pro traceabilitu.</summary>
     public static ProjectionFilter AiEnrichment => new()
     {
         IncludeCoreDetail = true,
         IncludeConstraints = true,
+        IncludeCoreIds = true,
         AttributeDetail = AttributeDetailLevel.WithValidation,
     };
 
@@ -285,8 +326,6 @@ public static class ProjectionSerializer
 }
 ```
 
-Serializace atributu podle detail levelu:
-
 ```csharp
 private static JsonObject SerializeAttribute(AttributeProjection attr, ProjectionFilter filter)
 {
@@ -294,6 +333,10 @@ private static JsonObject SerializeAttribute(AttributeProjection attr, Projectio
     {
         ["name"] = attr.Name,
     };
+
+    // CoreId (PROP-060 synergie — vždy pokud je k dispozici a filtr to chce)
+    if (filter.IncludeCoreIds && attr.CoreId is not null)
+        json["coreId"] = attr.CoreId.Value.ToString();
 
     if (filter.AttributeDetail >= AttributeDetailLevel.NameAndType)
     {
@@ -343,8 +386,106 @@ Custom view definované v `.metaforge/views.json`:
   "constraints-audit": {
     "includeConstraints": true,
     "includeCoreDetail": true,
+    "includeCoreIds": true,
     "attributeDetail": "withValidation"
+  },
+  "code-traceability": {
+    "includeCoreIds": true,
+    "includeDependencyGraph": true,
+    "attributeDetail": "nameOnly"
   }
+}
+```
+
+### 6. `DependencyGraphSection` — PROP-055 synergie
+
+```csharp
+// Src/MetaForge.Translator/Projections/DependencyGraphSection.cs
+
+/// <summary>
+/// Projekce referenčního grafu (PROP-055).
+/// Zobrazuje závislosti mezi elementy pro CLI/MCP inspect.
+/// </summary>
+public sealed record DependencyGraphSection
+{
+    public int NodeCount { get; init; }
+    public int EdgeCount { get; init; }
+    public bool HasCycles { get; init; }
+    public IReadOnlyList<DependencyNodeProjection> Nodes { get; init; } = [];
+    public IReadOnlyList<CycleProjection> Cycles { get; init; } = [];
+    public IReadOnlyList<UnresolvedProjection> Unresolved { get; init; } = [];
+}
+
+public sealed record DependencyNodeProjection
+{
+    public Guid ElementId { get; init; }
+    public string DisplayName { get; init; } = string.Empty;
+    public string ElementKind { get; init; } = string.Empty;
+    public int InDegree { get; init; }
+    public int OutDegree { get; init; }
+}
+
+public sealed record CycleProjection
+{
+    public IReadOnlyList<string> DisplayNames { get; init; } = [];
+}
+
+public sealed record UnresolvedProjection
+{
+    public string SourceDisplayName { get; init; } = string.Empty;
+    public string ReferencedAs { get; init; } = string.Empty;
+    public string Kind { get; init; } = string.Empty;
+}
+```
+
+### 7. ProjectionBuilder — integrace ElementIdMapping
+
+```csharp
+// Src/MetaForge.Translator/Projections/ProjectionBuilder.cs
+
+public sealed class ProjectionBuilder
+{
+    private readonly IBusinessTranslator _translator;
+    private readonly ElementIdMapping? _idMapping;  // PROP-060 — volitelné
+
+    public ProjectionBuilder(IBusinessTranslator translator, ElementIdMapping? idMapping = null)
+    {
+        _translator = translator;
+        _idMapping = idMapping;
+    }
+
+    public DocumentProjection Build(BusinessAuthoringDocument document, ProjectionFilter filter)
+    {
+        var projection = new DocumentProjection { ... };
+
+        foreach (var entity in document.Entities)
+        {
+            var entityProj = new EntityProjection
+            {
+                Id = entity.Id,
+                CoreId = _idMapping?.ResolveBusinessId(entity.Id),  // PROP-060
+                Name = entity.Name,
+            };
+
+            foreach (var attr in entity.Attributes)
+            {
+                var attrProj = new AttributeProjection
+                {
+                    Id = attr.Id,
+                    CoreId = _idMapping?.ResolveBusinessId(attr.Id),  // PROP-060
+                    Name = attr.Name,
+                };
+            }
+        }
+
+        // PROP-055 synergie
+        if (filter.IncludeDependencyGraph && _referenceGraph is not null)
+        {
+            projection.DependencyGraph = BuildDependencyGraphSection(_referenceGraph);
+        }
+
+        return projection;
+    }
 }
 ```
 
@@ -367,7 +508,7 @@ metaforge inspect --view expert --include-coin-cost=false --attr-detail=nameAndT
 metaforge inspect --view expert --output model.json
 ```
 
-### 6. Zapojení do AI enrichmentu
+### 8. Zapojení do AI enrichmentu
 
 `DefaultBusinessTranslator.TryEnrichAsync()` místo string interpolation:
 
@@ -379,10 +520,11 @@ var userPrompt = AuthoringTranslationModelPrompt.BuildUserPrompt(
 // Zítra:
 var entityProj = projection.Entities.First(e => e.Attributes.Any(a => a.Id == attribute.Id));
 var contextJson = entityProj.ToJson(ProjectionPresets.AiEnrichment);
+// contextJson nyní obsahuje i "coreId" pro každý atribut — AI vidí provázání na vygenerovaný kód
 var userPrompt = $"""
     Analyzuj atribut v kontextu entity.
 
-    Kontext (JSON):
+    Kontext (JSON včetně coreId pro traceabilitu):
     {contextJson}
 
     Vrať POUZE JSON podle schématu.
@@ -397,11 +539,12 @@ var userPrompt = $"""
 
 | Soubor | Obsah |
 |--------|-------|
-| `DocumentProjection.cs` | Hlavní projekční typ + všechny podtypy |
-| `ProjectionFilter.cs` | Filtr + `AttributeDetailLevel` |
-| `ProjectionPresets.cs` | Basic / Expert / AiEnrichment / Custom |
-| `ProjectionSerializer.cs` | `ToJson(filter)` extension metoda |
-| `ProjectionBuilder.cs` | Logika z `ProjectionReadService.BuildProjection()` sem |
+| `DocumentProjection.cs` | Hlavní projekční typ + EntityProjection, AttributeProjection, BehaviorProjection, RelationProjection, PendingQuestionProjection, ProjectionDiagnostics |
+| `ProjectionFilter.cs` | Filtr + `AttributeDetailLevel` enum |
+| `ProjectionPresets.cs` | Basic / Expert / AiEnrichment / Custom presety |
+| `ProjectionSerializer.cs` | `ToJson(filter)` extension metoda — serializuje včetně CoreId |
+| `ProjectionBuilder.cs` | Logika z `ProjectionReadService.BuildProjection()` sem — konzumuje `ElementIdMapping` (PROP-060) |
+| `DependencyGraphSection.cs` | Projekce grafu závislostí (PROP-055 synergie) — `DependencyNodeProjection`, `CycleProjection`, `UnresolvedProjection` |
 
 ### Odstraněné soubory
 
@@ -417,10 +560,11 @@ var userPrompt = $"""
 
 | Soubor | Změna |
 |--------|-------|
-| `Host/ProjectionReadService.cs` | `BuildProjection()` → používá `ProjectionBuilder`. `GetProjection()` vrací `DocumentProjection` místo `ProjectionView`. `GetExpertProjection()` → odstraněn (použít `GetProjection(doc, ProjectionPresets.Expert)`) |
-| `Host/BusinessAuthoringHostFacade.cs` | Metody vracející `ProjectionView` / `ExpertProjection` → vrací `DocumentProjection` |
-| `Translation/DefaultBusinessTranslator.cs` | `TryEnrichAsync()` používá JSON kontext místo string promptu |
-| `Prompting/SemanticBriefJson.cs` | Zůstává beze změny |
+| `Host/ProjectionReadService.cs` | `BuildProjection()` → deleguje na `ProjectionBuilder`. `GetProjection()` vrací `DocumentProjection`. `GetExpertProjection()` → odstraněn. Přidáno `GetElementIdMapping()` (PROP-060). Přidán `ReferenceGraph` parametr (PROP-055). |
+| `Host/BusinessAuthoringHostFacade.cs` | Metody vracející `ProjectionView`/`ExpertProjection` → vrací `DocumentProjection`. Ukládá `ElementIdMapping` z posledního `TranslateDocument()`. |
+| `Translation/DefaultBusinessTranslator.cs` | `TryEnrichAsync()` používá JSON kontext včetně CoreId. `TranslateDocument()` ukládá `ElementIdMapping` do Facade. |
+| `Translation/ElementIdMapping.cs` | **Použito** (nový soubor z PROP-060) — `ProjectionBuilder` konzumuje `ResolveBusinessId()`. |
+| `Prompting/SemanticBriefJson.cs` | Zůstává beze změny (výstupní schéma AI). |
 
 ### Pročištění codebase po refaktoringu
 
@@ -448,22 +592,34 @@ var userPrompt = $"""
 
 ```mermaid
 graph TD
-    A[1. Vytvořit DocumentProjection + ProjectionFilter] --> B[2. Implementovat ProjectionBuilder]
-    B --> C[3. Implementovat ProjectionSerializer.ToJson]
-    C --> D[4. Přepnout ProjectionReadService na nový typ]
-    D --> E[5. Přepnout BusinessAuthoringHostFacade]
-    E --> F[6. Zapojit do DefaultBusinessTranslator.TryEnrichAsync]
-    F --> G[7. Přidat custom views (.metaforge/views.json)]
-    G --> H[8. Odstranit staré soubory]
-    H --> I[9. Pročistit codebase a reference]
-    I --> J[10. Aktualizovat a přidat testy]
-    J --> K[11. Ověřit build + testy]
+    A[0. PROP-060 — ElementIdMapping existuje] --> B[1. Vytvořit DocumentProjection + ProjectionFilter]
+    B --> C[2. Implementovat ProjectionBuilder s ElementIdMapping]
+    C --> D[3. Implementovat ProjectionSerializer.ToJson vč. CoreId]
+    D --> E[4. Přepnout ProjectionReadService na nový typ]
+    E --> F[5. Přepnout BusinessAuthoringHostFacade]
+    F --> G[6. Zapojit JSON kontext do DefaultBusinessTranslator.TryEnrichAsync]
+    G --> H[7. Přidat DependencyGraphSection (PROP-055)]
+    H --> I[8. Přidat custom views .metaforge/views.json]
+    I --> J[9. Odstranit staré soubory]
+    J --> K[10. Pročistit codebase a reference]
+    K --> L[11. Aktualizovat a přidat testy]
+    L --> M[12. Ověřit build + testy]
 ```
 
 ---
 
 ## Otevřené otázky
 
-1. **Zpětná kompatibilita** — `BusinessAuthoringHostFacade` má metody vracející `ProjectionView`. Mají host surfaces (CLI, MCP, WebApi) přímou závislost na starých typech? Pokud ano, přidat adaptér nebo rovnou zlomit.
+1. **Zpětná kompatibilita** — `BusinessAuthoringHostFacade` má metody vracející `ProjectionView`. Mají host surfaces (CLI, MCP) přímou závislost na starých typech? Pokud ano, přidat adaptér nebo rovnou zlomit.
 2. **Custom views storage** — JSON soubor v `.metaforge/views.json` nebo v projektu? Možná obojí.
 3. **Format výstupu** — JSON je primární, ale `ToJson()` používá `System.Text.Json.Nodes` → YAML by šel přes konverzi (ale není v scope tohoto PROP).
+4. **OQ-056-04: Co když `ElementIdMapping` ještě neexistuje?** — `ProjectionBuilder` akceptuje `ElementIdMapping?` jako optional. `CoreId` bude `null`. PROP-060 je HARD dependency, takže by se to nemělo stát, ale graceful fallback je správný.
+5. **OQ-056-05: Má `IncludeCoreIds` být výchozí pro Basic?** — Ne. `CoreId` je implementační detail. Basic preset ho nezahrnuje. Jen Expert a AiEnrichment.
+
+## Navazuje na
+
+- **PROP-060** (Element Identity Stabilization) — 🔴 HARD. `CoreId` pole jsou populována z `ElementIdMapping.ResolveBusinessId()`.
+- **PROP-055** (ReferenceGraph) — 🟡 SOFT. `DependencyGraphSection` je volitelná sekce konzumující `ReferenceGraph`.
+- `IDEA-011` — původní koncept Snapshot Testing
+- `ProjectionReadService.cs` — hlavní soubor k refaktorování
+- `DefaultBusinessTranslator.cs` — AI enrichment začne používat JSON kontext

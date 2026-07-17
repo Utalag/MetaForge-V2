@@ -211,6 +211,21 @@ public sealed record TestCaseResult(string Name, bool Passed, string? Output);
 
 ## DI registrace (PROP-027)
 
+### AiRepairSuggestionService (PROP-061)
+
+```csharp
+// Implementace IRepairSuggestionService — AI-assisted repair návrhy
+// Graceful fallback: bez AI vrací prázdné pole, nikdy neblokuje
+public sealed class AiRepairSuggestionService : IRepairSuggestionService
+{
+    public AiRepairSuggestionService(IAiBackendAdapter? ai);
+    public Task<IReadOnlyList<RepairRecommendation>> SuggestRepairsAsync(
+        AuthoringFeedbackRecord feedback, CancellationToken ct);
+}
+```
+
+---
+
 ```csharp
 // Extension method pro jednoduchou registraci
 public static class AiServiceRegistration

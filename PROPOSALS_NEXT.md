@@ -3,15 +3,14 @@
 > Návrhy, které jsou identifikované, ale zatím neschválené k implementaci.
 > Nikdy neimplementovat přímo z tohoto souboru — vždy přesunout do PROPOSALS.md.
 > Plány jsou uloženy v `Docs/Plans/PROP-XXX-*.md` a jsou součástí návrhu.
-> Poslední aktualizace: 2026-07-12
+> Poslední aktualizace: 2026-07-18 (PROP-061 přidán, CODE-004 rozpuštěn do PROP-061)
 
 ## Kandidátní návrhy
 
 | ID | Název | Vrstva | Priorita | Odhad | Poznámka |
 |----|-------|--------|----------|-------|----------|
-| **CODE-001** | CLI — `generate`/`export` command | Host Surfaces | 🔴 Kritická | 2-3 dny | Blokátor B2: pipeline BusinessModel→Core→C# není v CLI propojená. Nutno přidat command, který propojí Translator + CodeGenerator. |
-| **CODE-002** | Perzistence v CLI/MCP — JsonCommandLogRepository + JsonDocumentRepository | Infrastructure | 🔴 Kritická | 1-2 dny | Blokátor B3: obě host surfaces používají in-memory storage. Data přežijí jen do restartu. |
-| **CODE-003** | Monetizace — IGenerationCostPolicy, tier licence, billing gate | Generators, Monetization | 🟡 Vysoká | 3-5 dní | Blokátor B4: chybí jakákoli implementace monetizace. Nutno před produkcí. |
+| **PROP-061** | Authoring Feedback Service — sjednocená diagnostika (Generator+Translator+Pipeline), ActiveFeedbackCache, AI repair návrhy, LearningArchive | Průřezové (Feedback, Translator, Core, Generators, AI, Infra, CLI, MCP) | 🟡 Vysoká | 18–23 dní | Nový projekt `MetaForge.Feedback`; absorbuje CODE-004; detail: `Docs/Plans/PROP-061-Authoring-Feedback-Service.md` |
+| **CODE-003** | Monetizace — IGenerationCostPolicy, tier licence, billing gate | Generators, Monetization | 🟡 Vysoká | 3-5 dní | Odloženo po ověření trakce |
 | **PROP-053** | Web Frontend — Blazor Server s MudBlazor (strom modelu, konfigurace, ForgeBlock výběr) | Frontend | ⚪ Na zvážení | ~5 dní | Návrh: `Docs/Plans/PROP-053-Web-Frontend-Blazor.md` |
 
 ## Odložené návrhy

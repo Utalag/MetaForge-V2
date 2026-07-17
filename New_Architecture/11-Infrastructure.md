@@ -140,6 +140,10 @@ public sealed class StorageOptions
     public string CheckpointPath { get; init; } = "data/checkpoints/";
     public bool AutoSave { get; init; } = true;
     public int AutoSaveIntervalMs { get; init; } = 5000;
+
+    // PROP-061: Feedback Platform
+    public string FeedbackCachePath { get; init; } = "data/feedback/";
+    public string LearningArchivePath { get; init; } = "data/learning/archive.jsonl";
 }
 
 public sealed class AiOptions
@@ -224,4 +228,22 @@ public class FileSystemProvider
     public virtual string[] GetFiles(string path, string searchPattern);
 }
 ```
+
+
+
+### Verification (PROP-057 — ✅ implementováno 2026-07-17)
+
+Src/MetaForge.Infrastructure/Verification/:
+- **VerificationState** enum — Unknown, Running, Passed, Failed, Stale
+- **VerificationRecord** — ElementId, Fingerprint, State, LastVerified, FailureDiagnostics
+- **IVerificationStateStore** — GetAsync/SetAsync/InvalidateAsync
+- **InMemoryVerificationStateStore** — Dictionary-based implementace
+
+### Sandbox (PROP-058 — ✅ kontrakty 2026-07-17, MVP pending)
+
+Src/MetaForge.Infrastructure/Sandbox/:
+- **ISandboxExecutionService** — ExecuteAsync(SandboxExecutionRequest)
+- **SandboxExecutionRequest** — Method, Contract?, InputJson, Mode, Timeout
+- **SandboxExecutionResult** — Success, OutputJson, ExceptionMessage, CompilationErrors
+- **SandboxMode** — Preview (tolerant) / Export (strict)
 

@@ -5,7 +5,7 @@ using MetaForge.Core.DataTypes;
 using MetaForge.Core.Elements.Members;
 using MetaForge.Core.Elements.Types;
 using MetaForge.Translator.Prompting;
-using MetaForge.Translator.Prompting.ModelPrompts;
+using MetaForge.Translator.Projections;
 
 namespace MetaForge.Translator.Translation;
 
@@ -18,6 +18,9 @@ public sealed class DefaultBusinessTranslator : IBusinessTranslator
 {
     private readonly CatalogManager _catalog;
     private readonly IAiTranslator? _aiTranslator;
+
+    /// <summary>Poslední mapping z TranslateDocument() — používá se pro traceabilitu (PROP-060).</summary>
+    public ElementIdMapping? LastMapping { get; private set; }
 
     /// <summary>
     /// Vytvoří překladač bez AI (pouze deterministický).
@@ -145,14 +148,30 @@ public sealed class DefaultBusinessTranslator : IBusinessTranslator
                 var isAvailable = await _aiTranslator.IsAvailableAsync(ct);
                 if (isAvailable)
                 {
-                    var userPrompt = AuthoringTranslationModelPrompt.BuildUserPrompt(
-                        attribute.Name,
-                        attribute.Type,
-                        siblingAttributes,
-                        entityName);
+                    var siblingList = siblingAttributes is not null
+                        ? string.Join(", ", siblingAttributes)
+                        : "";
+
+                    var userPrompt = $"""
+                        Analyze the attribute in context of its entity.
+
+                        Attribute: {attribute.Name}
+                        BusinessType: {attribute.Type}
+                        Entity: {entityName ?? "(unknown)"}
+                        Sibling attributes: [{siblingList}]
+                        IsRequired: {attribute.IsRequired}
+                        MaxLength: {attribute.MaxLength}
+                        DefaultValue: {attribute.DefaultValue ?? "(none)"}
+
+                        Return ONLY valid JSON matching the expected schema.
+                        """;
 
                     var aiResult = await _aiTranslator.CompleteStructuredAsync<SemanticBriefJson>(
-                        AuthoringTranslationModelPrompt.SystemPrompt,
+                        $"""
+                        You are a business domain analyst. Given a business attribute,
+                        determine its C# type, validation rules, and constraints.
+                        Return ONLY valid JSON.
+                        """,
                         userPrompt,
                         ct);
 
@@ -189,11 +208,13 @@ public sealed class DefaultBusinessTranslator : IBusinessTranslator
         ArgumentNullException.ThrowIfNull(document);
 
         var result = new List<RootElement>();
+        var mapping = new ElementIdMapping();  // PROP-060: uchovat mapování
         var translationSource = DetermineTranslationSource(document);
 
         foreach (var entity in document.Entities)
         {
             var classElement = new ClassElement { Name = entity.Name };
+            mapping.MapEntity(entity, classElement.Id);  // PROP-060: BusinessEntityNode.Id → ClassElement.Id
 
             // Translation source metadata
             if (translationSource != null)
@@ -201,6 +222,8 @@ public sealed class DefaultBusinessTranslator : IBusinessTranslator
 
             foreach (var attr in entity.Attributes)
             {
+                PropertyElement property;
+
                 // Strong type detekce přes CoreDetail
                 if (attr.CoreDetail?.IsStrongType == true && attr.CoreDetail?.ValueObjectName != null)
                 {
@@ -209,32 +232,34 @@ public sealed class DefaultBusinessTranslator : IBusinessTranslator
 
                     if (ctd != null)
                     {
-                        // Vytvořit ValueObjectElement (Vogen-annotated target)
                         var vo = new ValueObjectElement
                         {
                             Name = ctd.Name,
                             IsReadOnly = true,
                         };
 
-                        // Translation source metadata na value object
                         if (translationSource != null)
                             vo.Metadata.Set("Generation.TranslationSource", translationSource);
 
-                        // Property s odkazem na strong type
                         classElement.InlineStrongTypes.Add(vo);
-                        classElement.Properties.Add(PropertyElement.GetSet(attr.Name,
-                            TypeModel.Of(DataType.Struct).WithCustomName(ctd.Name)));
+                        property = PropertyElement.GetSet(attr.Name,
+                            TypeModel.Of(DataType.Struct).WithCustomName(ctd.Name));
+                        mapping.MapAttribute(attr, property.Id);  // PROP-060
+                        classElement.Properties.Add(property);
                         continue;
                     }
                 }
 
                 // Fallback na primitivum
-                classElement.Properties.Add(PropertyElement.GetSet(attr.Name, Translate(attr)));
+                property = PropertyElement.GetSet(attr.Name, Translate(attr));
+                mapping.MapAttribute(attr, property.Id);  // PROP-060
+                classElement.Properties.Add(property);
             }
 
             result.Add(classElement);
         }
 
+        LastMapping = mapping;  // PROP-060: uložit pro konzumenty
         return result;
     }
 

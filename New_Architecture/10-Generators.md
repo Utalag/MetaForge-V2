@@ -151,11 +151,24 @@ public sealed record DiagnosticInfo(
     string Message,
     DiagnosticSeverity Severity = DiagnosticSeverity.Warning,
     string? ElementId = null,
-    string? ElementName = null
+    string? ElementName = null,
+    string? Code = null          // PROP-061: kód diagnostiky pro mapování na Diagnostic (Core)
 );
 
 public enum DiagnosticSeverity { Warning, Error }
 ```
+
+### MapType rozšíření (PROP-061)
+
+```csharp
+// CodeGenerator.MapType() — nové cesty před IsCollection
+// Array → T[] syntax (Array vyhrává nad IsCollection)
+// Nullable → T? syntax
+// Diagnostika přes AsyncLocal<List<DiagnosticInfo>> pro nerozpoznané typy
+// IsKnownPrimitive() — 23 primitivních DataType hodnot
+```
+
+MapDataType nyní vrací čisté `"object"` bez TODO komentářů — diagnostika je v `MapType`.
 
 ---
 

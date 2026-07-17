@@ -5,23 +5,22 @@
 
 ## Aktivní návrhy — Zásobník dle priority implementace
 
-> Poslední aktualizace: 2026-07-16 (hloubková analýza — přehodnocení priorit)
+> Poslední aktualizace: 2026-07-18 (PROP-062, PROP-063, PROP-064 přidány — Workflow → FlowGraphSection)
 
 | ID | Název | Vrstva | Priorita | Odhad | Závislosti | Odkaz |
 |----|-------|--------|----------|-------|------------|-------|
-| **PROP-055** | ReferenceGraph — typový graf závislostí, detekce cyklů, správné pořadí generování | Core, Generators | 🔴 Vysoká | ~2 dny | Není | [Detail](Docs/Plans/PROP-055-ReferenceGraph.md) |
-| **PROP-060** | Element Identity Stabilization — přidání `Guid Id` do `IMemberElement`, oprava Business→Core ID mapping, ID-first foundation | Core, BusinessModel, Translator | 🔴 Kritická | 1–2 dny | PROP-040 (hotovo) | [Detail](Docs/Plans/PROP-060-Element-Identity-Stabilization.md) |
-| **PROP-057** | ElementContract + VerificationModel — sémantické kontrakty pro elementy, fingerprint-based verifikační stavy | Core, Infrastructure | 🔴 Vysoká | 3–4 dny | **PROP-060**, PROP-024, PROP-036, PROP-039 (hotovo) | [Detail](Docs/Plans/PROP-057-ElementContract-VerificationModel.md) |
-| **PROP-054** | ForgeBlock DI Extension Methods — `IForgeBlockDiProvider`, `AddEfCore()`, `AddAutoMapper()`, `AddFluentValidation()` | ForgeBlocks, Infrastructure | 🟡 Střední | ~2 dny | ISS-011, PROP-017 (hotovo) | [Detail](Docs/Plans/PROP-054-ForgeBlock-DI-Extension-Methods.md) |
-| **PROP-058** | Sandbox Preview Runner — izolované spouštění metod s JSON vstupy, MVP: jen čisté funkce bez závislostí | Generators, CLI, Infrastructure | 🟡 Střední | 3–5 dní | **PROP-057** | [Detail](Docs/Plans/PROP-058-Sandbox-Preview-Runner.md) |
-| **PROP-056** | Projection Unification + JSON Snapshot — sjednocení `ProjectionView` a `ExpertProjectionView` do `DocumentProjection`, `ToJson(filter)` | Translator, BusinessModel | 🟡 Střední | ~3 dny | PROP-018 (hotovo) | [Detail](Docs/Plans/PROP-056-Projection-Unification-JsonSnapshot.md) |
+| **PROP-061** | Authoring Feedback Service — sjednocená diagnostika (Generator+Translator+Pipeline), ActiveFeedbackCache, AI repair návrhy (max 3, ke schválení), FeedbackLearningArchive, consent-based HTTP export | Průřezové (Feedback, Translator, Core, Generators, AI, Infra, CLI, MCP) | ✅ Dokončeno | 18–23 dní | PROP-056, PROP-060 | ✅ Všechny fáze hotovy (2026-07-18) — [Detail](Docs/Plans/PROP-061-Authoring-Feedback-Service.md) |
+| **PROP-062** | FlowGraphSection — odvozená grafová vizualizace z entit a relací (nody + hrany) nad DocumentProjection, JsonCrack-kompatibilní | Translator (Projections) | 🟡 Vysoká | 1–2 dny | PROP-056 (hotovo) | [Detail](Docs/Plans/PROP-062-FlowGraph-Section.md) |
+| **PROP-063** | Remove Explicit Workflow Modeling — odstranění 6 modelů, 3 patch operací, 3 facade metod, ReplayEngine dispatch (náhrada: FlowGraphSection PROP-062) | BusinessModel, Translator | 🟡 Vysoká | 1–2 dny | **PROP-062** | [Detail](Docs/Plans/PROP-063-Remove-Explicit-Workflow.md) |
+| **PROP-058** | Sandbox Preview Runner — izolované spouštění metod s JSON vstupy, MVP: kontrakty hotovy (ISandboxExecutionService), zbývá Roslyn kompilace | Generators, CLI, Infrastructure | 🟡 Střední | 2–3 dny | **PROP-057** (hotovo) | [Detail](Docs/Plans/PROP-058-Sandbox-Preview-Runner.md) |
 | **PROP-053** | Web Frontend — Blazor Server s MudBlazor | Frontend | ⚪ Na zvážení | ~5 dní | PROP-044, PROP-045 (hotovo) | [Detail](Docs/Plans/PROP-053-Web-Frontend-Blazor.md) |
-| **PROP-023** | DX vylepšení — Typový SyncState, Layer stack, YAML DSL, Undo/redo | Průřezové | ⚪ Na zvážení | 5–9 dní | ∞ | [Detail](Docs/Plans/PROP-023-DX-Architecture-Improvements-Future.md) |
+| **PROP-023** | DX vylepšení — ~~Typový SyncState~~ (vytěženo do PROP-060), Layer stack, YAML DSL, Undo/redo | Průřezové | ⚪ Na zvážení | 4–8 dní | ∞ | [Detail](Docs/Plans/PROP-023-DX-Architecture-Improvements-Future.md) |
 
 ## Odložené návrhy
 
 | ID | Název | Důvod odložení |
 |----|-------|-----------------|
+| **PROP-064** | Post-Removal Workflow Cleanup — kontrolní checklist (13 bodů: grep, build, testy, dokumentace) po PROP-063 | ⚪ **Na zvážení**: Sanity check po dokončení PROP-063. Lze přeskočit, pokud removal proběhne čistě. |
 | **PROP-059** | Resilience & Healing Layer — user-facing resilience, method-level healing s audit trailem | 🔴 **Odloženo 2026-07-16**: PROP-043/045 generátory jsou stabilní. Aktivovat až po PROP-058 v produkci, pokud frekvence chyb > 10 %. Pokud < 5 % → DROPPED. |
 | **CODE-003** | Monetizace — IGenerationCostPolicy, tier licence, billing gate | Platforma může běžet bez monetizace. Plánováno po ověření trakce. |
 | **B5** | WebApi — REST API host surface | CLI + MCP pro MVP stačí. Až bude poptávka. |
@@ -36,6 +35,11 @@
 
 | ID | Název | Datum dokončení | Odkaz |
 |----|-------|-----------------|-------|
+| **PROP-057** | ElementContract + VerificationModel — 7 typů v Core (ContractValue, ElementContract, EntityContract, MethodContract, ContractScenario), Infrastructure (VerificationStateStore) | 2026-07-17 | [Detail](Docs/Plans/PROP-057-ElementContract-VerificationModel.md) |
+| **PROP-056** | Projection Unification + JSON Snapshot — DocumentProjection, ProjectionFilter, DependencyGraphSection, CoreId traceabilita | 2026-07-17 | [Detail](Docs/Plans/PROP-056-Projection-Unification-JsonSnapshot.md) |
+| **PROP-060** | Element Identity Stabilization — přidání `Guid Id` do `IMemberElement`, oprava Business→Core ID mapping, Typový SyncState (z PROP-023), `ElementIdMapping` | 2026-07-17 | [Detail](Docs/Plans/PROP-060-Element-Identity-Stabilization.md) |
+| **PROP-055** | ReferenceGraph — typový graf závislostí (ID-based, ReferenceKind, Kahnův sort), ReferenceCycle, UnresolvedReference | 2026-07-17 | [Detail](Docs/Plans/PROP-055-ReferenceGraph.md) |
+| **PROP-054** | ForgeBlock DI Extension Methods — `DiRegistrationAttribute`, `ForgeBlockRegistry.ApplyToDi()` deklarativní registrace | 2026-07-17 | [Detail](Docs/Plans/PROP-054-ForgeBlock-DI-Extension-Methods.md) |
 | **PROP-052** | Operator/Event/Delegate — 4 Delegate snapshot testy (D1-D4) | 2026-07-11 | [Detail](Docs/Plans/Implemented/PROP-052-OperatorEventDelegate-FollowUp.md) |
 | **PROP-048** | Generator Render Core Tests — 72 ExpressionRenderer + 13 StatementRenderer + 6 TemplateManager = 91 unit testů, 3 bugy v ExpressionRenderer opraveny (MapType, RenderSwitch, decimal) | 2026-07-11 | [Detail](Docs/Plans/PROP-048-Generator-Render-Core-Tests.md) |
 | **PROP-049** | Test Framework Consolidation — UPDATE_SNAPSHOTS env var v SnapshotComparer | 2026-07-11 | [Detail](Docs/Plans/PROP-049-Test-Framework-Consolidation.md) |

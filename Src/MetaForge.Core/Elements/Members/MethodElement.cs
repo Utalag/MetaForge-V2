@@ -1,4 +1,5 @@
 using MetaForge.Core.Abstractions;
+using MetaForge.Core.Contracts;
 using MetaForge.Core.DataTypes;
 using MetaForge.Core.Elements.Expressions;
 using MetaForge.Core.Elements.Statements;
@@ -11,6 +12,9 @@ namespace MetaForge.Core.Elements.Members;
 /// </summary>
 public sealed class MethodElement : IMemberElement
 {
+    /// <summary>Stable identity for cross-layer traceability (PROP-060).</summary>
+    public Guid Id { get; init; } = Guid.NewGuid();
+
     /// <summary>Název metody.</summary>
     public string Name { get; set; } = string.Empty;
 
@@ -72,6 +76,9 @@ public sealed class MethodElement : IMemberElement
 
     /// <summary>Celková cena včetně parametrů.</summary>
     public int TotalCoin => Coin + Parameters.Sum(p => p.Coin);
+
+    /// <summary>Sémantický kontrakt metody (PROP-057) — volitelný, default null.</summary>
+    public MethodContract? Contract { get; init; }
 
     // === Statické factory metody (M1-M7 matice) ===
 

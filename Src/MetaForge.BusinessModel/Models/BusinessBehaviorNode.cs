@@ -29,6 +29,9 @@ public sealed record BusinessBehaviorNode
 /// </summary>
 public sealed record BusinessParameterNode
 {
+    /// <summary>Unikátní identifikátor parametru (PROP-060).</summary>
+    public string Id { get; init; } = Guid.NewGuid().ToString("N")[..8];
+
     public string Name { get; init; } = string.Empty;
     public string Type { get; init; } = "string";
     public bool IsRequired { get; init; } = true;

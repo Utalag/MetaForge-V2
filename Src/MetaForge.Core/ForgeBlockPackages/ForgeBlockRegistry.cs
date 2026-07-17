@@ -1,4 +1,6 @@
 using System.Collections.Concurrent;
+using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MetaForge.Core.ForgeBlockPackages;
 
@@ -60,6 +62,93 @@ public sealed class ForgeBlockRegistry
             .SelectMany(p => p.Capabilities)
             .ToList()
             .AsReadOnly();
+    }
+
+    // ========================================================================
+    // PROP-054: Deklarativní DI registrace
+    // ========================================================================
+
+    /// <summary>
+    /// Aplikuje DI registrace ze všech registrovaných ForgeBlocků.
+    /// Čte <see cref="DiRegistrationAttribute"/> atributy reflectionem.
+    /// </summary>
+    public void ApplyToDi(IServiceCollection services)
+    {
+        foreach (var package in _packages.Values)
+        {
+            var type = package.GetType();
+            var attributes = type.GetCustomAttributes<DiRegistrationAttribute>();
+
+            foreach (var attr in attributes)
+            {
+                if (attr.FactoryMethod is not null)
+                {
+                    // Tovární metoda
+                    var factoryMethod = type.GetMethod(attr.FactoryMethod, BindingFlags.Public | BindingFlags.Static);
+                    if (factoryMethod is not null)
+                    {
+                        var factoryDelegate = Delegate.CreateDelegate(
+                            typeof(Func<IServiceProvider, object>), factoryMethod);
+                        RegisterWithLifetime(services, attr.ServiceType, factoryDelegate, attr.Lifetime, attr.ReplaceExisting);
+                    }
+                }
+                else if (attr.ImplementationType is not null)
+                {
+                    RegisterWithLifetime(services, attr.ServiceType, attr.ImplementationType, attr.Lifetime, attr.ReplaceExisting);
+                }
+                else
+                {
+                    RegisterWithLifetime(services, attr.ServiceType, attr.ServiceType, attr.Lifetime, attr.ReplaceExisting);
+                }
+            }
+        }
+    }
+
+    private static void RegisterWithLifetime(
+        IServiceCollection services,
+        Type serviceType,
+        Type implementationType,
+        ServiceLifetime lifetime,
+        bool replaceExisting)
+    {
+        if (replaceExisting)
+        {
+            // Odebrat existující registrace stejného typu
+            var existing = services.Where(s => s.ServiceType == serviceType).ToList();
+            foreach (var descriptor in existing)
+                services.Remove(descriptor);
+        }
+
+        switch (lifetime)
+        {
+            case ServiceLifetime.Singleton:
+                services.AddSingleton(serviceType, implementationType);
+                break;
+            case ServiceLifetime.Scoped:
+                services.AddScoped(serviceType, implementationType);
+                break;
+            case ServiceLifetime.Transient:
+                services.AddTransient(serviceType, implementationType);
+                break;
+        }
+    }
+
+    private static void RegisterWithLifetime(
+        IServiceCollection services,
+        Type serviceType,
+        Delegate factoryDelegate,
+        ServiceLifetime lifetime,
+        bool replaceExisting)
+    {
+        if (replaceExisting)
+        {
+            var existing = services.Where(s => s.ServiceType == serviceType).ToList();
+            foreach (var descriptor in existing)
+                services.Remove(descriptor);
+        }
+
+        var sd = new ServiceDescriptor(serviceType, factoryDelegate, lifetime);
+        services.Add(sd);
     }
 
 }

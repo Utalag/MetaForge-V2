@@ -21,6 +21,7 @@ MetaForge/
 │   ├── MetaForge.Mcp/          # MCP host surface
 │   ├── MetaForge.Generators/   # C#-first codegen
 │   ├── MetaForge.Ai/           # AI integrace (volitelná)
+│   ├── MetaForge.Feedback/     # Authoring Feedback Platform (PROP-061)
 │   └── ForgeBlocks/            # Capability balíky
 │       ├── Math/
 │       ├── String/

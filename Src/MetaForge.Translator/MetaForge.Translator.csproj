@@ -8,5 +8,6 @@
   <ItemGroup>
     <ProjectReference Include="..\MetaForge.Core\MetaForge.Core.csproj" />
     <ProjectReference Include="..\MetaForge.BusinessModel\MetaForge.BusinessModel.csproj" />
+    <ProjectReference Include="..\MetaForge.Feedback\MetaForge.Feedback.csproj" />
   </ItemGroup>
 </Project>

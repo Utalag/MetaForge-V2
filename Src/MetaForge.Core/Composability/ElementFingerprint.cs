@@ -23,16 +23,17 @@ public sealed class ElementFingerprint : IEquatable<ElementFingerprint>
     /// <summary>Version of the pipeline that last processed this element.</summary>
     public int PipelineVersion { get; }
 
+    /// <summary>SHA256 hash of the element's contract (PROP-057). Null = element nemá kontrakt.</summary>
+    public string? ContractHash { get; }
+
     /// <summary>UTC timestamp when this fingerprint was computed.</summary>
     public DateTimeOffset ComputedAt { get; }
 
-    /// <summary>
-    /// Creates a fingerprint with the given hash and pipeline version.
-    /// </summary>
-    public ElementFingerprint(string structuralHash, int pipelineVersion)
+    public ElementFingerprint(string structuralHash, int pipelineVersion, string? contractHash = null)
     {
         StructuralHash = structuralHash ?? throw new ArgumentNullException(nameof(structuralHash));
         PipelineVersion = pipelineVersion;
+        ContractHash = contractHash;
         ComputedAt = DateTimeOffset.UtcNow;
     }
 

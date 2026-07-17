@@ -3,6 +3,7 @@
 > Facade, Projection, Write-back, ITranslationService, DefaultBusinessTranslator
 
 **Aktualizace:** PROP-020 (2026-07-04) — WriteBackService používá SetCoreDetailOp přes PatchEngine, CoreDetail/SyncState v projekcích, překlad celého dokumentu.
+**Aktualizace:** PROP-061 (2026-07-18) — `IRepairSuggestionService` rozhraní pro AI-assisted repair návrhy.
 
 ---
 
@@ -56,7 +57,7 @@ public class BusinessAuthoringHostFacade
 // Nezávislosti: Nezávisí na Generators — překlad je nezávislý na výstupním formátu.
 // Invarianty: Překlad musí být deterministický pro stejný vstup. AI enrichment je volitelný overlay.
 // PROP-020: Rozšířeno na celý dokument (entity→ClassElement). Bere v potaz CoreDetail.
-// Související typy: CatalogManager, TypeModel, WriteBackService, AiTranslationService.
+// Související typy: CatalogManager, TypeModel, WriteBackService, AiTranslationService, IRepairSuggestionService (PROP-061).
 // Testy: Translator.Tests/Translation/DefaultBusinessTranslatorTests.cs.
 
 public class DefaultBusinessTranslator : IBusinessTranslator
@@ -239,3 +240,14 @@ public sealed class LanguageCapabilityProfile
     public static LanguageCapabilityProfile Professional();  // CSharp-Professional: vše kromě unsafe
 }
 ```
+
+### Projections (PROP-056 — ✅ implementováno 2026-07-17)
+
+Nové typy v Src/MetaForge.Translator/Projections/:
+- **DocumentProjection** — unifikace ProjectionView + ExpertProjectionView, con CoreId na vąech typech
+- **ProjectionFilter** — 11+ boolean flagů + AttributeDetailLevel
+- **ProjectionPresets** — Basic / Expert / AiEnrichment
+- **DependencyGraphSection** — PROP-055 synergie
+
+Staré typy (ProjectionView, ExpertProjectionView, ProjectionOptions) zůstávají pro zpětnou kompatibilitu, ale nový kód používá DocumentProjection.
+

@@ -17,6 +17,9 @@ namespace MetaForge.Core.Elements.Members;
 /// </summary>
 public sealed class ConstructorElement : IMemberElement
 {
+    /// <summary>Stable identity for cross-layer traceability (PROP-060).</summary>
+    public Guid Id { get; init; } = Guid.NewGuid();
+
     /// <summary>Constructor name (typically matches the class name).</summary>
     public string Name { get; set; } = string.Empty;
 

@@ -1,4 +1,5 @@
 using MetaForge.Core.Abstractions;
+using MetaForge.Core.Contracts;
 using MetaForge.Core.Elements.Members;
 
 namespace MetaForge.Core.Elements.Types;
@@ -63,6 +64,9 @@ public sealed class ClassElement : RootElement
     /// Např. CustomerId, PersonName — readonly record structy.
     /// </summary>
     public List<StructElement> InlineStrongTypes { get; init; } = new();
+
+    /// <summary>Sémantický kontrakt entity (PROP-057) — volitelný, default null.</summary>
+    public EntityContract? Contract { get; init; }
 
     public override int TotalCoin =>
         Coin + Properties.Sum(p => p.Coin) + Methods.Sum(m => m.TotalCoin)

@@ -7,7 +7,8 @@ public sealed record DiagnosticInfo(
     string Message,
     DiagnosticSeverity Severity = DiagnosticSeverity.Warning,
     string? ElementId = null,
-    string? ElementName = null
+    string? ElementName = null,
+    string? Code = null
 );
 
 public enum DiagnosticSeverity

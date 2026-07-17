@@ -19,7 +19,9 @@ Navazuje na:
 - **PROP-040** (Core Member Consistency — hotovo) — `IMemberElement` interface již existuje
 
 Blokuje:
-- **PROP-057** (ElementContract + VerificationModel) — 🔴 HARD dependency. `ContractScenario.InputsByElementId` vyžaduje stabilní ID pro Property/Method/Parameter.
+- **PROP-055** (ReferenceGraph) — 🔴 HARD. ReferenceGraph používá `Guid Id` a `ElementIdMapping.Resolve()` pro rozlišení referencí.
+- **PROP-056** (Projection Unification) — 🔴 HARD. `DocumentProjection.CoreId` pole jsou populována z `ElementIdMapping`.
+- **PROP-057** (ElementContract + VerificationModel) — 🔴 HARD. `ContractScenario.InputsByElementId` vyžaduje stabilní ID pro Property/Method/Parameter.
 - **PROP-058** (Sandbox Preview Runner) — nepřímo (přes PROP-057)
 
 ---
@@ -86,8 +88,9 @@ var propertyElement = new PropertyElement { Name = attr.Name };  // NEMÁ Id vů
 | 2 | Přidat `string Id { get; init; }` do `BusinessParameterNode` | BusinessModel | Konzistence — všechny BusinessModel typy mají Id |
 | 3 | `DefaultBusinessTranslator`: ukládat `Dictionary<string, Guid>` (BusinessId → CoreId) | Translator | Traceabilita Business → Core |
 | 4 | `DefaultBusinessTranslator`: přiřazovat `IMemberElement.Id` podle `BusinessAttributeNode.Id` / `BusinessBehaviorNode.Id` | Translator | Stabilní mapování |
-| 5 | Exponovat `ElementIdMapping` přes `ProjectionReadService` | Translator | Host surfaces můžou číst mapování |
+| 5 | Exponovat `ElementIdMapping` přes `ProjectionReadService` | Translator | Host surfaces můžou číst mapování, PROP-056 konzumuje |
 | 6 | `BusinessIdAllocator` rozšířit o member-level identitu (volitelné) | BusinessModel | Alternativní alokátor pro lidsky čitelné ID |
+| 7 | **Typový SyncState** — nahradit `enum AttributeSyncState` typovaným record-statem (z PROP-023 #1) | BusinessModel | Kompilátor vynutí pokrytí přechodů, `Conflict` nese kontext |
 
 ### Out of scope
 
@@ -197,6 +200,85 @@ Pro čitelnost a debug se používá prefixová konvence:
 
 > ⚠️ Tato konvence je pro debug/display, NE pro strojové reference. Strojově se používá `Guid Id`.
 
+### 6.6 Typový SyncState — extrakce z PROP-023 #1
+
+Místo plochého `enum AttributeSyncState` použít typovaný record-state. Kompilátor vynutí pokrytí všech přechodů, `Conflict` nese kontext — která strana co změnila.
+
+```csharp
+// Src/MetaForge.BusinessModel/Models/SyncState.cs
+
+/// <summary>
+/// Typovaný stav synchronizace mezi BusinessModel a Core vrstvou.
+/// Nahrazuje enum AttributeSyncState (PROP-020).
+/// Každý přechod je explicitní metoda — kompilátor hlídá exhaustivní pokrytí.
+/// </summary>
+public abstract record SyncState
+{
+    /// <summary>Nový element, ještě nesynchronizovaný.</summary>
+    public sealed record New : SyncState;
+
+    /// <summary>Synchronizováno — BusinessModel a Core jsou ve shodě.</summary>
+    public sealed record Synced(DateTimeOffset SyncedAt, Guid CoreElementId) : SyncState;
+
+    /// <summary>Uživatel upravil BusinessModel — čeká na nový překlad.</summary>
+    public sealed record BusinessEdited(SyncState Previous) : SyncState;
+
+    /// <summary>Core bylo obohaceno (AI enrichment) — čeká na write-back.</summary>
+    public sealed record CoreEdited(SyncState Previous) : SyncState;
+
+    /// <summary>Konflikt — obě strany se změnily nezávisle.</summary>
+    public sealed record Conflict(string Reason, SyncState Business, SyncState Core) : SyncState;
+
+    // === Explicitní přechody ===
+
+    public SyncState OnBusinessEdit() => this switch
+    {
+        Synced s        => new BusinessEdited(s),
+        CoreEdited c    => new Conflict("both edited", new BusinessEdited(c.Previous), c),
+        Conflict        => this,   // další editace během konfliktu — zůstává
+        _               => this,
+    };
+
+    public SyncState OnCoreEdit(Guid newCoreId) => this switch
+    {
+        Synced s        => new CoreEdited(s),
+        BusinessEdited b => new Conflict("both edited", b, new CoreEdited(b.Previous)),
+        Conflict        => this,
+        _               => this,
+    };
+
+    public SyncState OnSyncResolved(Guid coreId) => this switch
+    {
+        BusinessEdited  => new Synced(DateTimeOffset.UtcNow, coreId),
+        CoreEdited      => new Synced(DateTimeOffset.UtcNow, coreId),
+        Conflict        => new Synced(DateTimeOffset.UtcNow, coreId),
+        _               => this,
+    };
+}
+```
+
+Výhody oproti `enum AttributeSyncState`:
+- Kompilátor vynutí pokrytí všech přechodů (exhaustive switch)
+- `Conflict` nese kontext — která strana co změnila, proč
+- `Synced` nese timestamp + `CoreElementId` — okamžitá traceabilita
+- `BusinessAttributeCoreDetail.SyncState` se změní z `AttributeSyncState` na `SyncState` (breaking change, ale PROP-060 už je breaking)
+
+Migrace existujícího `CoreDetail`:
+
+```csharp
+// PŮVODNÍ (PROP-020):
+public sealed record BusinessAttributeCoreDetail
+{
+    public AttributeSyncState SyncState { get; init; }
+}
+
+// NOVÉ:
+public sealed record BusinessAttributeCoreDetail
+{
+    public SyncState SyncState { get; init; } = new SyncState.New();
+}
+```
+
 ---
 
 ## 7. Implementační dopad
@@ -212,8 +294,10 @@ Pro čitelnost a debug se používá prefixová konvence:
 | `Src/MetaForge.Core/Elements/Members/FieldElement.cs` | Implementovat `Id` |
 | `Src/MetaForge.Core/Elements/Members/ConstructorElement.cs` | Implementovat `Id` |
 | `Src/MetaForge.BusinessModel/Models/BusinessBehaviorNode.cs` | Přidat `Id` do `BusinessParameterNode` |
+| `Src/MetaForge.BusinessModel/Models/SyncState.cs` | **Nový** — typovaný record-state (z PROP-023 #1) |
+| `Src/MetaForge.BusinessModel/Models/BusinessAttributeCoreDetail.cs` | `AttributeSyncState` → `SyncState` |
 | `Src/MetaForge.Translator/Translation/ElementIdMapping.cs` | **Nový** — mapování |
-| `Src/MetaForge.Translator/Translation/DefaultBusinessTranslator.cs` | Ukládat mapování + přiřazovat členská ID |
+| `Src/MetaForge.Translator/Translation/DefaultBusinessTranslator.cs` | Ukládat mapování + přiřazovat členská ID + používat `SyncState.OnCoreEdit()` |
 | `Src/MetaForge.Translator/Host/ProjectionReadService.cs` | Exponovat mapping |
 
 ### Testy
@@ -224,6 +308,8 @@ Pro čitelnost a debug se používá prefixová konvence:
 | `IdMapping_ResolveBusinessId_ReturnsCoreId` | Business ID → Core ID |
 | `BusinessParameterNode_HasId` | Parametr má Id |
 | `Translator_PreservesIdMapping` | Po překladu mapování obsahuje všechny elementy |
+| `SyncState_Transitions_AreExhaustive` | Všechny přechody `OnBusinessEdit`/`OnCoreEdit`/`OnSyncResolved` jsou pokryté |
+| `SyncState_Conflict_CarriesContext` | `Conflict` nese `Reason`, obě strany |
 
 ---
 

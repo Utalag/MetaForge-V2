@@ -7,6 +7,7 @@
     <Project Path="Src/MetaForge.Mcp/MetaForge.Mcp.csproj" />
     <Project Path="Src/MetaForge.Translator/MetaForge.Translator.csproj" />
     <Project Path="Src/MetaForge.Cli/MetaForge.Cli.csproj" />
+    <Project Path="Src/MetaForge.Feedback/MetaForge.Feedback.csproj" />
     <Project Path="Src/MetaForge.Generators/MetaForge.Generators.csproj" />
   </Folder>
   <Folder Name="/Src/ForgeBlocks/">
@@ -22,6 +23,7 @@
     <Project Path="Tests/MetaForge.Core.Tests/MetaForge.Core.Tests.csproj" />
     <Project Path="Tests/MetaForge.BusinessModel.Tests/MetaForge.BusinessModel.Tests.csproj" />
     <Project Path="Tests/MetaForge.Translator.Tests/MetaForge.Translator.Tests.csproj" />
+    <Project Path="Tests/MetaForge.Feedback.Tests/MetaForge.Feedback.Tests.csproj" />
     <Project Path="Tests/MetaForge.Generators.Tests/MetaForge.Generators.Tests.csproj" />
   </Folder>
 </Solution>

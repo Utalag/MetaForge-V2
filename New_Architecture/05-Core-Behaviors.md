@@ -7,6 +7,7 @@
 **Aktualizace:** PROP-031 rozšíření (2026-07-08) — 6 nových statement typů: SwitchStatement, ForEachStatement, TryCatchStatement+CatchClause, UsingStatement, UsingDeclarationStatement, LocalFunctionStatement.
 **Aktualizace:** PROP-035 (2026-07-08) — Nové expression typy (LambdaExpression, NewExpression, DefaultExpression, ConversionExpression, AwaitExpression, SwitchExpression, IsPatternExpression, NullCoalescingExpression), NamedArgument v MethodCallExpression, ExpressionKind rozšířen o Await, Switch, IsPattern, NullCoalescing.
 **Aktualizace:** PROP-038 (2026-07-08) — Fluent Builder API, MetadataBag, DiagnosticBag+BuildResult\<T\>, TransformPipeline+AttributeReflectionTransform.
+**Aktualizace:** PROP-061 (2026-07-18) — `DiagnosticInfo.Code` přidán pro paritu s `Diagnostic.Code`. `DiagnosticBag` používán jako ambientní kolektor v generátorech (AsyncLocal).
 **Aktualizace:** PROP-036 (2026-07-08) — Specification Layer: InvariantDefinition, InvariantExpression boolean AST, IInvariantEvaluator, ReflectionBasedInvariantEvaluator, BuiltInInvariants (12 pravidel).
 **Aktualizace:** PROP-039 (2026-07-08) — Composability: ElementMixin (ConflictStrategy), ConventionRegistry (3 konvence), ElementFingerprint (SHA256 dirty-tracking).
 
@@ -403,4 +404,17 @@ public sealed class ElementFingerprint : IEquatable<ElementFingerprint>;
 public static ElementFingerprint Compute(this ClassElement cls, int pipelineVersion);
 public static ElementFingerprint Compute(this MethodElement method, int pipelineVersion);
 ```
+
+
+
+### Contracts (PROP-057 — ✅ 2026-07-17)
+
+7 nových typů v Src/MetaForge.Core/Contracts/:
+- **ContractValue** — abstract record, 9 sealed potomků (String, Int32, Decimal, Boolean, SystemGuid, DateTimeOffsetValue, Null, EnumValue, StrongTypeValue)
+- **ElementContract** — base, ElementId + Invariants + Scenarios + Metadata
+- **EntityContract** — sealed, RelationConstraints
+- **MethodContract** — sealed, OutputExpectation + SideEffects + ScenarioHints
+- **ContractScenario** — InputsByElementId s ContractValue, ScenarioExpectation
+- **ContractInvariant** — odkaz na InvariantDefinition (PROP-036)
+- **ScenarioExpectation** — ShouldSucceed, ExpectedException, ExpectedReturnValue
 

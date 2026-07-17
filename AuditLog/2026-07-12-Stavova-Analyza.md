@@ -1,8 +1,9 @@
-# MetaForge V2 — Stavová analýza k 2026-07-12
+# MetaForge V2 — Stavová analýza k 2026-07-17
 
 > **Účel:** Upřímný přehled toho, co platforma v této fázi umí, co jí chybí a co brání produkčnímu spuštění.
 > **Autor:** GitHub Copilot (DeepSeek V4 Flash)
 > **Kontext:** Kompletní revize kódu, dokumentace, testů a issue trackeru.
+> **Aktualizace:** 2026-07-17 — přidány PROP-054 (DI registrace), PROP-055 (ReferenceGraph), PROP-056 (Projection Unification), PROP-057 (ElementContract), PROP-060 (Element Identity), CI/CD build.
 
 ---
 
@@ -26,7 +27,12 @@
 - **ForgeBlockRegistry** — `IForgeBlockPackage`, `IForgeBlockCapabilityPackage`, discovery metadata
 - **AppRoot → Project → RootElement** hierarchie
 - **IMemberElement** konzistence napříč Property, Method, Event, Operator
-- **~405 unit testů** (Core.Tests) + **48 integračních snapshot testů** (Core.Integration.Tests)
+- **IMemberElement.Id** (Guid) — stabilní identita pro member elementy (PROP-060)
+- **IElementIdResolver** — Core abstrakce pro Business→Core ID mapping, Core nezávisí na Translatoru (PROP-060)
+- **DiRegistrationAttribute** — deklarativní DI registrace pro ForgeBlocky (PROP-054)
+- **ForgeBlockRegistry.ApplyToDi()** — reflection-based DI registrace služeb (PROP-054)
+- **ReferenceGraph** (5 souborů) — ID-based graf závislostí, Kahnův topologický sort + DFS detekce cyklů, `ReferenceKind`, `ReferenceCycle`, `UnresolvedReference`, `GetLayers()` (PROP-055)
+- **~402 unit testů** (Core.Tests) + **52 integračních snapshot testů** (Core.Integration.Tests)
 
 ### ✅ BusinessModel — kompletní
 
@@ -38,6 +44,8 @@
 - **Workflow model** — 6 typů (kroky, přechody, stavy)
 - **CoreDetail**, **SyncState**, **Provenance** systém
 - **BusinessIdAllocator** — generování ID + human-readable slug
+- **BusinessParameterNode.Id** — konzistentní identity napříč všemi BusinessModel typy (PROP-060)
+- **SyncState** record — typovaný state machine místo enum. Exhaustive switch. `Conflict` nese kontext (PROP-060)
 - **Telemetrie** — `ActivitySource` pro tracing
 
 ### ✅ Translator — solidní
@@ -49,7 +57,8 @@
 - **WriteBackService** — enrichment → `SetCoreDetailOp` přes PatchEngine
 - **IAiTranslator** + **OllamaAiTranslator**
 - **IBusinessTranslator.TryEnrichAsync()** — async enrichment v rozhraní (ISS-008)
-- **~36+ unit testů**
+- **ElementIdMapping** — Business→Core traceabilita. `Resolve()` pro PROP-055/056 (PROP-060)
+- **~36 unit testů**
 
 ### ✅ Generators — nejsilnější vrstva
 
@@ -108,27 +117,29 @@
 - **AutoMapper** — capability package (Domain tier, 3 capability) + Scriban šablona `AutoMapperProfile.scriban`
 - **EF Core** — capability package (Infrastructure tier, 5 capability) + Scriban šablony `DbContext.scriban`, `EntityTypeConfig.scriban`
 - **FluentValidation** — capability package (Infrastructure tier, 3 capability) + Scriban šablona `FluentValidator.scriban`
-- **Plugin systém**: `IForgeBlockTemplateProvider` (ISS-011), `IForgeBlockDiProvider` (PROP-054 — plán), `ForgeBlockPackageIntegrator` (PROP-017)
+- **Plugin systém**: `IForgeBlockTemplateProvider` (ISS-011), `DiRegistrationAttribute` + `ForgeBlockRegistry.ApplyToDi()` (PROP-054 — ✅ hotovo), `ForgeBlockPackageIntegrator` (PROP-017)
 
-### ✅ Testy celkem (~500+)
+### ✅ Testy celkem (~600+)
 
 | Projekt | Počet testů | Typ |
 |---------|-------------|-----|
-| MetaForge.Core.Tests | ~405 | Unit + FsCheck + snapshot |
-| MetaForge.Core.Integration.Tests | ~48 | Snapshot-based (7 scénářů) |
-| MetaForge.Generators.Tests | ~105 | Renderer unit + E2E |
-| MetaForge.Translator.Tests | ~36+ | Unit |
-| MetaForge.BusinessModel.Tests | ~30+ | Unit |
-| MetaForge.Ai.Tests | ~10+ | Unit + benchmark |
+| MetaForge.Core.Tests | 402 | Unit + FsCheck + snapshot |
+| MetaForge.Core.Integration.Tests | 52 | Snapshot-based (8+ scénářů) |
+| MetaForge.Generators.Tests | 91 | Renderer unit + E2E |
+| MetaForge.Translator.Tests | 36 | Unit |
+| MetaForge.BusinessModel.Tests | 22 | Unit |
+
+**Celkem: 603/603 testů ✅ — build 0 chyb, 0 warningů**
 
 ### ✅ Dokumentace
 
 - 30 dokumentů v `New_Architecture/` — kompletní architektonická dokumentace
 - 9 referenčních dokumentů v `Docs/Core/` — typový model, podpora, příklady
 - **Support Matrix** (YAML) — 73+ položek, 5 kategorií, 4 contract statusy
-- 35+ PROP plánů (33 hotových, 2 aktivní, 1 zamítnutý)
+- **36 PROPů hotových**, 3 aktivní (PROP-058, PROP-053, PROP-023), 1 zamítnutý
 - `PROPOSALS.md`, `PROPOSALS_NEXT.md`, `Progress.md`, `Memories.md`
-- 13 issue souborů v `Docs/Issues/`
+- AuditLog — 3 soubory (stavová analýza, overkill audit, analýza proti auditům)
+- 309 C# souborů ve `Src/`
 
 ---
 
@@ -157,7 +168,7 @@
 | ✅ B12 | TryEnrichAsync (ISS-008) | Vyřešeno 2026-07-12 | — |
 | ℹ️ B13 | OllamaAiTranslator duplicita (ISS-007) | By design | — |
 | ✅ B14 | CLI scoped services (ISS-009) | Vyřešeno 2026-07-12 | — |
-| B15 | ✅ **Vyřešeno (2026-07-13)** — `.github/workflows/build.yml` vytvořen. Build + testy všech 6 projektů na push/PR. | ❌ Chybí Docker image, NuGet publish | 0 |
+| ✅ B15 | **CI/CD pipeline** — `.github/workflows/build.yml` vytvořen (2026-07-13). Build + testy všech projektů na push/PR. | ✅ Hotovo ❌ Chybí Docker image, NuGet publish | 0 |
 | B16 | **Docker konfigurace chybí** | Není | 1-2 dny |
 
 ### 🟢 DROBNÉ / NÍZKÁ PRIORITA
@@ -172,7 +183,7 @@
 | B22 | Chybí setup/instalační skript | Uživatel musí ručně buildit |
 | B23 | Test coverage nízký pro okrajové případy | Chybí FsCheck testy pro statementy |
 | B24 | CoreValidator TODO | K1, M15, G07 |
-| B25 | **Chybí generování DI registrací** | `Program.cs` je ruční. PROP-054 naplánován. |
+| ✅ B25 | **Chybí generování DI registrací** | Vyřešeno 2026-07-17 — `DiRegistrationAttribute` + `ForgeBlockRegistry.ApplyToDi()` (PROP-054) |
 
 ---
 
@@ -191,7 +202,7 @@ MetaForge je **velmi propracovaný C# framework pro modelování a generování 
 
 - **Není samostatně spustitelný produkt** — Nyní už ANO: CLI umí generovat C# kód a persistovat data.
 - **Není monetizovatelný** — licence ani kredity nejsou implementované (**odloženo** — platforma může běžet bez monetizace).
-- **Není nasaditelný** — chybí Docker, CI/CD (WebApi odloženo).
+- **Není nasaditelný** — chybí Docker (CI/CD je hotový).
 - **Není ready pro reálné uživatele** — chybí end-user dokumentace, UX, instalační skript.
 
 ### Odhad práce k MVP spuštění: **~1–2 týdny**
@@ -199,21 +210,26 @@ MetaForge je **velmi propracovaný C# framework pro modelování a generování 
 | Fáze | Co udělat | Odhad | Stav |
 |------|-----------|-------|------|
 | **0. Blokátory** | Workflow, generate command, persistence | ✅ Hotovo (0) | 2026-07-12 |
-| **1. Productizace** | Docker, CI/CD, end-user README, ukázkové projekty | 3–5 dní | ❌ |
-| **2. ForgeBlock DI** | PROP-054: `IForgeBlockDiProvider`, extension metody | ~2 dny | 📝 Plán |
-| **3. Vylepšení** | Opravit B10 (MapType TODO), B11 (Operator stub), B19 (docs) | 2 dny | ❌ |
-| **4. Monetizace** | `IGenerationCostPolicy` — **odloženo** po ověření trakce | — | ⚪ |
-| **5. WebApi** | `MetaForge.WebApi` — **odloženo**, není potřeba pro MVP | — | ⚪ |
+| **1. Productizace** | Docker, end-user README, ukázkové projekty | 2–4 dny | ⬜ CI/CD ✅, zbytek ❌ |
+| **2. ForgeBlock DI** | PROP-054: `DiRegistrationAttribute`, `ApplyToDi()` | ✅ Hotovo | 2026-07-17 |
+| **3. Reference Graph** | PROP-055: ID-based graf závislostí | ✅ Hotovo | 2026-07-17 |
+| **4. Element Identity** | PROP-060: `IMemberElement.Id`, `SyncState`, `ElementIdMapping` | ✅ Hotovo | 2026-07-17 |
+| **5. Projection Unification** | PROP-056: `DocumentProjection`, `ProjectionFilter`, `DependencyGraphSection` | ✅ Hotovo | 2026-07-17 |
+| **6. ElementContract** | PROP-057: `ContractValue`, `ElementContract`, `EntityContract`, `MethodContract` | ✅ Hotovo | 2026-07-17 |
+| **7. Vylepšení** | Opravit B10 (MapType TODO), B11 (Operator stub), B19 (docs) | 2 dny | ❌ |
+| **8. Monetizace** | `IGenerationCostPolicy` — **odloženo** po ověření trakce | — | ⚪ |
+| **9. WebApi** | `MetaForge.WebApi` — **odloženo**, není potřeba pro MVP | — | ⚪ |
 
 ### Hlavní riziko:
 
-Platforma je **architektonicky vyspělá a produktově dozrávající**. Kritické blokátory (generate command, persistence) jsou vyřešeny — CLI je funkční vývojářský nástroj. Hlavní riziko je **absence CI/CD a Docker** (nelze snadno nasadit/demo) a **chybějící end-user dokumentace**.
+Platforma je **architektonicky vyspělá a produktově dozrávající**. Všechny kritické blokátory jsou vyřešeny. CI/CD pipeline běží (GitHub Actions, build + testy na push/PR). Přibyly nové capability (ReferenceGraph, ElementContract, DI registrace, Element Identity). Hlavní riziko je **absence Docker image** (nelze snadno nasadit/demo) a **chybějící end-user dokumentace**.
 
 ### Doporučení:
 
-1. ✅ **Blokátory vyřešeny** — B1–B3 hotovo. CLI je funkční nástroj s generováním a perzistencí.
-2. **Další krok: Productizace** — Docker, CI/CD, end-user README, PROP-054 (ForgeBlock DI).
-3. **Monetizace a WebApi** — řešit až po ověření trakce a poptávce.
+1. ✅ **Blokátory vyřešeny** — B1–B3, B15 (CI/CD), B25 (DI registrace) hotovo. CLI je funkční nástroj s generováním a perzistencí.
+2. ✅ **ReferenceGraph + ElementContract + Element Identity** — PROP-055/056/057/060 hotovo. Core má nyní ID-based referenční graf, kontraktní model a stabilní identity.
+3. **Další krok: Productizace** — Docker image, end-user README, PROP-058 (Sandbox Preview Runner).
+4. **Monetizace a WebApi** — řešit až po ověření trakce a poptávce.
 
 ---
 

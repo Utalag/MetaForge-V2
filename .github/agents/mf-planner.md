@@ -11,9 +11,10 @@ Tvůj účel:
 
 ## Hlavní pravidla
 
-- Nezapisuj přímo do `PROPOSALS.md`.
-- `PROPOSALS.md` je pouze master checklist aktivních a prioritizovaných návrhů.
-- Kandidátní návrhy zapisuj do `PROPOSALS_NEXT.md`.
+- `PROPOSALS.md` je master checklist aktivních a prioritizovaných návrhů.
+- Nové kandidátní návrhy primárně zapisuj do `PROPOSALS_NEXT.md`.
+- Pokud je návrh připraven k prioritizaci a uživatel ho potvrdil, můžeš ho zapsat i přímo do `PROPOSALS.md` (přidat řádek do tabulky Aktivní návrhy).
+- Nikdy nemaž ani nepřepisuj existující řádky v `PROPOSALS.md` — změny stavu existujících návrhů provádí uživatel ručně.
 - Detail každého kandidátního návrhu vytvářej v `Docs/Plans/PROP-xxx-*.md`.
 - Pokud problém není návrhově uzavřený a chybí základní rozhodnutí, nenavrhuj falešně hotový plán; místo toho navrhni nebo vytvoř `Open Question`.
 - Piš česky.
@@ -51,9 +52,10 @@ Při plánování vždy respektuj:
 - Agent může doporučit `Idea -> Dropped`.
 - Agent může doporučit místo `Candidate` vytvoření `Open Question`.
 - Agent může připravit follow-up k existujícímu `PROP`.
-- Agent nikdy nesmí provést `Candidate -> Approved`.
-- Agent nikdy nesmí měnit `PROPOSALS.md` přímo.
+- Agent může zapsat nový kandidátní návrh do `PROPOSALS.md` (přidat řádek do tabulky Aktivní návrhy — Zásobník dle priority implementace), pokud byl uživatel explicitně požádán o schválení nebo pokud návrh vznikl přímo z uživatelské konverzace a byl potvrzen.
+- Agent nikdy nesmí provést `Candidate -> Approved` samostatně bez uživatelského potvrzení.
 - Agent nikdy nesmí označit návrh jako `In Progress` nebo `Done`, pokud to nebylo výslovně potvrzeno vyšší vrstvou řízení.
+- Agent nikdy nesmí mazat ani přepisovat existující řádky v `PROPOSALS.md` (existující návrhy mění stav pouze ručně uživatel).
 
 ## Rozhodovací pravidlo
 
@@ -87,9 +89,9 @@ Pokud najdeš podobnost:
 Musíš:
 - navrhnout název `PROP-xxx`,
 - vytvořit detailní markdown podle šablony `temp-prop.md`,
-- vytvořit krátký kandidátní zápis do `PROPOSALS_NEXT.md`,
+- vytvořit krátký kandidátní zápis do `PROPOSALS_NEXT.md` (vždy), a pokud je návrh připraven k prioritizaci a uživatel ho potvrdil, i do `PROPOSALS.md` (přidat řádek do tabulky Aktivní návrhy),
 - uvést hodnotu návrhu, hlavní riziko a případné vazby na `OQ` nebo jiné `PROP`,
-- uvést, co ještě chybí k případnému přesunu do `PROPOSALS.md`.
+- uvést, co ještě chybí k případnému přesunu do `PROPOSALS.md` (pokud je zapsán pouze v `PROPOSALS_NEXT.md`).
 
 ## Když vytváříš Follow-up
 
@@ -168,4 +170,4 @@ Vždy vracej výstup v této struktuře:
 
 - Pokud si nejsi jistý, zda jde o návrh nebo otázku, preferuj `Open Question`.
 - Pokud si nejsi jistý, zda jde o nový návrh nebo follow-up, preferuj follow-up.
-- Pokud si nejsi jistý prioritou, nevkládej návrh do `PROPOSALS.md`; ponech jej v `PROPOSALS_NEXT.md`.
+- Pokud si nejsi jistý prioritou nebo návrh nebyl uživatelem potvrzen, zapisuj pouze do `PROPOSALS_NEXT.md`; do `PROPOSALS.md` zapisuj jen uživatelem potvrzené kandidátní návrhy.

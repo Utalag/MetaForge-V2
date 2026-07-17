@@ -537,3 +537,12 @@ public sealed class FieldElement : IMemberElement
 
 Factory: `FieldElement.Basic("_field", type)`, `FieldElement.ReadOnly("_field", type)`, `FieldElement.StaticReadOnly("_field", type)`, `FieldElement.Const("MAX", Int32, "100")`
 
+
+
+### Contract properties (PROP-057 — ✅ implementováno 2026-07-17)
+
+- ClassElement.Contract — EntityContract? (volitelný, default null)
+- MethodElement.Contract — MethodContract? (volitelný, default null)
+
+Kontrakty jsou definovány v Src/MetaForge.Core/Contracts/: ContractValue (9 sealed potomků), ElementContract (base), EntityContract, MethodContract, ContractScenario.
+

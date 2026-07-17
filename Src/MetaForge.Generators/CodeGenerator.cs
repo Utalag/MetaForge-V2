@@ -19,6 +19,23 @@ public sealed class CodeGenerator : BaseCodeGenerator
     /// <summary>Renderer pro Expression a Statement AST.</summary>
     private readonly ExpressionRenderer _renderer = new();
 
+    // Ambientní diagnostický kolektor pro MapType — aktivní pouze během Generate()
+    private static readonly AsyncLocal<List<DiagnosticInfo>?> _typeDiags = new();
+
+    private static List<DiagnosticInfo> BeginTypeDiagnostics()
+    {
+        var list = new List<DiagnosticInfo>();
+        _typeDiags.Value = list;
+        return list;
+    }
+
+    private static List<DiagnosticInfo>? EndTypeDiagnostics()
+    {
+        var list = _typeDiags.Value;
+        _typeDiags.Value = null;
+        return list;
+    }
+
     public override GeneratedCodeArtifact Generate(RootElement element)
     {
         if (string.IsNullOrWhiteSpace(element.Name))
@@ -29,6 +46,8 @@ public sealed class CodeGenerator : BaseCodeGenerator
                 Diagnostics: new[] { new DiagnosticInfo("Element nemá nastavený název.", DiagnosticSeverity.Error, element.Id.ToString()) }
             );
         }
+
+        BeginTypeDiagnostics();                         // ← NOVÉ: aktivuje ambientní kolektor
 
         var code = element switch
         {
@@ -44,6 +63,11 @@ public sealed class CodeGenerator : BaseCodeGenerator
         };
 
         var diagnostics = new List<DiagnosticInfo>();
+
+        var typeDiags = EndTypeDiagnostics();            // ← NOVÉ: vyzvedne varování z MapType
+        if (typeDiags is { Count: > 0 })
+            diagnostics.AddRange(typeDiags);
+
         if (string.IsNullOrWhiteSpace(code) || code.StartsWith("// Nepodporovaný"))
         {
             diagnostics.Add(new DiagnosticInfo(
@@ -496,6 +520,24 @@ public sealed class CodeGenerator : BaseCodeGenerator
             return $"{typeName}{nullable}";
         }
 
+        // Array — T[] syntax (před IsCollection, které vrací List<T>)
+        if (type.BaseType == DataType.Array)
+        {
+            var elementType = type.GenericArguments.Count > 0
+                ? MapType(type.GenericArguments[0])
+                : "object";
+            return $"{elementType}[]";
+        }
+
+        // Nullable jako BaseType — T? syntax
+        if (type.BaseType == DataType.Nullable)
+        {
+            var innerType = type.GenericArguments.Count > 0
+                ? MapType(type.GenericArguments[0])
+                : "object";
+            return $"{innerType}?";
+        }
+
         // Kolekce
         if (type.IsCollection)
         {
@@ -503,6 +545,17 @@ public sealed class CodeGenerator : BaseCodeGenerator
                 ? MapType(type.GenericArguments[0])
                 : "object";
             return $"List<{innerType}>";
+        }
+
+        // Diagnostika: nerozpoznaný typ → varování (jen pokud běží ambientní kolektor)
+        if (baseType == "object" && !IsKnownPrimitive(type.BaseType))
+        {
+            _typeDiags.Value?.Add(new DiagnosticInfo(
+                $"Nelze namapovat typ '{type.BaseType}' na C# typ. Používám 'object'.",
+                DiagnosticSeverity.Warning,
+                ElementName: type.CustomTypeName ?? type.BaseType.ToString(),
+                Code: "GEN-001"
+            ));
         }
 
         return $"{baseType}{nullable}";
@@ -540,12 +593,27 @@ public sealed class CodeGenerator : BaseCodeGenerator
         DataType.Object => "object",
         DataType.Void => "void",
         DataType.Dynamic => "dynamic",
-        DataType.Entity => "object /* TODO: Replace with actual entity type */",
+        DataType.Entity => "object",
         DataType.EnumValue => "int",
-        DataType.Array => "object[]/* TODO: Replace with actual array type */",
-        DataType.Nullable => "object /* TODO: Replace with actual nullable type */",
-        DataType.Struct => "object /* Resolved via CustomTypeName in MapType */",
-        DataType.Record => "object /* Resolved via CustomTypeName in MapType */",
+        DataType.Array => "object",
+        DataType.Nullable => "object",
+        DataType.Struct => "object",
+        DataType.Record => "object",
         _ => "object"
+    };
+
+    /// <summary>Vrátí true pro primitivní typy, které MapType umí přeložit bez CustomTypeName.</summary>
+    private static bool IsKnownPrimitive(DataType dt) => dt switch
+    {
+        DataType.Bool or DataType.Byte or DataType.SByte or DataType.Int16
+            or DataType.UInt16 or DataType.Int32 or DataType.UInt32 or DataType.Int64
+            or DataType.UInt64 or DataType.Int128 or DataType.Half or DataType.Single
+            or DataType.Double or DataType.Decimal or DataType.NInt or DataType.NUInt
+            or DataType.Char or DataType.String or DataType.Binary or DataType.DateOnly
+            or DataType.TimeOnly or DataType.DateTime or DataType.DateTimeOffset
+            or DataType.TimeSpan or DataType.Guid or DataType.Uri or DataType.Version
+            or DataType.Object or DataType.Void or DataType.Dynamic
+            or DataType.EnumValue => true,
+        _ => false
     };
 }

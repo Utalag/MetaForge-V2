@@ -3,6 +3,7 @@
 > CLI, MCP — tenké vrstvy bez business logiky
 
 **Aktualizace:** PROP-026 (2026-07-04) — CLI migrováno na System.CommandLine + Spectre.Console, MCP s dynamickým tool discovery, WebApi zatím neimplementováno.
+**Aktualizace:** PROP-061 (2026-07-18) — CLI `list-feedback`, `dismiss-feedback` commandy (Commands/FeedbackCommands.cs). MCP `get_feedback`, `dismiss_feedback` tooly (Tools/FeedbackTools.cs).
 
 ---
 
@@ -23,7 +24,9 @@ Src/MetaForge.Cli/
 ├── Program.cs                    ← kompletní DI setup + command definitions
 ├── appsettings.json
 └── Formatting/
-    └── CliOutputFormatter.cs     ← Spectre.Console tabulky, panely, markdown
+│   └── CliOutputFormatter.cs     ← Spectre.Console tabulky, panely, markdown
+└── Commands/
+    └── FeedbackCommands.cs      ← PROP-061: list-feedback, dismiss-feedback
 ```
 
 ### Program.cs — System.CommandLine

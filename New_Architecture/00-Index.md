@@ -2,7 +2,7 @@
 
 > Kompletní architektonická dokumentace MetaForge pro C#-first implementaci.
 > Dokumenty jsou řazeny do tematických celků a vzájemně na sebe navazují.
-> Poslední aktualizace: 2026-07-13
+> Poslední aktualizace: 2026-07-18 (PROP-061 — Authoring Feedback Platform)
 
 ---
 
@@ -28,14 +28,15 @@
 |---|--------|-------|------|
 | 07 | `07-BusinessModel.md` | BusinessAuthoringDocument, CommandLog, PatchEngine, ReplayEngine, Workflow, Validace, BusinessDocumentDiffer (vč. Modify detekce ISS-013) | ✅ |
 | 08 | `08-Translator.md` | Facade, Projection + ExpertProjection (PROP-018), WriteBack, IBusinessTranslator (vč. TryEnrichAsync ISS-008), DefaultBusinessTranslator, LanguageCapabilityProfile | ✅ |
-| 09 | `09-AI-Layer.md` | IAiBackendAdapter, OllamaAdapter, PromptRegistry, PromptEvaluator, AiTranslationService, AiServiceRegistration | ✅ |
+| 09 | `09-AI-Layer.md` | IAiBackendAdapter, OllamaAdapter, PromptRegistry, PromptEvaluator, AiTranslationService, AiRepairSuggestionService (PROP-061), AiServiceRegistration | ✅ |
 
-### Generátory, Infrastructure a Monetizace
+### Generátory, Feedback, Infrastructure a Monetizace
 | # | Soubor | Obsah | Stav |
 |---|--------|-------|------|
-| 10 | `10-Generators.md` | CodeGenerator (sealed), Scriban šablony, ExpressionRenderer (58 unit testů), StatementRenderer (13 unit testů), TemplateManager (vč. RegisterInlineTemplate), 13 E2E scénářů (async/await, foreach, try-catch, lambda, switch, while, local function), ForgeBlock Packaging — BlueprintBuilder + PackageIntegrator (PROP-017), ForgeBlock plugin šablony — IForgeBlockTemplateProvider (ISS-011), TieredCodeGenerator/IncrementalCodeGenerator — wrapper pattern (ISS-006) | ✅ |
-| 11 | `11-Infrastructure.md` | Persistence: JsonCommandLogRepository (true async I/O ISS-002), JsonDocumentRepository, InMemoryCommandLogRepository, IOptions konfigurace, CheckpointProjectionCache, FileSystemProvider, InfrastructureServiceRegistration | ✅ |
-| 12 | `12-Host-Surfaces.md` | CLI: 8 commandů (add-entity, list-entities, projection, add-attribute, delete-entity, info, generate, save), per-command IServiceScope (ISS-009), persistence v DI (CODE-002), generate pipeline (CODE-001). MCP: JSON-RPC + discovery. WebApi: odloženo. | ✅ |
+| 10 | `10-Generators.md` | CodeGenerator (sealed), Scriban šablony, ExpressionRenderer (58 unit testů), StatementRenderer (13 unit testů), TemplateManager (vč. RegisterInlineTemplate), 13 E2E scénářů, ForgeBlock Packaging, TieredCodeGenerator. **PROP-061:** MapType Array/Nullable, IsKnownPrimitive, AsyncLocal diagnostika, DiagnosticInfo.Code | ✅ |
+| **—** | **PROP-061 — Authoring Feedback Platform** | `MetaForge.Feedback` projekt: `IAuthoringFeedbackService`, `AuthoringFeedbackRecord` (wrapper nad `Diagnostic` Core), `RepairRecommendation`, `ActiveFeedbackCache`, `FeedbackLearningArchive`, `FeedbackLearningExporter`, `IFeedbackCacheRepository`, `IFeedbackLearningRepository`, `IRepairSuggestionService` (Translator), `AiRepairSuggestionService` (AI), CLI `list-feedback`, MCP `get_feedback`/`dismiss_feedback`. `StorageOptions` rozšířen. `DiagnosticInfo.Code` přidán. | ✅ |
+| 11 | `11-Infrastructure.md` | Persistence: JsonCommandLogRepository (true async I/O ISS-002), JsonDocumentRepository, InMemoryCommandLogRepository, IOptions konfigurace, CheckpointProjectionCache, FileSystemProvider, InfrastructureServiceRegistration. **PROP-061:** JsonFeedbackCacheRepository, JsonFeedbackLearningRepository, StorageOptions.FeedbackCachePath/LearningArchivePath | ✅ |
+| 12 | `12-Host-Surfaces.md` | CLI: 9 commandů (add-entity, list-entities, projection, add-attribute, delete-entity, info, generate, save, list-feedback), per-command IServiceScope (ISS-009), persistence v DI (CODE-002), generate pipeline (CODE-001). MCP: JSON-RPC + discovery + feedback tools. WebApi: odloženo. | ✅ |
 | 29 | `29-Monetization.md` | Kreditový systém, tier licence, MCP-ready billing gate. Implementace odložena (CODE-003). | ⏳ Odloženo |
 
 ### Plánování a proces
@@ -147,3 +148,21 @@
 2. **AppRoot → Project → RootElement**: AppRoot je vstupní bod, obsahuje projekty, projekt obsahuje RootElement.
 3. **Žádná business logika v host vrstvě**: CLI, MCP, WebApi volají pouze `BusinessAuthoringHostFacade`.
 4. **Kontrakty v Core/Translator, implementace v Infrastructure/Ai**: Core definuje rozhraní, implementace jsou oddělené.
+
+
+### PROP-057 (✅ implementováno 2026-07-17)
+- 7 Core typů: ContractValue (9 sealed potomků), ElementContract, EntityContract, MethodContract, ContractScenario, ContractInvariant, ScenarioExpectation
+- 2 Infrastructure typy: VerificationState, IVerificationStateStore
+- ClassElement.Contract (EntityContract?), MethodElement.Contract (MethodContract?)
+- ElementFingerprint.ContractHash
+
+### PROP-056 (✅ implementováno 2026-07-17)
+- DocumentProjection (unifikace ProjectionView + ExpertProjectionView)
+- ProjectionFilter + ProjectionPresets (Basic/Expert/AiEnrichment)
+- DependencyGraphSection (PROP-055 synergie)
+- CoreId na EntityProjection, AttributeProjection, BehaviorProjection, RelationProjection
+
+### PROP-058 (✅ kontrakty hotovy 2026-07-17)
+- ISandboxExecutionService, SandboxExecutionRequest/Result
+- SandboxMode (Preview/Export)
+- Roslyn kompilace MVP zbývá

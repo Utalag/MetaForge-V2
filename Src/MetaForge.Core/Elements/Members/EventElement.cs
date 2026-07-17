@@ -16,6 +16,9 @@ namespace MetaForge.Core.Elements.Members;
 /// </summary>
 public sealed class EventElement : IMemberElement
 {
+    /// <summary>Stable identity for cross-layer traceability (PROP-060).</summary>
+    public Guid Id { get; init; } = Guid.NewGuid();
+
     /// <summary>Event name.</summary>
     public string Name { get; set; } = string.Empty;
 

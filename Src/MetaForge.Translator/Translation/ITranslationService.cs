@@ -1,5 +1,5 @@
 using MetaForge.BusinessModel.Models;
-using MetaForge.Translator.Host;
+using MetaForge.Translator.Projections;
 
 namespace MetaForge.Translator.Translation;
 
@@ -15,6 +15,6 @@ public interface ITranslationService
     /// </summary>
     Task<EnrichmentResult?> EnrichAsync(
         BusinessAttributeNode attribute,
-        ProjectionView context,
+        DocumentProjection context,
         CancellationToken ct = default);
 }

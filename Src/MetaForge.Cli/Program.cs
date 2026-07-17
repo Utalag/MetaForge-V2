@@ -6,6 +6,7 @@ using MetaForge.Core.Catalog;
 using MetaForge.Core.ForgeBlockPackages;
 using MetaForge.Core.Inference;
 using MetaForge.Cli.Formatting;
+using MetaForge.Feedback;
 using MetaForge.Generators;
 using MetaForge.Infrastructure;
 using MetaForge.Infrastructure.Persistence;
@@ -19,11 +20,22 @@ var builder = Host.CreateApplicationBuilder(args);
 // === Infrastructure: Persistence (CODE-002) ===
 builder.Services.AddMetaForgeInfrastructure(useJsonPersistence: true);
 
+// === Feedback (PROP-061) ===
+builder.Services.AddMetaForgeFeedback();
+
 // === Core services ===
 builder.Services.AddSingleton<CatalogManager>();
-builder.Services.AddSingleton<ForgeBlockRegistry>();
+var registry = new ForgeBlockRegistry();
+// TODO: Register ForgeBlock packages here before ApplyToDi
+// registry.Register(new EfCoreForgeBlock());
+// registry.Register(new AutoMapperForgeBlock());
+// registry.Register(new FluentValidationForgeBlock());
+builder.Services.AddSingleton<ForgeBlockRegistry>(registry);
 builder.Services.AddSingleton<ICatalogProvider, BuiltInCatalogProvider>();
 builder.Services.AddSingleton<IConstraintInferencer, RuleBasedConstraintInferencer>();
+
+// === PROP-054: Apply deklarativní DI registrace z DiRegistrationAttribute ===
+registry.ApplyToDi(builder.Services);
 
 // === BusinessModel + Translator (scoped = per-command isolation) ===
 builder.Services.AddScoped<BusinessAuthoringDocument>(sp =>

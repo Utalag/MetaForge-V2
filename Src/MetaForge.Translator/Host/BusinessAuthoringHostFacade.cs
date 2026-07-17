@@ -2,6 +2,7 @@ using MetaForge.BusinessModel.CommandLog;
 using MetaForge.BusinessModel.Models;
 using MetaForge.BusinessModel.Patches;
 using MetaForge.BusinessModel.Patches.Operations;
+using MetaForge.Translator.Projections;
 using MetaForge.Translator.Translation;
 
 namespace MetaForge.Translator.Host;
@@ -142,15 +143,21 @@ public sealed class BusinessAuthoringHostFacade
         return op.TransitionId;
     }
 
-    // === READ OPERATIONS ===
+    /// <summary>Vrátí aktuální projekci (PROP-056 — DocumentProjection).</summary>
+    public DocumentProjection GetProjection(ProjectionFilter? filter = null) =>
+        _projectionService.GetProjection(_document, filter);
 
-    /// <summary>Vrátí aktuální projekci.</summary>
-    public ProjectionView GetProjection() =>
-        _projectionService.GetProjection(_document);
+    /// <summary>Vrátí expertní projekci — ekvivalent GetProjection(ProjectionPresets.Expert).</summary>
+    public DocumentProjection GetExpertProjection() =>
+        _projectionService.GetProjection(_document, ProjectionPresets.Expert);
 
-    /// <summary>Vrátí expertní projekci s diagnostikou a relacemi (PROP-018).</summary>
-    public ExpertProjectionView GetExpertProjection(ProjectionOptions? options = null) =>
-        _projectionService.GetExpertProjection(_document, options);
+    /// <summary>Exponuje ElementIdMapping z Translatoru (PROP-060).</summary>
+    public ElementIdMapping? GetElementIdMapping()
+    {
+        if (_translator is DefaultBusinessTranslator dbt)
+            return dbt.LastMapping;
+        return null;
+    }
 
     /// <summary>Vrátí samotný dokument (pro debugging).</summary>
     public BusinessAuthoringDocument GetDocument() { lock (_documentLock) { return _document; } }

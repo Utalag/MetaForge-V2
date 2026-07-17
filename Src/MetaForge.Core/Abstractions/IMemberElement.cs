@@ -15,6 +15,9 @@ namespace MetaForge.Core.Abstractions;
 /// </summary>
 public interface IMemberElement
 {
+    /// <summary>Stable identity for this member element. Used for cross-layer traceability (PROP-060).</summary>
+    Guid Id { get; init; }
+
     /// <summary>Member name.</summary>
     string Name { get; }
 

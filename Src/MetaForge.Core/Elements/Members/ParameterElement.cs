@@ -7,6 +7,9 @@ namespace MetaForge.Core.Elements.Members;
 /// </summary>
 public sealed class ParameterElement
 {
+    /// <summary>Stable identity for cross-layer traceability (PROP-060).</summary>
+    public Guid Id { get; init; } = Guid.NewGuid();
+
     /// <summary>Název parametru.</summary>
     public string Name { get; set; } = string.Empty;
 

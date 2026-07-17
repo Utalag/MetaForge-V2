@@ -19,4 +19,10 @@ public sealed class StorageOptions
 
     /// <summary>Interval auto-save v milisekundách (0 = po každém commandu).</summary>
     public int AutoSaveIntervalMs { get; init; } = 5000;
+
+    /// <summary>Cesta k adresáři s feedback cache.</summary>
+    public string FeedbackCachePath { get; init; } = "data/feedback/";
+
+    /// <summary>Cesta k learning archive JSONL souboru.</summary>
+    public string LearningArchivePath { get; init; } = "data/learning/archive.jsonl";
 }

@@ -1,6 +1,6 @@
 using MetaForge.Ai.Abstractions;
 using MetaForge.BusinessModel.Models;
-using MetaForge.Translator.Host;
+using MetaForge.Translator.Projections;
 using MetaForge.Translator.Translation;
 
 namespace MetaForge.Ai.Translation;
@@ -24,7 +24,7 @@ public sealed class AiTranslationService : ITranslationService
     /// </summary>
     public async Task<EnrichmentResult?> EnrichAsync(
         BusinessAttributeNode attribute,
-        ProjectionView context,
+        DocumentProjection context,
         CancellationToken ct = default)
     {
         try

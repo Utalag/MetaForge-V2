@@ -7,6 +7,8 @@
 
 | Datum | Epic/Slice | Popis | Autor |
 |-------|-----------|-------|-------|
+| 2026-07-18 | PROP-061 Fáze 0 — Generator diagnostics (CODE-004) | `CodeGenerator.cs`: AsyncLocal kolektor pro MapType diagnostiku, Array (`T[]`) + Nullable (`T?`) mapování, `IsKnownPrimitive()`. `MapDataType()` — 5 TODO/komentářů odstraněno. 13 nových unit testů (`MapTypeDiagnosticsTests`). Build: 0 chyb, 616/616 testů (0 regresí). CODE-004 rozpuštěn do PROP-061, přesunut do `Implemented/`. | Copilot |
+| 2026-07-18 | PROP-061 Fáze 1–5 — Authoring Feedback Platform | Nový projekt `MetaForge.Feedback` (18 souborů): modely (`AuthoringFeedbackRecord`, `RepairRecommendation`, `FeedbackLearningRecord`), `IAuthoringFeedbackService`, `IFeedbackCacheRepository`, `IFeedbackLearningRepository`, JSON cache/learning repozitory, `FeedbackLearningExporter`, `FeedbackOptions`. `IRepairSuggestionService` v Translatoru, `AiRepairSuggestionService` v AI. CLI `FeedbackCommands` + MCP `FeedbackTools`. `DiagnosticInfo` rozšířen o `Code`. `StorageOptions` rozšířen o `FeedbackCachePath`/`LearningArchivePath`. `MetaForge.slnx` + 3 `.csproj` aktualizace. Build: 0 chyb, 616/616 testů (0 regresí). | Copilot |
 | 2026-07-11 | PROP-045 — Generator E2E Completeness | Dokončeno: Scénáře 9-13 (ErrorHandling, Conditional, Lambda+NullCoalescing, Switch, While). 13/13 scénářů pokrývá všechny renderery. | Copilot |
 | 2026-07-11 | PROP-046 — AI Model Benchmarking | CoreElementComparer s Diff, 4 benchmark testy, 4 adapter testy. OllamaAdapter testy opraveny na string-based konstruktor. | Copilot |
 | 2026-07-12 | ISS-002 — AppendAsync sync → true async I/O | `JsonCommandLogRepository.AppendAsync` převeden na `SemaphoreSlim` + `File.AppendAllTextAsync`. | Copilot |
@@ -15,7 +17,12 @@
 | 2026-07-12 | ISS-013 — Diff Modify detekce | `BusinessDocumentDiffer.Diff()` nyní detekuje změny názvu entity a vlastností atributů (Name, Type, IsRequired, MaxLength, DefaultValue). | Copilot |
 | 2026-07-12 | ISS-016 — Async E2E test | Scénář 7 rozšířen o `AssertGeneratedCodeMatches` pro async metodu s await. | Copilot |
 | 2026-07-13 | PROP-054 — Plan: ForgeBlock DI Extension Methods | Plán pro `IForgeBlockDiProvider`: ForgeBlocky poskytují vlastní `Add{BlockName}()` extension metody pro DI. ~2 dny. Prop-054 navazuje na ISS-011 (plugin šablony). | Copilot |
-| 2026-07-13 | AuditLog 2026-07-12 — Revize | Analýza aktualizována: 12/16 blokátorů vyřešeno, ISS appendix zjednodušen, monetizace odložena, fáze 0 dokončena. | Copilot |
+| 2026-07-17 | PROP-057 — ElementContract + VerificationModel | 5 Core typů (ContractValue + 9 potomků, ElementContract, EntityContract, MethodContract, ContractScenario), 2 Infrastructure typy (VerificationState + IVerificationStateStore + InMemory impl), ClassElement.Contract, MethodElement.Contract, ElementFingerprint.ContractHash. | Copilot |
+| 2026-07-17 | PROP-056 — Projection Unification | DocumentProjection (unifikace ProjectionView + ExpertProjectionView), ProjectionFilter + ProjectionPresets, DependencyGraphSection, CoreId na všech projekčních typech. | Copilot |
+| 2026-07-17 | PROP-058 — Sandbox kontrakty | ISandboxExecutionService, SandboxExecutionRequest/Result, SandboxMode. Roslyn kompilace TODO. | Copilot |
+| 2026-07-17 | PROP-055 — ReferenceGraph (ID-based) | 5 souborů v `Src/MetaForge.Core/ReferenceGraph/`: ReferenceGraphNode, ReferenceGraph (Kahnův sort + DFS cykly), ReferenceKind, ReferenceCycle, UnresolvedReference. Guid-based, `IElementIdResolver`. GetLayers(). | Copilot |
+| 2026-07-17 | PROP-054 — ForgeBlock DI registrace | `DiRegistrationAttribute` (deklarativní). `ForgeBlockRegistry.ApplyToDi()` — reflection-based DI registrace. Core.csproj přidána reference na DI.Abstractions. | Copilot |
+| 2026-07-17 | AuditLog 2026-07-17 — Plánová Efektivizace | Analýza 8 aktivních PROPů, synergie implementovány: PROP-060→PROP-056 (CoreId), PROP-055→PROP-056 (DependencyGraphSection), PROP-060→PROP-023 (Typový SyncState). Build: 0 chyb, 603/603 testů. | Copilot |
 | 2026-07-13 | PROPOSALS — Refresh | PROP-054 přidán do aktivních. CODE-003 přesunut do Odložených. Duplicitní sekce odstraněny. | Copilot |
 | 2026-07-13 | PROP-055 — Plan: ReferenceGraph | Nový PROP pro typový graf závislostí mezi RootElement. Detekce cyklů, nevyřešených typů, topologické řazení. ReferenceGraph vyčleněn z IDEA-010. SymbolTable + EmitPhase zůstávají v IDEA-010. ~2 dny. | Copilot |
 | 2026-07-13 | IDEA-010 — rozdělení | ReferenceGraph vyčleněn → PROP-055. IDEA-010 nyní obsahuje jen SymbolTable + EmitPhase. | Copilot |

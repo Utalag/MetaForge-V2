@@ -1,4 +1,4 @@
-using MetaForge.Translator.Host;
+using MetaForge.Translator.Projections;
 using Spectre.Console;
 
 namespace MetaForge.Cli.Formatting;
@@ -12,7 +12,7 @@ public static class CliOutputFormatter
     /// <summary>
     /// Vypíše hlavičku s informacemi o projektu.
     /// </summary>
-    public static void RenderHeader(ProjectionView view)
+    public static void RenderHeader(DocumentProjection view)
     {
         var panel = new Panel(new Markup($"""
             [bold]Projekt:[/] [cyan]{view.ProjectName}[/]
@@ -30,7 +30,7 @@ public static class CliOutputFormatter
     /// <summary>
     /// Vypíše entitu jako Spectre.Console tabulku.
     /// </summary>
-    public static void RenderEntityTable(ProjectionView view, string entityName)
+    public static void RenderEntityTable(DocumentProjection view, string entityName)
     {
         var entity = view.Entities.FirstOrDefault(e =>
             e.Name.Equals(entityName, StringComparison.OrdinalIgnoreCase));
@@ -50,7 +50,7 @@ public static class CliOutputFormatter
         foreach (var attr in entity.Attributes)
         {
             var required = attr.IsRequired ? "[green]✓[/]" : "[grey]–[/]";
-            table.AddRow(attr.Name, attr.CoreType.BaseType.ToString(), required);
+            table.AddRow(attr.Name, attr.CoreType ?? attr.BusinessType, required);
         }
 
         AnsiConsole.Write(new Rule($"[bold]📋 Entita: {entity.Name}[/]").RuleStyle("grey"));
@@ -60,7 +60,7 @@ public static class CliOutputFormatter
     /// <summary>
     /// Vypíše seznam všech entit.
     /// </summary>
-    public static void RenderEntityList(ProjectionView view)
+    public static void RenderEntityList(DocumentProjection view)
     {
         if (view.Entities.Count == 0)
         {
