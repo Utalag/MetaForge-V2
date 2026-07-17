@@ -5,13 +5,10 @@
 
 ## Aktivní návrhy — Zásobník dle priority implementace
 
-> Poslední aktualizace: 2026-07-18 (PROP-062, PROP-063, PROP-064 přidány — Workflow → FlowGraphSection)
+> Poslední aktualizace: 2026-07-18 (PROP-062 + PROP-063 dokončeny — Workflow → FlowGraphSection)
 
 | ID | Název | Vrstva | Priorita | Odhad | Závislosti | Odkaz |
 |----|-------|--------|----------|-------|------------|-------|
-| **PROP-061** | Authoring Feedback Service — sjednocená diagnostika (Generator+Translator+Pipeline), ActiveFeedbackCache, AI repair návrhy (max 3, ke schválení), FeedbackLearningArchive, consent-based HTTP export | Průřezové (Feedback, Translator, Core, Generators, AI, Infra, CLI, MCP) | ✅ Dokončeno | 18–23 dní | PROP-056, PROP-060 | ✅ Všechny fáze hotovy (2026-07-18) — [Detail](Docs/Plans/PROP-061-Authoring-Feedback-Service.md) |
-| **PROP-062** | FlowGraphSection — odvozená grafová vizualizace z entit a relací (nody + hrany) nad DocumentProjection, JsonCrack-kompatibilní | Translator (Projections) | 🟡 Vysoká | 1–2 dny | PROP-056 (hotovo) | [Detail](Docs/Plans/PROP-062-FlowGraph-Section.md) |
-| **PROP-063** | Remove Explicit Workflow Modeling — odstranění 6 modelů, 3 patch operací, 3 facade metod, ReplayEngine dispatch (náhrada: FlowGraphSection PROP-062) | BusinessModel, Translator | 🟡 Vysoká | 1–2 dny | **PROP-062** | [Detail](Docs/Plans/PROP-063-Remove-Explicit-Workflow.md) |
 | **PROP-058** | Sandbox Preview Runner — izolované spouštění metod s JSON vstupy, MVP: kontrakty hotovy (ISandboxExecutionService), zbývá Roslyn kompilace | Generators, CLI, Infrastructure | 🟡 Střední | 2–3 dny | **PROP-057** (hotovo) | [Detail](Docs/Plans/PROP-058-Sandbox-Preview-Runner.md) |
 | **PROP-053** | Web Frontend — Blazor Server s MudBlazor | Frontend | ⚪ Na zvážení | ~5 dní | PROP-044, PROP-045 (hotovo) | [Detail](Docs/Plans/PROP-053-Web-Frontend-Blazor.md) |
 | **PROP-023** | DX vylepšení — ~~Typový SyncState~~ (vytěženo do PROP-060), Layer stack, YAML DSL, Undo/redo | Průřezové | ⚪ Na zvážení | 4–8 dní | ∞ | [Detail](Docs/Plans/PROP-023-DX-Architecture-Improvements-Future.md) |
@@ -35,6 +32,8 @@
 
 | ID | Název | Datum dokončení | Odkaz |
 |----|-------|-----------------|-------|
+| **PROP-062** | FlowGraphSection — odvozená grafová vizualizace z entit a relací nad DocumentProjection, FlowGraphBuilder, 8 testů | 2026-07-18 | [Detail](Docs/Plans/PROP-062-FlowGraph-Section.md) |
+| **PROP-063** | Remove Explicit Workflow Modeling — odstraněno 10 souborů (6 modelů, 3 operace, 1 test), 4 modifikace, 0 regresí | 2026-07-18 | [Detail](Docs/Plans/PROP-063-Remove-Explicit-Workflow.md) |
 | **PROP-057** | ElementContract + VerificationModel — 7 typů v Core (ContractValue, ElementContract, EntityContract, MethodContract, ContractScenario), Infrastructure (VerificationStateStore) | 2026-07-17 | [Detail](Docs/Plans/PROP-057-ElementContract-VerificationModel.md) |
 | **PROP-056** | Projection Unification + JSON Snapshot — DocumentProjection, ProjectionFilter, DependencyGraphSection, CoreId traceabilita | 2026-07-17 | [Detail](Docs/Plans/PROP-056-Projection-Unification-JsonSnapshot.md) |
 | **PROP-060** | Element Identity Stabilization — přidání `Guid Id` do `IMemberElement`, oprava Business→Core ID mapping, Typový SyncState (z PROP-023), `ElementIdMapping` | 2026-07-17 | [Detail](Docs/Plans/PROP-060-Element-Identity-Stabilization.md) |

@@ -102,7 +102,7 @@ Odstranit explicitní workflow modeling z write modelu platformy. Nahrazeno `Flo
 ### Fáze 0: Commity a značení
 1. ✅ PROP-062 (FlowGraphSection) je implementován a otestován — commitnut
 2. Vytvořit tag `archive/workflow-last` na aktuálním HEAD **před jakýmkoliv mazáním**
-3. Poznamenat commit hash: `[doplnit]`
+3. Poznamenat commit hash: `be1c052`
 
 ### Fáze 1: Odstranění BusinessModel vrstvy
 4. Smazat 6 modelových souborů
@@ -121,7 +121,7 @@ Odstranit explicitní workflow modeling z write modelu platformy. Nahrazeno `Flo
 ### Fáze 4: Commit a záznam
 12. `dotnet build` + `dotnet test` — ověřit
 13. Commit: `PROP-063: Remove explicit workflow modeling (replaced by FlowGraphSection PROP-062)`
-14. Zaznamenat commit hash: `[doplnit]`
+14. Zaznamenat commit hash: `8ecd5c9`
 15. Zaznamenat commit hash do PROP-064
 
 ---
@@ -156,6 +156,6 @@ Odstranit explicitní workflow modeling z write modelu platformy. Nahrazeno `Flo
 
 ## 10. Final Traceability
 
-- **Tag před odstraněním:** `archive/workflow-last` → `[doplnit]`
-- **Commit odstranění:** `[doplnit]` — `PROP-063: Remove explicit workflow modeling (replaced by FlowGraphSection PROP-062)`
+- **Tag před odstraněním:** `archive/workflow-last` → `be1c052`
+- **Commit odstranění:** `8ecd5c9` — `PROP-063: Remove explicit workflow modeling (replaced by FlowGraphSection PROP-062)`
 - **Související:** PROP-062 (FlowGraphSection), PROP-064 (post-removal check)

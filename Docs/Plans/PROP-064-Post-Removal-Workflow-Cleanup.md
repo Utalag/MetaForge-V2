@@ -6,8 +6,8 @@
 **Depends on:** PROP-063 (Remove Explicit Workflow Modeling)
 
 **Kontextové commity:**
-- Před odstraněním: `archive/workflow-last` → `[doplnit]`
-- Odstranění: `[doplnit]` — PROP-063 removal commit
+- Před odstraněním: `archive/workflow-last` → `be1c052`
+- Odstranění: `8ecd5c9` — PROP-063 removal commit
 
 ---
 
