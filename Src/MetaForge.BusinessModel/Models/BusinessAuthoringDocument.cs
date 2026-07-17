@@ -33,9 +33,6 @@ public sealed record BusinessAuthoringDocument
 
     /// <summary>Nezodpovězené otázky.</summary>
     public IReadOnlyList<PendingQuestionNode> PendingQuestions { get; init; } = [];
-
-    /// <summary>Workflow definice.</summary>
-    public IReadOnlyList<BusinessWorkflowNode> Workflows { get; init; } = [];
 }
 
 /// <summary>

@@ -56,13 +56,6 @@ public sealed class BusinessIdAllocator
         return EnsureUnique(baseId, document.Relations.Select(r => r.Id));
     }
 
-    /// <summary>Vytvoří ID workflow v kontextu dokumentu.</summary>
-    public string CreateWorkflowId(string workflowName, BusinessAuthoringDocument document)
-    {
-        var baseId = $"workflow.{Slugify(workflowName)}";
-        return EnsureUnique(baseId, Array.Empty<string>());
-    }
-
     /// <summary>Vytvoří ID otázky v kontextu dokumentu.</summary>
     public string CreateQuestionId(BusinessAuthoringDocument document)
     {

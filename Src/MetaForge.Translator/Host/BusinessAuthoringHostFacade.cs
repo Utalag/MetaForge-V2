@@ -111,38 +111,6 @@ public sealed class BusinessAuthoringHostFacade
         lock (_documentLock) { _document = _patchEngine.Apply(_document, op); }
     }
 
-    // === WORKFLOW OPERATIONS ===
-
-    /// <summary>Přidá nové workflow do dokumentu.</summary>
-    public string AddWorkflow(string name, string? description = null)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Název workflow nesmí být prázdný.", nameof(name));
-
-        var op = new AddWorkflowOp(name, description);
-        lock (_documentLock) { _document = _patchEngine.Apply(_document, op); }
-        return op.WorkflowId;
-    }
-
-    /// <summary>Přidá krok do existujícího workflow.</summary>
-    public string AddWorkflowStep(string workflowId, string stepName, BusinessWorkflowStepKind kind = BusinessWorkflowStepKind.Manual)
-    {
-        if (string.IsNullOrWhiteSpace(stepName))
-            throw new ArgumentException("Název kroku nesmí být prázdný.", nameof(stepName));
-
-        var op = new AddWorkflowStepOp(workflowId, stepName, kind);
-        lock (_documentLock) { _document = _patchEngine.Apply(_document, op); }
-        return op.StepId;
-    }
-
-    /// <summary>Přidá přechod mezi dvěma kroky workflow.</summary>
-    public string AddWorkflowTransition(string workflowId, string fromStepId, string toStepId, string? condition = null, string? label = null)
-    {
-        var op = new AddWorkflowTransitionOp(workflowId, fromStepId, toStepId, condition, label);
-        lock (_documentLock) { _document = _patchEngine.Apply(_document, op); }
-        return op.TransitionId;
-    }
-
     /// <summary>Vrátí aktuální projekci (PROP-056 — DocumentProjection).</summary>
     public DocumentProjection GetProjection(ProjectionFilter? filter = null) =>
         _projectionService.GetProjection(_document, filter);
