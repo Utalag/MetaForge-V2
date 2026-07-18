@@ -1,8 +1,8 @@
 # BusinessModel
 
-> Event Sourcing, CommandLog, Document, Replay, Patches, Workflow, Validace
+> Event Sourcing, CommandLog, Document, Replay, Patches, Validace
 
-**Aktualizace:** PROP-020 (2026-07-04) — immutable record modely, CoreDetail vrstvení, SyncState, CommandLog provenance, Workflow, BusinessIdAllocator, validace.
+**Aktualizace:** PROP-020 (2026-07-04) — immutable record modely, CoreDetail vrstvení, SyncState, CommandLog provenance, BusinessIdAllocator, validace. Workflow odstraněno PROP-063 (2026-07-18), nahrazeno FlowGraphSection (PROP-062).
 
 ---
 
@@ -20,12 +20,6 @@ Src/MetaForge.BusinessModel/
 │   ├── BusinessBehaviorKind.cs      — enum Query|Command|Rule
 │   ├── BusinessRelationNode.cs      — relace mezi entitami
 │   ├── BusinessRelationKind.cs      — enum BelongsTo|HasMany|HasOne|ManyToMany
-│   ├── BusinessWorkflowNode.cs      — workflow se stepy a přechody
-│   ├── BusinessWorkflowStepNode.cs  — krok workflow
-│   ├── BusinessWorkflowTransitionNode.cs — přechod mezi kroky
-│   ├── BusinessWorkflowStepBindingDetail.cs — vazba na entitu/behavior
-│   ├── BusinessWorkflowStepKind.cs  — enum Manual|Automatic|Decision|Wait
-│   ├── WorkflowBindingSyncState.cs  — enum New|Synced|Edited|Conflict
 │   ├── AttributeSyncState.cs        — enum New|Synced|BusinessEdited|CoreEdited|Conflict
 │   ├── CoreInfoSource.cs            — enum Unknown|Manual|Generated|Hybrid
 │   ├── BusinessNoteNode.cs          — poznámka k entitě
@@ -91,7 +85,7 @@ public sealed record BusinessAuthoringDocument
     public IReadOnlyList<BusinessRelationNode> Relations { get; init; } = [];
     public IReadOnlyList<CustomTypeDefinition> CustomTypes { get; init; } = [];
     public IReadOnlyList<PendingQuestionNode> PendingQuestions { get; init; } = [];
-    public IReadOnlyList<BusinessWorkflowNode> Workflows { get; init; } = []; // PROP-020
+    // Workflows removed PROP-063 (2026-07-18) — replaced by FlowGraphSection (PROP-062)
 }
 ```
 
@@ -226,49 +220,12 @@ public sealed record BusinessRelationNode
 public enum BusinessRelationKind { BelongsTo = 0, HasMany = 1, HasOne = 2, ManyToMany = 3 }
 ```
 
-### Workflow modely (PROP-020)
+### Workflow modely — ODSTRANĚNO PROP-063 (2026-07-18)
 
-```csharp
-// PROP-020: Workflow — sekvence kroků s přechody pro modelování procesů
-public sealed record BusinessWorkflowNode
-{
-    public string Id { get; init; } = Guid.NewGuid().ToString("N")[..8];
-    public string Name { get; init; } = string.Empty;
-    public string? Description { get; init; }
-    public IReadOnlyList<BusinessWorkflowStepNode> Steps { get; init; } = [];
-    public IReadOnlyList<BusinessWorkflowTransitionNode> Transitions { get; init; } = [];
-}
-
-public sealed record BusinessWorkflowStepNode
-{
-    public string Id { get; init; } = Guid.NewGuid().ToString("N")[..8];
-    public string Name { get; init; } = string.Empty;
-    public string? Description { get; init; }
-    public BusinessWorkflowStepKind Kind { get; init; } = BusinessWorkflowStepKind.Manual;
-    public int Order { get; init; }
-    public BusinessWorkflowStepBindingDetail? Binding { get; init; }
-}
-
-public sealed record BusinessWorkflowTransitionNode
-{
-    public string Id { get; init; } = Guid.NewGuid().ToString("N")[..8];
-    public string FromStepId { get; init; } = string.Empty;
-    public string ToStepId { get; init; } = string.Empty;
-    public string? Condition { get; init; }
-    public string? Label { get; init; }
-}
-
-public sealed record BusinessWorkflowStepBindingDetail
-{
-    public string? EntityId { get; init; }
-    public string? BehaviorId { get; init; }
-    public string? BindingName { get; init; }
-    public WorkflowBindingSyncState SyncState { get; init; } = WorkflowBindingSyncState.New;
-}
-
-public enum BusinessWorkflowStepKind { Manual = 0, Automatic = 1, Decision = 2, Wait = 3 }
-public enum WorkflowBindingSyncState { New = 0, Synced = 1, Edited = 2, Conflict = 3 }
-```
+> Workflow model (6 typů: BusinessWorkflowNode, BusinessWorkflowStepNode, BusinessWorkflowTransitionNode,
+> BusinessWorkflowStepBindingDetail, BusinessWorkflowStepKind, WorkflowBindingSyncState) byl odstraněn.
+> Náhrada: `FlowGraphSection` v `DocumentProjection` — odvozená grafová vizualizace z entit a relací (PROP-062).
+> Poslední verze s workflow: tag `archive/workflow-last` (`be1c052`).
 
 ### BusinessNoteNode + PendingQuestionNode
 
@@ -510,7 +467,7 @@ public sealed class BusinessIdAllocator
     public string CreateAttributeId(string name, BusinessEntityNode entity);  // → "attr.employee-email"
     public string CreateBehaviorId(string name, BusinessEntityNode entity);   // → "behavior.employee-calc..."
     public string CreateRelationId(string srcId, string kind, string tgtId, BusinessAuthoringDocument doc);
-    public string CreateWorkflowId(string name, BusinessAuthoringDocument doc); // → "workflow.approval"
+    // CreateWorkflowId removed PROP-063 (2026-07-18)
     public string CreateQuestionId(BusinessAuthoringDocument doc); // → "question.3"
     public string CreateNoteId();                                // → "note.1720123456"
 }

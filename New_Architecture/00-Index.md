@@ -2,7 +2,7 @@
 
 > Kompletní architektonická dokumentace MetaForge pro C#-first implementaci.
 > Dokumenty jsou řazeny do tematických celků a vzájemně na sebe navazují.
-> Poslední aktualizace: 2026-07-18 (PROP-061 — Authoring Feedback Platform)
+> Poslední aktualizace: 2026-07-18 (PROP-062/063 — Workflow → FlowGraphSection)
 
 ---
 
@@ -26,7 +26,7 @@
 ### Business a Translator vrstva
 | # | Soubor | Obsah | Stav |
 |---|--------|-------|------|
-| 07 | `07-BusinessModel.md` | BusinessAuthoringDocument, CommandLog, PatchEngine, ReplayEngine, Workflow, Validace, BusinessDocumentDiffer (vč. Modify detekce ISS-013) | ✅ |
+| 07 | `07-BusinessModel.md` | BusinessAuthoringDocument, CommandLog, PatchEngine, ReplayEngine, Validace, BusinessDocumentDiffer. Workflow → FlowGraphSection (PROP-062/063) | ✅ |
 | 08 | `08-Translator.md` | Facade, Projection + ExpertProjection (PROP-018), WriteBack, IBusinessTranslator (vč. TryEnrichAsync ISS-008), DefaultBusinessTranslator, LanguageCapabilityProfile | ✅ |
 | 09 | `09-AI-Layer.md` | IAiBackendAdapter, OllamaAdapter, PromptRegistry, PromptEvaluator, AiTranslationService, AiRepairSuggestionService (PROP-061), AiServiceRegistration | ✅ |
 
@@ -108,7 +108,7 @@
 | Milestone | Stav | Datum |
 |-----------|------|-------|
 | Core vrstva — kompletní (všechny elementy, expressions, statements) | ✅ | 2026-07-08 |
-| BusinessModel — dokument, CommandLog, PatchEngine, ReplayEngine, Workflow | ✅ | 2026-07-04 |
+| BusinessModel — dokument, CommandLog, PatchEngine, ReplayEngine. Workflow → FlowGraphSection (PROP-062/063) | ✅ | 2026-07-18 |
 | Translator — Facade, Projection, WriteBack, ExpertProjection | ✅ | 2026-07-12 |
 | AI Layer — OllamaAdapter, PromptRegistry, graceful fallback | ✅ | 2026-07-04 |
 | Generators — CodeGenerator, ExpressionRenderer, 13 E2E scénářů | ✅ | 2026-07-11 |
@@ -161,6 +161,20 @@
 - ProjectionFilter + ProjectionPresets (Basic/Expert/AiEnrichment)
 - DependencyGraphSection (PROP-055 synergie)
 - CoreId na EntityProjection, AttributeProjection, BehaviorProjection, RelationProjection
+
+### PROP-062 (✅ implementováno 2026-07-18)
+- FlowGraphSection — odvozená grafová vizualizace (nody + hrany) z entit a relací
+- FlowGraphBuilder — staví FlowGraphSection z BusinessAuthoringDocument
+- FlowNode (Entity/Behavior), FlowEdge (Relation/Invokes) s Label a Condition
+- ProjectionPresets.FlowGraph, IncludeFlowGraph flag
+- 8 unit testů
+
+### PROP-063 (✅ implementováno 2026-07-18)
+- Odstraněn explicitní workflow model (10 souborů: 6 modelů, 3 operace, 1 test)
+- Modifikováno: BusinessAuthoringDocument, BusinessIdAllocator, ReplayEngine, Facade
+- Nahrazeno FlowGraphSection (PROP-062)
+- Tag: archive/workflow-last (be1c052)
+- 0 regresí (612/612 testů)
 
 ### PROP-058 (✅ kontrakty hotovy 2026-07-17)
 - ISandboxExecutionService, SandboxExecutionRequest/Result

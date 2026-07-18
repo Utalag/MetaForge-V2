@@ -246,8 +246,9 @@ public sealed class LanguageCapabilityProfile
 Nové typy v Src/MetaForge.Translator/Projections/:
 - **DocumentProjection** — unifikace ProjectionView + ExpertProjectionView, con CoreId na vąech typech
 - **ProjectionFilter** — 11+ boolean flagů + AttributeDetailLevel
-- **ProjectionPresets** — Basic / Expert / AiEnrichment
+- **ProjectionPresets** — Basic / Expert / AiEnrichment / FlowGraph
 - **DependencyGraphSection** — PROP-055 synergie
+- **FlowGraphSection** — PROP-062: odvozená grafová vizualizace (nody + hrany) z entit a relací. Node: FlowNode (Entity, Behavior). Edge: FlowEdge (Relation, Invokes). Builder: FlowGraphBuilder. MVP: Entity nody + Relation hrany. JsonCrack-kompatibilní JSON výstup.
 
 Staré typy (ProjectionView, ExpertProjectionView, ProjectionOptions) zůstávají pro zpětnou kompatibilitu, ale nový kód používá DocumentProjection.
 

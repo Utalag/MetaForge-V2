@@ -407,12 +407,18 @@ generator:
 
 ## 13. State Machines / Workflow
 
+> ⚠️ Explicitní workflow model byl z platformy odstraněn (PROP-063, 2026-07-18).
+> Náhrada: `FlowGraphSection` — odvozená grafová vizualizace z entit a relací (PROP-062).
+> State machine generování (Stateless, WorkflowCore) zůstává jako potenciální ForgeBlock capability,
+> ale jejím vstupem již není `BusinessWorkflowNode` — byl by jím `FlowGraphSection` nebo budoucí
+> query vrstva nad ním.
+
 | Knihovna | ForgeBlock vhodnost | Zdůvodnění |
 |----------|-------------------|------------|
-| **Stateless** | ⭐⭐⭐⭐⭐ | Lehký state machine. ForgeBlock generuje stavy, přechody, trigger handlery z business workflow. |
+| **Stateless** | ⭐⭐⭐⭐⭐ | Lehký state machine. Vstup: FlowGraphSection nebo explicitní model v budoucnu. |
 | **WorkflowCore** | ⭐⭐⭐⭐ | Plnohodnotný workflow engine s podporou kroků, branching, retry. |
 
-### Capability návrh
+### Capability návrh (revidováno PROP-063)
 
 ```yaml
 capability: state-machine
@@ -421,6 +427,7 @@ handles: [stateless, state-machine, fsm, workflow, state, transition, trigger]
 generator:
   csharp: Stateless state machine config
   typescript: XState machine
+note: Vstupem již není BusinessWorkflowNode. FlowGraphSection nebo budoucí explicitní model.
 ```
 
 ---

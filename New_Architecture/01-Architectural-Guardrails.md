@@ -61,7 +61,9 @@ Generators (CSharpGenerator — jediný cílový jazyk)
 
 ---
 
-## Workflow guardraily
+## Vývojové guardraily
+
+> Přejmenováno z "Workflow guardraily" — workflow jako doménový koncept byl odstraněn (PROP-063, 2026-07-18).
 
 | Guardrail | Popis |
 |-----------|-------|
@@ -81,4 +83,5 @@ Generators (CSharpGenerator — jediný cílový jazyk)
 - AI bez fallbacku.
 - Rozsáhlá změna bez rollback plánu.
 - Changelog workflow místo markdown-first governance.
+- Znovuzavedení explicitního workflow modelu bez schváleného PROP (odstraněno PROP-063).
 - Export invalidního modelu jako vykonatelný artefakt.
