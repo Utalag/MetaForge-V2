@@ -1,9 +1,9 @@
-# MetaForge V2 — Stavová analýza k 2026-07-17
+# MetaForge V2 — Stavová analýza k 2026-07-18
 
 > **Účel:** Upřímný přehled toho, co platforma v této fázi umí, co jí chybí a co brání produkčnímu spuštění.
-> **Autor:** GitHub Copilot (DeepSeek V4 Flash)
+> **Autor:** GitHub Copilot (DeepSeek V4 Pro)
 > **Kontext:** Kompletní revize kódu, dokumentace, testů a issue trackeru.
-> **Aktualizace:** 2026-07-17 — přidány PROP-054 (DI registrace), PROP-055 (ReferenceGraph), PROP-056 (Projection Unification), PROP-057 (ElementContract), PROP-060 (Element Identity), CI/CD build.
+> **Aktualizace:** 2026-07-18 — PROP-062 (FlowGraphSection), PROP-063 (odstranění explicitního workflow modelu), PROP-064 (post-removal cleanup). Workflow nahrazen odvozenou grafovou vizualizací z entit a relací.
 
 ---
 
@@ -36,12 +36,12 @@
 
 ### ✅ BusinessModel — kompletní
 
-- **BusinessAuthoringDocument** — entity, atributy, chování, relace, workflow, notes, pending questions, custom types
+- **BusinessAuthoringDocument** — entity, atributy, chování, relace, notes, pending questions, custom types
 - **CommandLog** — append-only, `CommandEnvelope` s `Provenance`, `MutationId`, `SchemaVersion`, `StreamId`
-- **ReplayEngine** — plný i inkrementální replay, `CommandMigrationEngine` pro schema migrace
-- **PatchEngine** — všechny `IPatchOperation` operace (AddEntity, UpdateEntity, DeleteEntity, AddAttribute, SetCoreDetail, UpdateSyncState, AddWorkflow, AddWorkflowStep, AddWorkflowTransition)
+- **ReplayEngine** — plný i inkrementální replay, `CommandMigrationEngine` pro schema migrace, default skip pro neznámé commandy
+- **PatchEngine** — `IPatchOperation` operace (AddEntity, UpdateEntity, DeleteEntity, AddAttribute, SetCoreDetail, UpdateSyncState)
 - **BusinessDocumentValidator** — `BusinessValidationIssue`, validační pipeline
-- **Workflow model** — 6 typů (kroky, přechody, stavy)
+- ~~Workflow model~~ — 6 typů odstraněno PROP-063 (2026-07-18). Náhrada: FlowGraphSection (PROP-062)
 - **CoreDetail**, **SyncState**, **Provenance** systém
 - **BusinessIdAllocator** — generování ID + human-readable slug
 - **BusinessParameterNode.Id** — konzistentní identity napříč všemi BusinessModel typy (PROP-060)
@@ -52,13 +52,14 @@
 
 - **BusinessAuthoringHostFacade** — jediný entry point, thread-safe (lock na `_document`)
 - **ProjectionReadService** + **ProjectionView** + **ExpertProjectionView** (PROP-018)
-- **ProjectionOptions** — Basic/Full s volitelnými sekcemi (Expert, Workflow, AuthoringContext, DiscoveryContext)
+- **ProjectionOptions** — Basic/Full s volitelnými sekcemi (Expert, AuthoringContext, DiscoveryContext)
+- **FlowGraphSection** (PROP-062) — odvozená grafová vizualizace z entit a relací nad DocumentProjection. FlowNode, FlowEdge, FlowGraphBuilder. JsonCrack-kompatibilní.
 - **DefaultBusinessTranslator** — business → TypeModel, `TranslateDocument()` pro celý dokument, StrongType mapping (PROP-047)
 - **WriteBackService** — enrichment → `SetCoreDetailOp` přes PatchEngine
 - **IAiTranslator** + **OllamaAiTranslator**
 - **IBusinessTranslator.TryEnrichAsync()** — async enrichment v rozhraní (ISS-008)
 - **ElementIdMapping** — Business→Core traceabilita. `Resolve()` pro PROP-055/056 (PROP-060)
-- **~36 unit testů**
+- **~32 unit testů** (8 nových FlowGraphSection, 12 workflow testů odstraněno PROP-063)
 
 ### ✅ Generators — nejsilnější vrstva
 
@@ -126,17 +127,17 @@
 | MetaForge.Core.Tests | 402 | Unit + FsCheck + snapshot |
 | MetaForge.Core.Integration.Tests | 52 | Snapshot-based (8+ scénářů) |
 | MetaForge.Generators.Tests | 91 | Renderer unit + E2E |
-| MetaForge.Translator.Tests | 36 | Unit |
+| MetaForge.Translator.Tests | 32 | Unit (8 FlowGraphSection, 12 workflow odstraněno) |
 | MetaForge.BusinessModel.Tests | 22 | Unit |
 
-**Celkem: 603/603 testů ✅ — build 0 chyb, 0 warningů**
+**Celkem: 612/612 testů ✅ — build 0 chyb, 4 warningy (preexistující)**
 
 ### ✅ Dokumentace
 
 - 30 dokumentů v `New_Architecture/` — kompletní architektonická dokumentace
 - 9 referenčních dokumentů v `Docs/Core/` — typový model, podpora, příklady
 - **Support Matrix** (YAML) — 73+ položek, 5 kategorií, 4 contract statusy
-- **36 PROPů hotových**, 3 aktivní (PROP-058, PROP-053, PROP-023), 1 zamítnutý
+- **38 PROPů hotových** (vč. PROP-062/063), 1 aktivní (PROP-058), 2 na zvážení (PROP-053, PROP-023), 1 zamítnutý
 - `PROPOSALS.md`, `PROPOSALS_NEXT.md`, `Progress.md`, `Memories.md`
 - AuditLog — 3 soubory (stavová analýza, overkill audit, analýza proti auditům)
 - 309 C# souborů ve `Src/`
@@ -149,7 +150,7 @@
 
 | ID | Problém | Kde | Dopad |
 |----|---------|-----|-------|
-| ✅ B1 | **Workflow obchází PatchEngine** — Vyřešeno PROP-044 (2026-07-10). | `BusinessAuthoringHostFacade.cs` | ✅ Hotovo |
+| ✅ B1 | **Workflow obchází PatchEngine** — Vyřešeno PROP-044 (2026-07-10). Následně celý workflow model odstraněn PROP-063 (2026-07-18) — nahrazen FlowGraphSection (PROP-062). | — | ✅ Hotovo + odstraněno |
 | ✅ B2 | **CLI chybí `generate`/`export`** — Vyřešeno CODE-001 (2026-07-12). `generate --output` + `save`. | `MetaForge.Cli/Program.cs` | ✅ Hotovo |
 | ✅ B3 | **Chybí perzistence v CLI** — Vyřešeno CODE-002 (2026-07-12). JSONL + JSON, `appsettings.json` konfigurace. | DI registrace | ✅ Hotovo (MCP in-memory) |
 | **B4** | **Monetizace odložena** — `IGenerationCostPolicy` není implementováno. Platforma může běžet bez monetizace. | ⚪ Odloženo | Plánováno po trakci |
@@ -209,7 +210,7 @@ MetaForge je **velmi propracovaný C# framework pro modelování a generování 
 
 | Fáze | Co udělat | Odhad | Stav |
 |------|-----------|-------|------|
-| **0. Blokátory** | Workflow, generate command, persistence | ✅ Hotovo (0) | 2026-07-12 |
+| **0. Blokátory** | Workflow (odstraněno PROP-063), generate command, persistence | ✅ Hotovo (0) | 2026-07-18 |
 | **1. Productizace** | Docker, end-user README, ukázkové projekty | 2–4 dny | ⬜ CI/CD ✅, zbytek ❌ |
 | **2. ForgeBlock DI** | PROP-054: `DiRegistrationAttribute`, `ApplyToDi()` | ✅ Hotovo | 2026-07-17 |
 | **3. Reference Graph** | PROP-055: ID-based graf závislostí | ✅ Hotovo | 2026-07-17 |

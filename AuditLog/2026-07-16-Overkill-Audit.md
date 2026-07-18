@@ -4,6 +4,7 @@
 > Zdroj: Hloubková analýza po Perplexity konverzaci e2801d78
 > Rozsah: 7 kandidátních PROP (022, 036, 037, 039, 041, 046, 051)
 > Metoda: Čtení detailních plánů + verifikace proti kódu v Src/
+> **Aktualizace 2026-07-18:** Přidána sekce 6 — PROP-063 jako pozitivní příklad odstranění overkill infrastruktury.
 
 ---
 
@@ -184,3 +185,22 @@
 3. **ElementContract** (PROP-057) — riziko: stane se další "abstrakcí bez consumera". Mitigace: povinně dodat s min. 1 reálným použitím (např. `EntityContract` pro `Auto` entitu v ProductionHub)
 4. **Sandbox** (PROP-058) — riziko: test harness bez reálného spuštění (jako PROP-046). Mitigace: CLI command `metaforge preview run-method` MUSÍ fungovat end-to-end před uzavřením PROP
 5. **Healing** (PROP-059) — riziko: framework bez consumera (jako PROP-039). Mitigace: odloženo, dokud data neukážou potřebu
+
+---
+
+## 6. Follow-up 2026-07-18: PROP-063 — Pozitivní příklad úklidu
+
+PROP-063 (Remove Explicit Workflow Modeling) validuje hlavní tezi tohoto auditu:
+
+- **Workflow model (6 typů)** byl v platformě od PROP-020 (2026-07-04), ale nikdy neměl:
+  - Authoring use-case (0 CLI/MCP commandů)
+  - Projekci (0 read-path integrace)
+  - Napojení na doménový model
+- Byl to přesně ten pattern: **infrastruktura bez konzumenta**
+- PROP-063 ho kompletně odstranil (10 souborů, 4 modifikace) a nahradil `FlowGraphSection` — odvozenou read-only vizualizací z entit a relací (PROP-062)
+- **612/612 testů, 0 regresí**
+- Tag `archive/workflow-last` (`be1c052`) pro zpětnou dohledatelnost
+
+**Lekce:** Když se najde overkill infrastruktura, je správné ji odstranit — ne "nechat být". Workflow model tu byl 14 dní jako mrtvá váha. Čím dřív se overkill identifikuje a odstraní, tím míň kódu na něm začne záviset.
+
+**Doporučení pro budoucí audity:** Periodicky (každé 2–4 týdny) kontrolovat, zda nepřibyla další "infrastruktura bez konzumenta" — zejména v Core vrstvě, kde je riziko nejvyšší (viz PROP-039).
